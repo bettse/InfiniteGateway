@@ -16,6 +16,15 @@
 		6D3AFB7D1BAB860300FAE962 /* NSData+endian.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6D3AFB791BAB860300FAE962 /* NSData+endian.swift */; settings = {ASSET_TAGS = (); }; };
 		6D3AFB7E1BAB860300FAE962 /* NSData+hex.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6D3AFB7A1BAB860300FAE962 /* NSData+hex.swift */; settings = {ASSET_TAGS = (); }; };
 		6D3AFB7F1BAB860300FAE962 /* UInt8+reverse.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6D3AFB7B1BAB860300FAE962 /* UInt8+reverse.swift */; settings = {ASSET_TAGS = (); }; };
+		6D3AFB8A1BAB86FC00FAE962 /* Command.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6D3AFB811BAB86FC00FAE962 /* Command.swift */; settings = {ASSET_TAGS = (); }; };
+		6D3AFB8B1BAB86FC00FAE962 /* DIMP.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6D3AFB821BAB86FC00FAE962 /* DIMP.swift */; settings = {ASSET_TAGS = (); }; };
+		6D3AFB8C1BAB86FC00FAE962 /* Message.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6D3AFB831BAB86FC00FAE962 /* Message.swift */; settings = {ASSET_TAGS = (); }; };
+		6D3AFB8D1BAB86FC00FAE962 /* Portal.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6D3AFB841BAB86FC00FAE962 /* Portal.swift */; settings = {ASSET_TAGS = (); }; };
+		6D3AFB8E1BAB86FC00FAE962 /* Report.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6D3AFB851BAB86FC00FAE962 /* Report.swift */; settings = {ASSET_TAGS = (); }; };
+		6D3AFB8F1BAB86FC00FAE962 /* Response.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6D3AFB861BAB86FC00FAE962 /* Response.swift */; settings = {ASSET_TAGS = (); }; };
+		6D3AFB901BAB86FC00FAE962 /* ThePoster.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6D3AFB871BAB86FC00FAE962 /* ThePoster.swift */; settings = {ASSET_TAGS = (); }; };
+		6D3AFB911BAB86FC00FAE962 /* Token.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6D3AFB881BAB86FC00FAE962 /* Token.swift */; settings = {ASSET_TAGS = (); }; };
+		6D3AFB921BAB86FC00FAE962 /* Update.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6D3AFB891BAB86FC00FAE962 /* Update.swift */; settings = {ASSET_TAGS = (); }; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -30,6 +39,15 @@
 		6D3AFB791BAB860300FAE962 /* NSData+endian.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "NSData+endian.swift"; sourceTree = "<group>"; };
 		6D3AFB7A1BAB860300FAE962 /* NSData+hex.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "NSData+hex.swift"; sourceTree = "<group>"; };
 		6D3AFB7B1BAB860300FAE962 /* UInt8+reverse.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "UInt8+reverse.swift"; sourceTree = "<group>"; };
+		6D3AFB811BAB86FC00FAE962 /* Command.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Command.swift; sourceTree = "<group>"; };
+		6D3AFB821BAB86FC00FAE962 /* DIMP.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DIMP.swift; sourceTree = "<group>"; };
+		6D3AFB831BAB86FC00FAE962 /* Message.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Message.swift; sourceTree = "<group>"; };
+		6D3AFB841BAB86FC00FAE962 /* Portal.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Portal.swift; sourceTree = "<group>"; };
+		6D3AFB851BAB86FC00FAE962 /* Report.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Report.swift; sourceTree = "<group>"; };
+		6D3AFB861BAB86FC00FAE962 /* Response.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Response.swift; sourceTree = "<group>"; };
+		6D3AFB871BAB86FC00FAE962 /* ThePoster.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ThePoster.swift; sourceTree = "<group>"; };
+		6D3AFB881BAB86FC00FAE962 /* Token.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Token.swift; sourceTree = "<group>"; };
+		6D3AFB891BAB86FC00FAE962 /* Update.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Update.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -62,6 +80,15 @@
 		6D3AFB651BAB848B00FAE962 /* InfiniteGateway */ = {
 			isa = PBXGroup;
 			children = (
+				6D3AFB811BAB86FC00FAE962 /* Command.swift */,
+				6D3AFB821BAB86FC00FAE962 /* DIMP.swift */,
+				6D3AFB831BAB86FC00FAE962 /* Message.swift */,
+				6D3AFB841BAB86FC00FAE962 /* Portal.swift */,
+				6D3AFB851BAB86FC00FAE962 /* Report.swift */,
+				6D3AFB861BAB86FC00FAE962 /* Response.swift */,
+				6D3AFB871BAB86FC00FAE962 /* ThePoster.swift */,
+				6D3AFB881BAB86FC00FAE962 /* Token.swift */,
+				6D3AFB891BAB86FC00FAE962 /* Update.swift */,
 				6D3AFB661BAB848B00FAE962 /* AppDelegate.swift */,
 				6D3AFB681BAB848B00FAE962 /* ViewController.swift */,
 				6D3AFB6D1BAB848B00FAE962 /* Assets.xcassets */,
@@ -159,7 +186,16 @@
 				6D3AFB7E1BAB860300FAE962 /* NSData+hex.swift in Sources */,
 				6D3AFB6C1BAB848B00FAE962 /* InfiniteGateway.xcdatamodeld in Sources */,
 				6D3AFB691BAB848B00FAE962 /* ViewController.swift in Sources */,
+				6D3AFB911BAB86FC00FAE962 /* Token.swift in Sources */,
+				6D3AFB8F1BAB86FC00FAE962 /* Response.swift in Sources */,
 				6D3AFB671BAB848B00FAE962 /* AppDelegate.swift in Sources */,
+				6D3AFB8C1BAB86FC00FAE962 /* Message.swift in Sources */,
+				6D3AFB921BAB86FC00FAE962 /* Update.swift in Sources */,
+				6D3AFB8D1BAB86FC00FAE962 /* Portal.swift in Sources */,
+				6D3AFB901BAB86FC00FAE962 /* ThePoster.swift in Sources */,
+				6D3AFB8B1BAB86FC00FAE962 /* DIMP.swift in Sources */,
+				6D3AFB8A1BAB86FC00FAE962 /* Command.swift in Sources */,
+				6D3AFB8E1BAB86FC00FAE962 /* Report.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -266,6 +302,7 @@
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = org.ericbetts.InfiniteGateway;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_INCLUDE_PATHS = "CommonCRC CommonCrypto";
 			};
 			name = Debug;
 		};
@@ -278,6 +315,7 @@
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = org.ericbetts.InfiniteGateway;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_INCLUDE_PATHS = "CommonCRC CommonCrypto";
 			};
 			name = Release;
 		};
