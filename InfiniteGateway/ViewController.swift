@@ -23,8 +23,10 @@ class ViewController: NSViewController, NSTableViewDataSource, NSTableViewDelega
     
     override func viewDidLoad() {
         super.viewDidLoad()
-
+        
         // Do any additional setup after loading the view.
+        status?.stringValue = "Portal Disconnected"
+        
         NSNotificationCenter.defaultCenter().addObserver(self, selector: "deviceConnected:", name: "deviceConnected", object: nil)
         NSNotificationCenter.defaultCenter().addObserver(self, selector: "incomingMessage:", name: "incomingMessage", object: nil)
         NSNotificationCenter.defaultCenter().addObserver(self, selector: "deviceDisconnected:", name: "deviceDisconnected", object: nil)
@@ -49,15 +51,11 @@ class ViewController: NSViewController, NSTableViewDataSource, NSTableViewDelega
         return nfcMap.count
     }
     
-    func tableView(tableView: NSTableView, objectValueForTableColumn: NSTableColumn?, row: Int) -> AnyObject? {
+    func tableView(tableView: NSTableView, viewForTableColumn: NSTableColumn?, row: Int) -> NSView? {
         if let token = nfcMap[UInt8(row)] {
-            if let result = tableView.makeViewWithIdentifier("MyView", owner: self) as? NSTextField {
-                result.stringValue = token.description
-                return result
-            } else {
-                let result = NSTextField.init(frame: NSMakeRect(0, 0, 250, 250))
-                result.identifier = "MyView"
-                return result
+            if let cell = tableView.makeViewWithIdentifier("tableCell", owner: self) as? NSTableCellView {
+                cell.textField!.stringValue = token.description
+                return cell
             }
         }
         return nil
@@ -86,6 +84,9 @@ class ViewController: NSViewController, NSTableViewDataSource, NSTableViewDelega
                 presence[update.ledPlatform]?.removeAtIndex(pIndex)
             }
             updateColor = NSColor.blackColor()
+            if let table = nfcTable {
+                table.reloadData()
+            }
         }
         
         portal.outputCommand(LightOnCommand(ledPlatform: update.ledPlatform, color: updateColor))
