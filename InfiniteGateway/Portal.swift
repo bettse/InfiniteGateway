@@ -20,7 +20,9 @@ class Portal : NSObject {
     func input(inResult: IOReturn, inSender: UnsafeMutablePointer<Void>, type: IOHIDReportType, reportId: UInt32, report: UnsafeMutablePointer<UInt8>, reportLength: CFIndex) {
         let report = Report(data: NSData(bytes: report, length: reportLength))
         if let msg = report.content {
-            NSNotificationCenter.defaultCenter().postNotificationName("incomingMessage", object: nil, userInfo: ["message": msg])
+            dispatch_async(dispatch_get_main_queue(), {
+                NSNotificationCenter.defaultCenter().postNotificationName("incomingMessage", object: nil, userInfo: ["message": msg])
+            })
         }
     }
     
@@ -55,11 +57,15 @@ class Portal : NSObject {
         IOHIDDeviceRegisterInputReportCallback(device, report, reportSize, 🙊, unsafeBitCast(self, UnsafeMutablePointer<Void>.self));
 
         //Let the world know
-        NSNotificationCenter.defaultCenter().postNotificationName("deviceConnected", object: nil, userInfo: ["class": NSStringFromClass(self.dynamicType)])
+        dispatch_async(dispatch_get_main_queue(), {
+            NSNotificationCenter.defaultCenter().postNotificationName("deviceConnected", object: nil, userInfo: ["class": NSStringFromClass(self.dynamicType)])
+        })
     }
 
     func removed(inResult: IOReturn, inSender: UnsafeMutablePointer<Void>, inIOHIDDeviceRef: IOHIDDevice!) {
-        NSNotificationCenter.defaultCenter().postNotificationName("deviceDisconnected", object: nil, userInfo: ["class": NSStringFromClass(self.dynamicType)])
+        dispatch_async(dispatch_get_main_queue(), {
+            NSNotificationCenter.defaultCenter().postNotificationName("deviceDisconnected", object: nil, userInfo: ["class": NSStringFromClass(self.dynamicType)])
+        })
     }
     
     func initUsb() {
