@@ -121,17 +121,15 @@ class ViewController: NSViewController, NSTableViewDataSource, NSTableViewDelega
     }
     
     func tokenRead(response: ReadResponse) {
-        let blockNumber = response.blockNumber
         if let token = nfcMap[response.nfcIndex] {
             token.load(response.blockNumber, blockData: response.blockData)
-            let nextBlock : UInt8 = blockNumber + 1
-            if (nextBlock < Token.blockCount) {
-                portal.outputCommand(ReadCommand(nfcIndex: response.nfcIndex, block: nextBlock))
-            } else { //Completed token
+            if (token.complete()) {
                 if let table = nfcTable {
                     table.reloadData()
                 }
-                //token.save(false)
+            } else {
+                let nextBlock : UInt8 = token.nextBlock()
+                portal.outputCommand(ReadCommand(nfcIndex: response.nfcIndex, block: nextBlock))
             }
         } //end if token
     }

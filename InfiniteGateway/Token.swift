@@ -134,7 +134,15 @@ class Token : CustomStringConvertible {
     init(tagId: NSData) {
         self.tagId = tagId
     }
- 
+    
+    func nextBlock() -> UInt8 {
+        return UInt8(encryptedData.length / Int(Token.blockSize))
+    }
+    
+    func complete() -> Bool{
+        return (nextBlock() == Token.blockCount)
+    }
+
     func load(blockNumber: UInt8, blockData: NSData, debug: Bool = false) {
         encryptedData.appendData(blockData)        
         let clearData = decrypt(blockNumber, blockData: blockData)
