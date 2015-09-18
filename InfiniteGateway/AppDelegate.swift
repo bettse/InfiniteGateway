@@ -18,9 +18,6 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     var platform : [UInt8:Token] = [:]
     var presence = Dictionary<Message.LedPlatform, Array<UInt8>>()
     
-
-
-
     var portal : Portal {
         get {
             return Portal.singleton
@@ -41,7 +38,6 @@ class AppDelegate: NSObject, NSApplicationDelegate {
             print("Error starting portal thread")
         }
         
-        
     }
 
     func applicationWillTerminate(aNotification: NSNotification) {
@@ -49,6 +45,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     }
     
     // MARK: - Portal interaction methods
+
     
     /* General flow is such:
     Update (new token) -> request TagId
@@ -58,13 +55,15 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     */
     func incomingUpdate(update: Update) {
         var updateColor : NSColor = NSColor()
-        //TODO: Need to figure out how to update presence dictionary wen I get an update
-        print(update, terminator: "\n")
         if (update.direction == Update.Direction.Arriving) {
+            presence[update.ledPlatform]?.append(update.nfcIndex)
             updateColor = NSColor.whiteColor()
             //In order to add tag to platform dictionary, we need its tagid
             portal.outputCommand(TagIdCommand(nfcIndex: update.nfcIndex))
         } else if (update.direction == Update.Direction.Departing) {
+            if let pIndex = presence[update.ledPlatform]?.indexOf(update.nfcIndex) {
+                presence[update.ledPlatform]?.removeAtIndex(pIndex)
+            }
             updateColor = NSColor.blackColor()
             platform[update.nfcIndex] = nil
         }
@@ -78,9 +77,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
             portal.output(report)
         } else if let response = response as? PresenceResponse {
             presence = response.details
-            print(response, terminator: "\n")
         } else if let response = response as? TagIdResponse {
-            print(response, terminator: "\n")
             platform[response.nfcIndex] = Token(tagId: response.tagId)
             let report = Report(cmd: ReadCommand(nfcIndex: response.nfcIndex, block: 0))
             portal.output(report)
