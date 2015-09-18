@@ -77,9 +77,9 @@ class Token : CustomStringConvertible {
             //It is the first 16 bytes of a SHA1 hash of: a hard-coded 16 bytes, 15 bytes of the string "(c) Disney 2013", and the 7 bytes of the tag ID.
             //Each integer, or group of 4 bytes, of the SHA1 hash needs to be reversed because of endianness.
 
-            let prekey = NSMutableData(capacity: DIMP.magic.length + DIMP.secret.length + tagId.length)!
-            prekey.appendData(DIMP.secret)
-            prekey.appendData(DIMP.magic)
+            let prekey = NSMutableData(capacity: AppDelegate.magic.length + AppDelegate.secret.length + tagId.length)!
+            prekey.appendData(AppDelegate.secret)
+            prekey.appendData(AppDelegate.magic)
             prekey.appendData(tagId)
             if (prekey.length != 16 + 15 + 7) {
                 print("Pre-hashed key wasn't of the correct length")
