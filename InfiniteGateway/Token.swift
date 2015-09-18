@@ -214,7 +214,7 @@ class Token : CustomStringConvertible {
         //Choose the next further up skill and it became:
         //01 00 00 10 00 00 00 00 00 00 00 01 
         if (skills > 0) {
-            print("Skills: \(String(skills, radix: BINARY))")
+            //print("Skills: \(String(skills, radix: BINARY))")
         }
 
     }
