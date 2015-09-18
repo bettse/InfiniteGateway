@@ -50,21 +50,17 @@ class ViewController: NSViewController, NSTableViewDataSource, NSTableViewDelega
     }
     
     func tableView(tableView: NSTableView, objectValueForTableColumn: NSTableColumn?, row: Int) -> AnyObject? {
-        let token = nfcMap[UInt8(row)]
-        
-        /*
-        NSTableCellView *result = [tableView makeViewWithIdentifier:tableColumn.identifier owner:self];
-        for (NSView *view in result.subviews) {
-        if ([view.identifier isEqualToString:@"tagName"]) {
-        ((NSTextField *)view).stringValue = tag.name;
-        } else if ([view.identifier isEqualToString:@"tagId"]) {
-        ((NSTextField *)view).stringValue = tag.uid;
+        if let token = nfcMap[UInt8(row)] {
+            if let result = tableView.makeViewWithIdentifier("MyView", owner: self) as? NSTextField {
+                result.stringValue = token.description
+                return result
+            } else {
+                let result = NSTextField.init(frame: NSMakeRect(0, 0, 250, 250))
+                result.identifier = "MyView"
+                return result
+            }
         }
-        }
-        
-        */
-        
-        return token
+        return nil
     }
  
     
@@ -85,7 +81,7 @@ class ViewController: NSViewController, NSTableViewDataSource, NSTableViewDelega
             //In order to add tag to platform dictionary, we need its tagid
             portal.outputCommand(TagIdCommand(nfcIndex: update.nfcIndex))
         } else if (update.direction == Update.Direction.Departing) {
-            nfcMap[update.nfcIndex] = nil
+            nfcMap.removeValueForKey(update.nfcIndex)
             if let pIndex = presence[update.ledPlatform]?.indexOf(update.nfcIndex) {
                 presence[update.ledPlatform]?.removeAtIndex(pIndex)
             }
@@ -131,7 +127,9 @@ class ViewController: NSViewController, NSTableViewDataSource, NSTableViewDelega
             if (nextBlock < Token.blockCount) {
                 portal.outputCommand(ReadCommand(nfcIndex: response.nfcIndex, block: nextBlock))
             } else { //Completed token
-                nfcTable!.reloadData()
+                if let table = nfcTable {
+                    table.reloadData()
+                }
                 //token.save(false)
             }
         } //end if token
