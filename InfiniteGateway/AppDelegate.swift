@@ -18,6 +18,9 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     var platform : [UInt8:Token] = [:]
     var presence = Dictionary<Message.LedPlatform, Array<UInt8>>()
     
+
+
+
     var portal : Portal {
         get {
             return Portal.singleton
