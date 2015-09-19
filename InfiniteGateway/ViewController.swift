@@ -13,7 +13,6 @@ class ViewController: NSViewController, NSTableViewDataSource, NSTableViewDelega
     @IBOutlet weak var status: NSTextField?
     @IBOutlet weak var nfcTable: NSTableView?
     var nfcMap : [UInt8:Token] = [:]
-    var presence = Dictionary<Message.LedPlatform, Array<UInt8>>()
     
     var portal : Portal {
         get {
@@ -28,8 +27,11 @@ class ViewController: NSViewController, NSTableViewDataSource, NSTableViewDelega
         status?.stringValue = "Portal Disconnected"
         
         NSNotificationCenter.defaultCenter().addObserver(self, selector: "deviceConnected:", name: "deviceConnected", object: nil)
-        NSNotificationCenter.defaultCenter().addObserver(self, selector: "incomingMessage:", name: "incomingMessage", object: nil)
         NSNotificationCenter.defaultCenter().addObserver(self, selector: "deviceDisconnected:", name: "deviceDisconnected", object: nil)
+        
+        NSNotificationCenter.defaultCenter().addObserver(self, selector: "tokenLoaded:", name: "tokenLoaded", object: nil)
+        NSNotificationCenter.defaultCenter().addObserver(self, selector: "tokenLeft:", name: "tokenLeft", object: nil)
+        
     }
 
     override var representedObject: AnyObject? {
@@ -38,12 +40,37 @@ class ViewController: NSViewController, NSTableViewDataSource, NSTableViewDelega
         }
     }
 
-    func deviceConnected(notification: NSNotification) {
-        //We set the connected status when we get a response
-        portal.outputCommand(ActivateCommand())
-    }
+
     func deviceDisconnected(notification: NSNotification) {
         status?.stringValue = "Portal Disconnected"
+    }
+    
+    func deviceConnected(notification: NSNotification) {
+        status?.stringValue = "Portal Connected"
+    }
+    
+    func tokenLoaded(notificaiton: NSNotification) {
+        if let userInfo = notificaiton.userInfo {
+            if let token = userInfo["token"] as? Token {
+                if let nfcIndex = userInfo["nfcIndex"] as? Int {
+                    nfcMap[UInt8(nfcIndex)] = token
+                }
+            }
+        }
+        if let table = nfcTable {
+            table.reloadData()
+        }
+    }
+    
+    func tokenLeft(notificaiton: NSNotification) {
+        if let userInfo = notificaiton.userInfo {
+            if let nfcIndex = userInfo["nfcIndex"] as? Int {
+                nfcMap.removeValueForKey(UInt8(nfcIndex))
+            }
+        }
+        if let table = nfcTable {
+            table.reloadData()
+        }
     }
     
     // MARK: - NSTable stuff
@@ -65,85 +92,6 @@ class ViewController: NSViewController, NSTableViewDataSource, NSTableViewDelega
     // MARK: - Portal interaction methods
     
     
-    /* General flow is such:
-    Update (new token) -> request TagId
-    get TagId -> create in memory token and request Block 0
-    get block 0 -> request block n
-    get block n -> request block n+1 if n+1 < Token.tokenSize
-    */
-    func incomingUpdate(update: Update) {
-        var updateColor : NSColor = NSColor()
-        if (update.direction == Update.Direction.Arriving) {
-            presence[update.ledPlatform]?.append(update.nfcIndex)
-            updateColor = NSColor.whiteColor()
-            //In order to add tag to platform dictionary, we need its tagid
-            portal.outputCommand(TagIdCommand(nfcIndex: update.nfcIndex))
-        } else if (update.direction == Update.Direction.Departing) {
-            nfcMap.removeValueForKey(update.nfcIndex)
-            if let pIndex = presence[update.ledPlatform]?.indexOf(update.nfcIndex) {
-                presence[update.ledPlatform]?.removeAtIndex(pIndex)
-            }
-            updateColor = NSColor.blackColor()
-            if let table = nfcTable {
-                table.reloadData()
-            }
-        }
-        
-        portal.outputCommand(LightOnCommand(ledPlatform: update.ledPlatform, color: updateColor))
-    }
-    
-    func incomingResponse(response: Response) {
-        if let _ = response as? ActivateResponse {
-            status?.stringValue = "Portal Connected"
-            let report = Report(cmd: PresenceCommand())
-            portal.output(report)
-        } else if let response = response as? PresenceResponse {
-            presence = response.details
-        } else if let response = response as? TagIdResponse {
-            nfcMap[response.nfcIndex] = Token(tagId: response.tagId)
-            let report = Report(cmd: ReadCommand(nfcIndex: response.nfcIndex, block: 0))
-            portal.output(report)
-        } else if let response = response as? ReadResponse {
-            tokenRead(response)
-        } else if let _ = response as? WriteResponse {
-            //Idea: DIMP (business logic) always writes to protal any new token data, then the
-            //write response is used to kick off a read of that block, which then updates the in
-            //memory token.
-            //Counterpoint: DIMP needs to know what the block data would look like; or Token needs to be
-            //updated first (setSkill(...)) then have a "getChangedBlocks" and have DIMP loop and send them
-        } else if let _ = response as? LightOnResponse {
-        } else if let _ = response as? LightFadeResponse {
-        } else if let _ = response as? LightFlashResponse {
-        } else {
-            print("Received \(response) for command \(response.command)", terminator: "\n")
-        }
-        
-    }
-    
-    func tokenRead(response: ReadResponse) {
-        if let token = nfcMap[response.nfcIndex] {
-            token.load(response.blockNumber, blockData: response.blockData)
-            if (token.complete()) {
-                if let table = nfcTable {
-                    table.reloadData()
-                }
-            } else {
-                let nextBlock : UInt8 = token.nextBlock()
-                portal.outputCommand(ReadCommand(nfcIndex: response.nfcIndex, block: nextBlock))
-            }
-        } //end if token
-    }
-    
-    func incomingMessage(notification: NSNotification) {
-        let userInfo = notification.userInfo
-        if let message = userInfo?["message"] as? Message {
-            if let update = message as? Update {
-                incomingUpdate(update)
-            } else if let response = message as? Response {
-                incomingResponse(response)
-            }
-        }
-    }
 
 
 }

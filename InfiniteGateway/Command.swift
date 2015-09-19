@@ -62,7 +62,7 @@ class ActivateCommand : Command {
     override init() {
         super.init()
         type = commandType.Activate
-        params = AppDelegate.magic
+        params = PortalDriver.magic
     }
 }
 

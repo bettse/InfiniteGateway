@@ -21,7 +21,7 @@ class Portal : NSObject {
         let report = Report(data: NSData(bytes: report, length: reportLength))
         if let msg = report.content {
             dispatch_async(dispatch_get_main_queue(), {
-                NSNotificationCenter.defaultCenter().postNotificationName("incomingMessage", object: nil, userInfo: ["message": msg])
+                NSNotificationCenter.defaultCenter().postNotificationName("incomingMessage", object: self, userInfo: ["message": msg])
             })
         }
     }
@@ -58,13 +58,13 @@ class Portal : NSObject {
 
         //Let the world know
         dispatch_async(dispatch_get_main_queue(), {
-            NSNotificationCenter.defaultCenter().postNotificationName("deviceConnected", object: nil, userInfo: ["class": NSStringFromClass(self.dynamicType)])
+            NSNotificationCenter.defaultCenter().postNotificationName("deviceConnected", object: self, userInfo: ["class": NSStringFromClass(self.dynamicType)])
         })
     }
 
     func removed(inResult: IOReturn, inSender: UnsafeMutablePointer<Void>, inIOHIDDeviceRef: IOHIDDevice!) {
         dispatch_async(dispatch_get_main_queue(), {
-            NSNotificationCenter.defaultCenter().postNotificationName("deviceDisconnected", object: nil, userInfo: ["class": NSStringFromClass(self.dynamicType)])
+            NSNotificationCenter.defaultCenter().postNotificationName("deviceDisconnected", object: self, userInfo: ["class": NSStringFromClass(self.dynamicType)])
         })
     }
     
