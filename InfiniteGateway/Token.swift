@@ -14,6 +14,10 @@ import CommonCRC
 
 //Tokens can be figures, disks (some are stackable), playsets (clear 3d figure with hex base)
 
+struct TokenStruct {
+    
+}
+
 class Token : CustomStringConvertible {
     static let sectorSize : UInt8 = 4 //Blocks
     static let sectorCount : UInt8 = 5
