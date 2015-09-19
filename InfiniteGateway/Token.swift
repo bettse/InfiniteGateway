@@ -74,8 +74,23 @@ class Token : CustomStringConvertible {
         }
     }
     
-    var name : String = "<Unset>"
-    var modelId : UInt32 = 0
+    var name : String {
+        get {
+            return ThePoster.getName(modelId.bigEndian)
+        }
+    }
+    var modelId : UInt32 {
+        get {
+            //TODO: Create a mapping of these characteristics to a property name
+            let blockNumber : UInt8 = 1
+            let blockIndex : UInt8 = 0
+            let offset = Int(blockNumber * Token.blockSize + blockIndex)
+            var value : UInt32 = 0
+            let size = sizeof(value.dynamicType)
+            data.getBytes(&value, range: NSMakeRange(offset, size))
+            return value
+        }
+    }
     var dataBlock : NSData = NSData(bytes:[UInt8](count: Int(Token.blockSize), repeatedValue: 0), length: Int(Token.blockSize))
     var generation : UInt8 = 0
     var manufactureYear : UInt8 = 0

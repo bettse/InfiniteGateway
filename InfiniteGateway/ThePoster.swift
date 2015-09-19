@@ -16,15 +16,6 @@ import Foundation
 
 
 class ThePoster {
-    /*
-    static let types : [Int:String] = [
-        1000000 : "Figure",
-        2000000 : "PlaySet/ToyBox",
-        3000000 : "PowerDisc (Round)",
-        4000000 : "PowerDisc (Hex)",
-    ]
-    */
-    
     static func getName(id: UInt32) -> String {
         return names.get(id, defaultValue: "<Unknown>")
     }
