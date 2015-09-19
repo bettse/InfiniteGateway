@@ -25,7 +25,7 @@ class PortalDriver : NSObject {
     }
 
     var presence = Dictionary<Message.LedPlatform, Array<UInt8>>()
-    var loadingTokens : [UInt8:Token] = [:]
+    var encryptedTokens : [UInt8:EncryptedToken] = [:]
     
     override init() {
         super.init()
@@ -80,7 +80,7 @@ class PortalDriver : NSObject {
         } else if let response = response as? PresenceResponse {
             presence = response.details
         } else if let response = response as? TagIdResponse {
-            loadingTokens[response.nfcIndex] = Token(tagId: response.tagId)
+            encryptedTokens[response.nfcIndex] = EncryptedToken(tagId: response.tagId)
             let report = Report(cmd: ReadCommand(nfcIndex: response.nfcIndex, block: 0))
             portal.output(report)
         } else if let response = response as? ReadResponse {
@@ -111,18 +111,19 @@ class PortalDriver : NSObject {
     }
     
     func tokenRead(response: ReadResponse) {
-        if let token = loadingTokens[response.nfcIndex] {
+        if let token = encryptedTokens[response.nfcIndex] {
             token.load(response.blockNumber, blockData: response.blockData)
             if (token.complete()) {
+                let decryptedToken = token.getDecryptedToken()
                 let userInfo : [NSObject : AnyObject] = [
                     "nfcIndex": Int(response.nfcIndex),
                     "ledPlatform": Int(ledPlatformOfNfcIndex(response.nfcIndex).rawValue),
-                    "token": token
+                    "token": decryptedToken
                 ]
                 dispatch_async(dispatch_get_main_queue(), {
                     NSNotificationCenter.defaultCenter().postNotificationName("tokenLoaded", object: nil, userInfo: userInfo)
                 })
-                loadingTokens.removeValueForKey(response.nfcIndex)
+                encryptedTokens.removeValueForKey(response.nfcIndex)
             } else {
                 let nextBlock : UInt8 = token.nextBlock()
                 portal.outputCommand(ReadCommand(nfcIndex: response.nfcIndex, block: nextBlock))

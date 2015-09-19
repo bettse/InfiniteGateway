@@ -12,9 +12,7 @@ import CommonCrypto
 import CommonCRC
 
 
-class EncryptedToken {
-    
-    var tagId : NSData
+class EncryptedToken : Token {
     
     var key : NSData {
         get {
@@ -39,11 +37,6 @@ class EncryptedToken {
             let swappedKey = truncatedSha.bigEndianUInt32
             return NSData(data: swappedKey)
         }
-    }
-
-    
-    init(tagId: NSData) {
-        self.tagId = tagId
     }
     
     func isEncrypted(blockNumber: UInt8, blockData: NSData) -> Bool {
@@ -94,10 +87,25 @@ class EncryptedToken {
         
         return NSData(data: cryptData.subdataWithRange(NSMakeRange(0, blockData.length)))
     }
-    
-    
-    func sectorTrailer(blockNumber : UInt8) -> Bool {
-        return (blockNumber + 1) % 4 == 0
+
+    func getDecryptedToken() -> Token {
+        let encryptedData : NSData = data
+        let clearToken : Token = Token(tagId: self.tagId)
+        for blockNumber in 0..<Token.blockCount {
+            let blockStart = Int(blockNumber) * Int(Token.blockSize)
+            let blockRange = NSMakeRange(blockStart, Int(Token.blockSize))
+            let encryptedBlock = encryptedData.subdataWithRange(blockRange)
+            let clearBlock = decrypt(blockNumber, blockData: encryptedBlock)
+            clearToken.load(blockNumber, blockData: clearBlock)
+        }
+        
+        
+        return clearToken;
     }
 
 }
+
+
+
+
+

@@ -58,8 +58,6 @@ class Token : CustomStringConvertible {
     let ownerIdIndex = 0x08 //block 0x0c
     let loadCountIndex = 0x0b //block 0x0c
     
-    let dumpToken = true
-    
     var description: String {
         let me = String(self.dynamicType).componentsSeparatedByString(".").last!
         return "\(me)(\(tagId): v\(generation) \(name) L\(level)[\(experience)] lastSaved \(lastSave) | Manuf: \(manufactureYear)/\(manufactureMonth)/\(manufactureDay)"
@@ -73,31 +71,6 @@ class Token : CustomStringConvertible {
             dateFormatter.dateFormat = "yyyy-MM-dd'T'HH:mm:ssZZZZZ"
             dateFormatter.locale = NSLocale(localeIdentifier: "en_US")
             return dateFormatter
-        }
-    }
-    
-    var key : NSData {
-        get {
-            //It is the first 16 bytes of a SHA1 hash of: a hard-coded 16 bytes, 15 bytes of the string "(c) Disney 2013", and the 7 bytes of the tag ID.
-            //Each integer, or group of 4 bytes, of the SHA1 hash needs to be reversed because of endianness.
-
-            let prekey = NSMutableData(capacity: PortalDriver.magic.length + PortalDriver.secret.length + tagId.length)!
-            prekey.appendData(PortalDriver.secret)
-            prekey.appendData(PortalDriver.magic)
-            prekey.appendData(tagId)
-            if (prekey.length != 16 + 15 + 7) {
-                print("Pre-hashed key wasn't of the correct length")
-                return NSData()
-            }
-            
-            let sha = NSMutableData(length: Int(CC_SHA1_DIGEST_LENGTH))!
-            let shaBytes = UnsafeMutablePointer<CUnsignedChar>(sha.mutableBytes)
-            CC_SHA1(prekey.bytes, CC_LONG(prekey.length), shaBytes)            
-            let truncatedSha = sha.subdataWithRange(NSMakeRange(0, 16))
-
-            //Swap bytes for endianness
-            let swappedKey = truncatedSha.bigEndianUInt32
-            return NSData(data: swappedKey)
         }
     }
     
@@ -115,8 +88,7 @@ class Token : CustomStringConvertible {
     var ownerId : UInt32 = 0
     var loadCount : UInt8 = 0
     var skills : UInt32 = 0
-    var diskData : NSMutableData = NSMutableData()
-    var encryptedData : NSMutableData = NSMutableData()
+    var data : NSMutableData = NSMutableData()
     
     var type : String {
         get {
@@ -140,75 +112,15 @@ class Token : CustomStringConvertible {
     }
     
     func nextBlock() -> UInt8 {
-        return UInt8(encryptedData.length / Int(Token.blockSize))
+        return UInt8(data.length / Int(Token.blockSize))
     }
     
     func complete() -> Bool{
         return (nextBlock() == Token.blockCount)
     }
 
-    func load(blockNumber: UInt8, blockData: NSData, debug: Bool = false) {
-        encryptedData.appendData(blockData)        
-        let clearData = decrypt(blockNumber, blockData: blockData)
-        
-        if (debug) {
-            print("[\(blockNumber)]: \(clearData)")
-        }
-        
-        switch blockNumber {
-        case 0: //Manufacturer data
-            let uidFromBlock = blockData.subdataWithRange(NSMakeRange(0, 7))
-            if (!uidFromBlock.isEqualToData(tagId)) {
-                print("Mismatch in tagid with tag data, \(tagId) vs block0 \(uidFromBlock)")
-                //tagId = uidFromBlock
-            }
-            break
-        case 1:
-            clearData.getBytes(&modelId, range: NSMakeRange(modelIdIndex, sizeof(UInt32)))
-            name = ThePoster.getName(modelId.bigEndian)
-            //type = ThePoster.getType(modelId.bigEndian)
-            clearData.getBytes(&generation, range: NSMakeRange(generationIndex, sizeof(UInt8)))
-            //Y/M/D
-            clearData.getBytes(&manufactureYear, range: NSMakeRange(manufactureYearIndex, sizeof(UInt8)))
-            clearData.getBytes(&manufactureMonth, range: NSMakeRange(manufactureMonthIndex, sizeof(UInt8)))
-            clearData.getBytes(&manufactureDay, range: NSMakeRange(manufactureDayIndex, sizeof(UInt8)))
-            
-            var diConstant : UInt16 = 0
-            clearData.getBytes(&diConstant, range: NSMakeRange(disneyInfinityConstantIndex, sizeof(UInt16)))
-            //if (diConstant.bigEndian != Token.DiConstant) { print("0xD11F constant mismatch: \(String(diConstant, radix: HEX))") }
-        case 0x04:
-            dataBlock = clearData
-            parseDataBlock()
-        case 0x05: //Skills
-            clearData.getBytes(&skills, range: NSMakeRange(skillsIndex, sizeof(skills.dynamicType)))
-            parseSkills()
-        case 0x09: //Skills
-            clearData.getBytes(&skills, range: NSMakeRange(skillsIndex, sizeof(skills.dynamicType)))
-            parseSkills()
-        case 0x08:
-            var sequence4 : UInt8 = 0
-            dataBlock.getBytes(&sequence4, range: NSMakeRange(sequenceIndex, sizeof(UInt8)))
-            var sequence8 : UInt8 = 0
-            clearData.getBytes(&sequence8, range: NSMakeRange(sequenceIndex, sizeof(UInt8)))
-            if (sequence8 > sequence4) {
-                dataBlock = clearData
-            }
-            parseDataBlock()
-
-        case 0x0c:
-            clearData.getBytes(&ownerId, range: NSMakeRange(ownerIdIndex, 3 /*UInt24*/))
-            clearData.getBytes(&loadCount, range: NSMakeRange(loadCountIndex, sizeof(loadCount.dynamicType)))
-        default:
-            //Nothing interesting in this block?
-            break
-        }
-
-        diskData.appendData(clearData)
-        
-        if (!verifyChecksum(clearData, blockNumber: blockNumber)) {
-            print("Checksum failed for block \(blockNumber)")
-        }
-
+    func load(blockNumber: UInt8, blockData: NSData) {
+        data.appendData(blockData)
     }
     
     //May be called multiple times if block 0x8 has a higher sequence than 0x4
@@ -230,56 +142,11 @@ class Token : CustomStringConvertible {
         }
 
     }
-
-    func isEncrypted(blockNumber: UInt8, blockData: NSData) -> Bool {
-        let zeros = NSData(bytes:[UInt8](count: blockData.length, repeatedValue: 0), length: blockData.length)
-        
-        if (blockNumber == 0 || blockNumber == 18 || sectorTrailer(blockNumber) || blockData.isEqualToData(zeros)) {
-            return false
-        }
-
-        return true
+    
+    func sectorTrailer(blockNumber : UInt8) -> Bool {
+        return (blockNumber + 1) % 4 == 0
     }
-
-    //Each block is encrypted with a 128-bit AES key (ECB) unique to that figure.
-    func decrypt(blockNumber: UInt8, blockData: NSData) -> NSData {
-        if (UInt8(blockData.length) != Token.blockSize) {
-            print("blockData must be exactly \(Token.blockSize) bytes")
-            return blockData
-        }
-
-        if (!isEncrypted(blockNumber, blockData: blockData)) {
-            return blockData
-        }
-        
-        let operation : CCOperation = UInt32(kCCDecrypt)
-        let algoritm : CCAlgorithm = UInt32(kCCAlgorithmAES128)
-        let options : CCOptions   = UInt32(kCCOptionECBMode)
-        
-        let keyBytes = UnsafePointer<UInt8>(key.bytes)
-        let keyLength : size_t = size_t(kCCKeySizeAES128)
-        
-        let dataBytes = UnsafePointer<UInt8>(blockData.bytes)
-        let dataLength : size_t = size_t(blockData.length)
-
-        let cryptData = NSMutableData(length: Int(blockData.length) + kCCBlockSizeAES128)!
-        let cryptPointer = UnsafeMutablePointer<UInt8>(cryptData.mutableBytes)
-        let cryptLength : size_t = size_t(cryptData.length)
-        var numBytesEncrypted : size_t = 0
-                
-        let cryptStatus : CCCryptorStatus = CCCrypt(
-            operation, algoritm, options,
-            keyBytes, keyLength, nil,
-            dataBytes, dataLength,
-            cryptPointer, cryptLength, &numBytesEncrypted)
-        
-        if (UInt32(cryptStatus) != UInt32(kCCSuccess)) {
-            print("Decryption failed")
-        }
-        
-        return NSData(data: cryptData.subdataWithRange(NSMakeRange(0, blockData.length)))
-    }
- 
+    
     func verifyChecksum(blockData: NSData, blockNumber: UInt8) -> Bool {
         //Excluded blocks
         if (blockNumber == 0 || blockNumber == 2 || sectorTrailer(blockNumber)) {
@@ -311,24 +178,13 @@ class Token : CustomStringConvertible {
         return NSData()
     }
     
-    func sectorTrailer(blockNumber : UInt8) -> Bool {
-        return (blockNumber + 1) % 4 == 0
-    }
-    
-    func save(encrypted: Bool = false, withDatetime: Bool = false) {
+    func save() {
         let downloads = NSSearchPathForDirectoriesInDomains(.DownloadsDirectory, .UserDomainMask, true)
-        var filename = "\(tagId.hexadecimalString)-\(name)"
-        if (withDatetime) {
-            filename += "-\(dateFormat.stringFromDate(NSDate()))"
-        }
-        filename += ".bin"
+        let filename = "\(tagId.hexadecimalString)-\(name).bin"
         let fullPath = NSURL(fileURLWithPath: downloads[0]).URLByAppendingPathComponent(filename)
         
-        if (encrypted) {
-            encryptedData.writeToURL(fullPath, atomically: true)
-        } else {
-            diskData.writeToURL(fullPath, atomically: true)
-        }
+        data.writeToURL(fullPath, atomically: true)
+
     }
 
     
