@@ -310,6 +310,13 @@ class Token : CustomStringConvertible {
         return valid
     }
     
+    func correctChecksum(blockNumber: UInt8) {
+        let blockData : NSMutableData = block(blockNumber).subdataWithRange(NSMakeRange(0, Int(Token.blockSize) - sizeof(UInt32))).mutableCopy() as! NSMutableData
+        let checksum = getChecksum(blockData)
+        blockData.appendData(checksum)
+        load(blockNumber, blockData: blockData)
+    }
+    
     func getChecksum(data: NSData) -> NSData {
         let dataBytes = UnsafePointer<UInt8>(data.bytes)
         let dataLength : size_t = size_t(data.length)
