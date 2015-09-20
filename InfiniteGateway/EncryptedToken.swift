@@ -66,8 +66,7 @@ class EncryptedToken : Token {
     }
     
     func skipEncryption(blockNumber: UInt8, blockData: NSData) -> Bool {
-        let zeros = NSData(bytes:[UInt8](count: blockData.length, repeatedValue: 0), length: blockData.length)
-        return (blockNumber == 0 || blockNumber == 18 || sectorTrailer(blockNumber) || blockData.isEqualToData(zeros))
+        return (blockNumber == 0 || blockNumber == 18 || sectorTrailer(blockNumber) || blockData.isEqualToData(emptyBlock))
     }
     
     //Each block is encrypted with a 128-bit AES key (ECB) unique to that figure.

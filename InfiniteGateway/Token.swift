@@ -14,10 +14,6 @@ import CommonCRC
 
 //Tokens can be figures, disks (some are stackable), playsets (clear 3d figure with hex base)
 
-struct TokenStruct {
-    
-}
-
 class Token : CustomStringConvertible {
     static let sectorSize : UInt8 = 4 //Blocks
     static let sectorCount : UInt8 = 5
@@ -32,6 +28,7 @@ class Token : CustomStringConvertible {
     let BINARY = 2
     let HEX = 0x10
     let sector_trailor = NSData(bytes: [0, 0, 0, 0, 0, 0, 0x77, 0x87, 0x88, 0, 0, 0, 0, 0, 0, 0,], length: 16)
+    let emptyBlock = NSData(bytes:[UInt8](count: Int(Token.blockSize), repeatedValue: 0), length: Int(Token.blockSize))
     
     //All blocks
     let checksumIndex = 0x0c //all blocks
@@ -241,6 +238,23 @@ class Token : CustomStringConvertible {
 
     init(tagId: NSData) {
         self.tagId = tagId
+    }
+    
+    init(modelId: UInt32) {
+        //Make 7 bytes uid
+        let uid = NSMutableData(bytes: [0, 0, 0, 0, 0, 0, 0] as [UInt8], length: 7)
+        var value = modelId
+        uid.replaceBytesInRange(NSMakeRange(0, sizeof(modelId.dynamicType)), withBytes: &value)
+        self.tagId = uid
+        
+        //Load empty data
+        for blockNumber in 0..<Token.blockCount {
+            self.load(blockNumber, blockData: emptyBlock)
+        }
+        //Run minimal setters
+        self.modelId = modelId
+        self.diConstant = Token.DiConstant
+        self.generation = UInt8(modelId / 100 % 10)
     }
     
     func nextBlock() -> UInt8 {
