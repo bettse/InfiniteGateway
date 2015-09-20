@@ -35,21 +35,6 @@ class Token : CustomStringConvertible {
     
     //All blocks
     let checksumIndex = 0x0c //all blocks
-    //Block 1
-    let modelIdIndex = 0x00
-    let NextBlockIndex = 0x07 //not sure yet
-    let generationIndex = 0x09 // block 1  (DI 1.0 vs DI 2.0
-    let disneyInfinityConstantIndex = 0x0A //block 1
-    let manufactureYearIndex = 0x04
-    let manufactureMonthIndex = 0x05
-    let manufactureDayIndex = 0x06
-
-    
-    //block 0x04 or 0x08
-    let sequenceIndex = 0x0b //only 0x04/0x08
-    let experienceIndex = 0x03 //May end up being multibyte and starting at an earlier offset
-    let levelIndex = 0x04
-    let timestampIndex = 0x05
     
     //block 0x05/0x09
     let skillsIndex = 0x00
@@ -60,7 +45,7 @@ class Token : CustomStringConvertible {
     
     var description: String {
         let me = String(self.dynamicType).componentsSeparatedByString(".").last!
-        return "\(me)(\(tagId): v\(generation) \(name) L\(level)[\(experience)] lastSaved \(lastSave) | Manuf: \(manufactureYear)/\(manufactureMonth)/\(manufactureDay)"
+        return "\(me)(\(tagId): v\(generation) \(name) L\(level)[\(experience)] | Manuf: \(manufactureYear)/\(manufactureMonth)/\(manufactureDay)"
     }
     var tagId : NSData
     var dateFormat : NSDateFormatter {
@@ -73,12 +58,7 @@ class Token : CustomStringConvertible {
             return dateFormatter
         }
     }
-    
-    var name : String {
-        get {
-            return ThePoster.getName(modelId.bigEndian)
-        }
-    }
+
     var modelId : UInt32 {
         get {
             //TODO: Create a mapping of these characteristics to a property name
@@ -91,15 +71,124 @@ class Token : CustomStringConvertible {
             return value
         }
     }
-    var dataBlock : NSData = NSData(bytes:[UInt8](count: Int(Token.blockSize), repeatedValue: 0), length: Int(Token.blockSize))
-    var generation : UInt8 = 0
-    var manufactureYear : UInt8 = 0
-    var manufactureMonth : UInt8 = 0
-    var manufactureDay : UInt8 = 0
-    var experience : UInt16 = 0
-    var level : UInt8 = 0
-    var timestamp : UInt32 = 0
-    var lastSave : NSDate = NSDate()
+    
+    var name : String {
+        get {
+            return ThePoster.getName(modelId.bigEndian)
+        }
+    }
+
+    var generation : UInt8 {
+        get {
+            let blockNumber : UInt8 = 1
+            let blockIndex : UInt8 = 0x09
+            let offset = Int(blockNumber * Token.blockSize + blockIndex)
+            var value : UInt8 = 0
+            data.getBytes(&value, range: NSMakeRange(offset, sizeof(value.dynamicType)))
+            return value
+        }
+    }
+    
+    var diConstant : UInt16 {
+        get {
+            let blockNumber : UInt8 = 1
+            let blockIndex : UInt8 = 0x0A
+            let offset = Int(blockNumber * Token.blockSize + blockIndex)
+            var value : UInt16 = 0
+            primaryDataBlock.getBytes(&value, range: NSMakeRange(offset, sizeof(value.dynamicType)))
+            return value
+        }
+    }
+    
+    var correctDIConstant : Bool {
+        get {
+            return diConstant == 0xD11F
+        }
+    }
+    
+    var manufactureYear : UInt8 {
+        get {
+            let blockNumber : UInt8 = 1
+            let blockIndex : UInt8 = 0x04
+            let offset = Int(blockNumber * Token.blockSize + blockIndex)
+            var value : UInt8 = 0
+            data.getBytes(&value, range: NSMakeRange(offset, sizeof(value.dynamicType)))
+            return value
+        }
+    }
+    
+    var manufactureMonth : UInt8 {
+        get {
+            let blockNumber : UInt8 = 1
+            let blockIndex : UInt8 = 0x05
+            let offset = Int(blockNumber * Token.blockSize + blockIndex)
+            var value : UInt8 = 0
+            data.getBytes(&value, range: NSMakeRange(offset, sizeof(value.dynamicType)))
+            return value
+        }
+    }
+    var manufactureDay : UInt8 {
+        get {
+            let blockNumber : UInt8 = 1
+            let blockIndex : UInt8 = 0x06
+            let offset = Int(blockNumber * Token.blockSize + blockIndex)
+            var value : UInt8 = 0
+            data.getBytes(&value, range: NSMakeRange(offset, sizeof(value.dynamicType)))
+            return value
+        }
+    }
+    
+    var sequenceA : UInt8 {
+        get {
+            let blockNumber : UInt8 = 4
+            let blockIndex : UInt8 = 0x0b
+            let offset = Int(blockNumber * Token.blockSize + blockIndex)
+            var value : UInt8 = 0
+            data.getBytes(&value, range: NSMakeRange(offset, sizeof(value.dynamicType)))
+            return value
+        }
+    }
+    
+    var sequenceB : UInt8 {
+        get {
+            let blockNumber : UInt8 = 8
+            let blockIndex : UInt8 = 0x0b
+            let offset = Int(blockNumber * Token.blockSize + blockIndex)
+            var value : UInt8 = 0
+            data.getBytes(&value, range: NSMakeRange(offset, sizeof(value.dynamicType)))
+            return value
+        }
+    }
+    
+    var primaryDataBlock : NSData {
+        get {
+            var range : NSRange
+            if (sequenceA > sequenceB) {
+                range = NSMakeRange(Int(Token.blockSize) * 4, Int(Token.blockSize))
+            } else {
+                range = NSMakeRange(Int(Token.blockSize) * 8, Int(Token.blockSize))
+            }
+            return data.subdataWithRange(range)
+        }
+    }
+    
+    var experience : UInt16 {
+        get {
+            let blockIndex = 0x03
+            var value : UInt16 = 0
+            primaryDataBlock.getBytes(&value, range: NSMakeRange(blockIndex, sizeof(value.dynamicType)))
+            return value
+        }
+    }
+    var level : UInt8 {
+        get {
+            let blockIndex = 0x04
+            var value : UInt8 = 0
+            primaryDataBlock.getBytes(&value, range: NSMakeRange(blockIndex, sizeof(value.dynamicType)))
+            return value
+        }
+    }
+    
     var ownerId : UInt32 = 0
     var loadCount : UInt8 = 0
     var skills : UInt32 = 0
@@ -136,15 +225,6 @@ class Token : CustomStringConvertible {
 
     func load(blockNumber: UInt8, blockData: NSData) {
         data.appendData(blockData)
-    }
-    
-    //May be called multiple times if block 0x8 has a higher sequence than 0x4
-    func parseDataBlock() {
-        dataBlock.getBytes(&level, range: NSMakeRange(levelIndex, sizeof(level.dynamicType)))
-        dataBlock.getBytes(&experience, range: NSMakeRange(experienceIndex, sizeof(experience.dynamicType)))
-        dataBlock.getBytes(&timestamp, range: NSMakeRange(timestampIndex, 3))
-        timestamp = timestamp.bigEndian/0x100 //Correct for endianness
-        lastSave = NSDate(timeIntervalSince1970: NSTimeInterval(Int(timestamp) * DATE_COEFFICIENT + DATE_OFFSET))
     }
     
     func parseSkills() {
@@ -197,11 +277,7 @@ class Token : CustomStringConvertible {
         let downloads = NSSearchPathForDirectoriesInDomains(.DownloadsDirectory, .UserDomainMask, true)
         let filename = "\(tagId.hexadecimalString)-\(name).bin"
         let fullPath = NSURL(fileURLWithPath: downloads[0]).URLByAppendingPathComponent(filename)
-        
         data.writeToURL(fullPath, atomically: true)
-
     }
-
     
 }
-
