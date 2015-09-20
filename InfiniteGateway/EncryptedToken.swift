@@ -39,14 +39,35 @@ class EncryptedToken : Token {
         }
     }
     
-    func isEncrypted(blockNumber: UInt8, blockData: NSData) -> Bool {
-        let zeros = NSData(bytes:[UInt8](count: blockData.length, repeatedValue: 0), length: blockData.length)
-        
-        if (blockNumber == 0 || blockNumber == 18 || sectorTrailer(blockNumber) || blockData.isEqualToData(zeros)) {
-            return false
+    convenience init(from: Token) {
+        self.init(tagId: from.tagId)
+        for blockNumber in 0..<Token.blockCount {
+            let blockStart = Int(blockNumber) * Int(Token.blockSize)
+            let blockRange = NSMakeRange(blockStart, Int(Token.blockSize))
+            let clearBlock = from.data.subdataWithRange(blockRange)
+            let encryptedBlock = encrypt(blockNumber, blockData: clearBlock)
+            self.data.appendData(encryptedBlock)
+        }
+    }
+    
+    func getDecryptedToken() -> Token {
+        let encryptedData : NSData = data
+        let clearToken : Token = Token(tagId: self.tagId)
+        for blockNumber in 0..<Token.blockCount {
+            let blockStart = Int(blockNumber) * Int(Token.blockSize)
+            let blockRange = NSMakeRange(blockStart, Int(Token.blockSize))
+            let encryptedBlock = encryptedData.subdataWithRange(blockRange)
+            let clearBlock = decrypt(blockNumber, blockData: encryptedBlock)
+            clearToken.load(blockNumber, blockData: clearBlock)
         }
         
-        return true
+        
+        return clearToken;
+    }
+    
+    func skipEncryption(blockNumber: UInt8, blockData: NSData) -> Bool {
+        let zeros = NSData(bytes:[UInt8](count: blockData.length, repeatedValue: 0), length: blockData.length)
+        return (blockNumber == 0 || blockNumber == 18 || sectorTrailer(blockNumber) || blockData.isEqualToData(zeros))
     }
     
     //Each block is encrypted with a 128-bit AES key (ECB) unique to that figure.
@@ -56,7 +77,7 @@ class EncryptedToken : Token {
             return blockData
         }
         
-        if (!isEncrypted(blockNumber, blockData: blockData)) {
+        if (skipEncryption(blockNumber, blockData: blockData)) {
             return blockData
         }
         
@@ -88,20 +109,46 @@ class EncryptedToken : Token {
         return NSData(data: cryptData.subdataWithRange(NSMakeRange(0, blockData.length)))
     }
 
-    func getDecryptedToken() -> Token {
-        let encryptedData : NSData = data
-        let clearToken : Token = Token(tagId: self.tagId)
-        for blockNumber in 0..<Token.blockCount {
-            let blockStart = Int(blockNumber) * Int(Token.blockSize)
-            let blockRange = NSMakeRange(blockStart, Int(Token.blockSize))
-            let encryptedBlock = encryptedData.subdataWithRange(blockRange)
-            let clearBlock = decrypt(blockNumber, blockData: encryptedBlock)
-            clearToken.load(blockNumber, blockData: clearBlock)
+    
+    //Each block is encrypted with a 128-bit AES key (ECB) unique to that figure.
+    func encrypt(blockNumber: UInt8, blockData: NSData) -> NSData {
+        if (UInt8(blockData.length) != Token.blockSize) {
+            print("blockData must be exactly \(Token.blockSize) bytes")
+            return blockData
         }
         
+        if (skipEncryption(blockNumber, blockData: blockData)) {
+            return blockData
+        }
         
-        return clearToken;
+        let operation : CCOperation = UInt32(kCCEncrypt)
+        let algoritm : CCAlgorithm = UInt32(kCCAlgorithmAES128)
+        let options : CCOptions   = UInt32(kCCOptionECBMode)
+        
+        let keyBytes = UnsafePointer<UInt8>(key.bytes)
+        let keyLength : size_t = size_t(kCCKeySizeAES128)
+        
+        let dataBytes = UnsafePointer<UInt8>(blockData.bytes)
+        let dataLength : size_t = size_t(blockData.length)
+        
+        let cryptData = NSMutableData(length: Int(blockData.length) + kCCBlockSizeAES128)!
+        let cryptPointer = UnsafeMutablePointer<UInt8>(cryptData.mutableBytes)
+        let cryptLength : size_t = size_t(cryptData.length)
+        var numBytesEncrypted : size_t = 0
+        
+        let cryptStatus : CCCryptorStatus = CCCrypt(
+            operation, algoritm, options,
+            keyBytes, keyLength, nil,
+            dataBytes, dataLength,
+            cryptPointer, cryptLength, &numBytesEncrypted)
+        
+        if (UInt32(cryptStatus) != UInt32(kCCSuccess)) {
+            print("Encryption failed")
+        }
+        
+        return cryptData.subdataWithRange(NSMakeRange(0, blockData.length))
     }
+
 
 }
 
