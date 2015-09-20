@@ -669,19 +669,19 @@
             <objects>
                 <viewController id="XfG-lQ-9wD" customClass="ViewController" customModule="InfiniteGateway" customModuleProvider="target" sceneMemberID="viewController">
                     <view key="view" id="m2S-Jp-Qdl">
-                        <rect key="frame" x="0.0" y="0.0" width="480" height="270"/>
+                        <rect key="frame" x="0.0" y="0.0" width="480" height="331"/>
                         <autoresizingMask key="autoresizingMask"/>
                         <subviews>
                             <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="382-mF-wpq">
-                                <rect key="frame" x="118" y="233" width="244" height="17"/>
-                                <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title="Portal status" id="shu-sz-Aac">
+                                <rect key="frame" x="118" y="294" width="244" height="17"/>
+                                <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="center" title="Portal status" id="shu-sz-Aac">
                                     <font key="font" metaFont="system"/>
                                     <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
                                     <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                                 </textFieldCell>
                             </textField>
                             <scrollView fixedFrame="YES" autohidesScrollers="YES" horizontalLineScroll="19" horizontalPageScroll="10" verticalLineScroll="19" verticalPageScroll="10" usesPredominantAxisScrolling="NO" translatesAutoresizingMaskIntoConstraints="NO" id="O38-0z-3lg">
-                                <rect key="frame" x="20" y="25" width="440" height="200"/>
+                                <rect key="frame" x="20" y="86" width="440" height="200"/>
                                 <clipView key="contentView" ambiguous="YES" id="XvT-4D-JjL">
                                     <rect key="frame" x="1" y="1" width="438" height="198"/>
                                     <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
@@ -735,7 +735,7 @@
                                     <color key="backgroundColor" name="controlBackgroundColor" catalog="System" colorSpace="catalog"/>
                                 </clipView>
                                 <scroller key="horizontalScroller" hidden="YES" wantsLayer="YES" verticalHuggingPriority="750" horizontal="YES" id="uZu-tI-tfQ">
-                                    <rect key="frame" x="1" y="119" width="223" height="15"/>
+                                    <rect key="frame" x="1" y="-14" width="0.0" height="15"/>
                                     <autoresizingMask key="autoresizingMask"/>
                                 </scroller>
                                 <scroller key="verticalScroller" hidden="YES" wantsLayer="YES" verticalHuggingPriority="750" horizontal="NO" id="gTM-qI-uuv">
@@ -743,16 +743,35 @@
                                     <autoresizingMask key="autoresizingMask"/>
                                 </scroller>
                             </scrollView>
+                            <button verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="PTK-Fh-Iny">
+                                <rect key="frame" x="384" y="51" width="82" height="32"/>
+                                <buttonCell key="cell" type="push" title="Build" bezelStyle="rounded" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="hae-JD-5Sb">
+                                    <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
+                                    <font key="font" metaFont="system"/>
+                                </buttonCell>
+                                <connections>
+                                    <action selector="buildBlank:" target="XfG-lQ-9wD" id="PWF-9l-rci"/>
+                                </connections>
+                            </button>
+                            <comboBox verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="jX6-ia-v2r">
+                                <rect key="frame" x="20" y="54" width="343" height="26"/>
+                                <comboBoxCell key="cell" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" sendsActionOnEndEditing="YES" borderStyle="bezel" placeholderString="Create empty token image" drawsBackground="YES" usesDataSource="YES" numberOfVisibleItems="10" id="bGE-Bp-ioP">
+                                    <font key="font" metaFont="system"/>
+                                    <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
+                                    <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
+                                </comboBoxCell>
+                            </comboBox>
                         </subviews>
                     </view>
                     <connections>
+                        <outlet property="modelSelection" destination="jX6-ia-v2r" id="7er-bf-QxM"/>
                         <outlet property="nfcTable" destination="U2x-d9-ZXq" id="1jK-eO-Bl6"/>
                         <outlet property="status" destination="382-mF-wpq" id="WzY-v0-db7"/>
                     </connections>
                 </viewController>
                 <customObject id="rPt-NT-nkU" userLabel="First Responder" customClass="NSResponder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="75" y="655"/>
+            <point key="canvasLocation" x="75" y="685.5"/>
         </scene>
     </scenes>
 </document>

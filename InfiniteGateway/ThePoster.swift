@@ -14,8 +14,54 @@ import Foundation
 //Like how you might use a real world poster to look 
 //at a list of the figures, their pictures, or stats
 
+class Model : NSObject {
+    let DECIMAL = 10
+    var id : UInt32
+    var typeValue : Int {
+        return Int(id) / 1000000 % DECIMAL
+    }
+    var type : String {
+        get {
+            switch typeValue {
+            case 1:
+                return "Figure"
+            case 2:
+                return "Play Sets / Toy Box"
+            case 3:
+                return "Round Power Disc"
+            case 4:
+                return "Hexagonal Power Disc"
+            default:
+                return "Unknown"
+            }
+        }
+    }
+    var generation : UInt8 {
+        get {
+            return UInt8(id / 100 % 10)
+        }
+    }
+    var name : String {
+        return ThePoster.getName(id)
+    }
+    
+    init(id: UInt32) {
+        self.id = id
+    }
+    
+    func copyWithZone(zone: NSZone) -> Model {
+        return Model(id: self.id)
+    }
+    
+}
 
 class ThePoster {
+    static var models : [Model] {
+        get {
+            return names.keys.map{return Model(id: $0)}
+        }
+    }
+    
     static func getName(id: UInt32) -> String {
         return names.get(id, defaultValue: "<Unknown>")
     }

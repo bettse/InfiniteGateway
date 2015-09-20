@@ -8,10 +8,12 @@
 
 import Cocoa
 
-class ViewController: NSViewController, NSTableViewDataSource, NSTableViewDelegate {
+class ViewController: NSViewController, NSTableViewDataSource, NSTableViewDelegate, NSComboBoxDataSource {
 
     @IBOutlet weak var status: NSTextField?
     @IBOutlet weak var nfcTable: NSTableView?
+    @IBOutlet weak var modelSelection: NSComboBox?
+    
     var nfcMap : [UInt8:Token] = [:]
     
     var portal : Portal {
@@ -26,6 +28,8 @@ class ViewController: NSViewController, NSTableViewDataSource, NSTableViewDelega
         // Do any additional setup after loading the view.
         status?.stringValue = "Portal Disconnected"
         
+        modelSelection?.dataSource = self
+        
         NSNotificationCenter.defaultCenter().addObserver(self, selector: "deviceConnected:", name: "deviceConnected", object: nil)
         NSNotificationCenter.defaultCenter().addObserver(self, selector: "deviceDisconnected:", name: "deviceDisconnected", object: nil)
         
@@ -38,6 +42,18 @@ class ViewController: NSViewController, NSTableViewDataSource, NSTableViewDelega
         didSet {
         // Update the view, if already loaded.
         }
+    }
+    
+    @IBAction func buildBlank(sender: AnyObject?) {
+        if let comboBox = modelSelection {
+            let index = comboBox.indexOfSelectedItem
+            let model = ThePoster.models[index]
+            let t = Token(modelId: model.id)
+            let et = EncryptedToken(from: t)
+            et.dump()
+
+        }
+
     }
 
 
@@ -89,10 +105,15 @@ class ViewController: NSViewController, NSTableViewDataSource, NSTableViewDelega
     }
  
     
-    // MARK: - Portal interaction methods
+    // MARK: - NSComboBoxDataSource
     
+    func numberOfItemsInComboBox(aComboBox: NSComboBox) -> Int {
+        return ThePoster.models.count
+    }
     
-
+    func comboBox(aComboBox: NSComboBox, objectValueForItemAtIndex index: Int) -> AnyObject {
+        return ThePoster.models[index].name
+    }
 
 }
 

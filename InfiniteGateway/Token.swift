@@ -252,6 +252,7 @@ class Token : CustomStringConvertible {
             self.load(blockNumber, blockData: emptyBlock)
         }
         //Run minimal setters
+        self.data.replaceBytesInRange(NSMakeRange(0, uid.length), withBytes: uid.bytes)
         self.modelId = modelId
         self.diConstant = Token.DiConstant
         self.generation = UInt8(modelId / 100 % 10)
