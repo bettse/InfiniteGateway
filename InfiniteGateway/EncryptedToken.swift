@@ -38,6 +38,18 @@ class EncryptedToken : MifareMini {
         }
     }
     
+    var decryptedToken : Token {
+        get {
+            let clearToken : Token = Token(tagId: self.tagId)
+            for blockNumber in 0..<MifareMini.blockCount {
+                let encryptedBlock = block(blockNumber)
+                let clearBlock = decrypt(blockNumber, blockData: encryptedBlock)
+                clearToken.load(blockNumber, blockData: clearBlock)
+            }
+            return clearToken;
+        }
+    }
+    
     convenience init(from: Token) {
         self.init(tagId: from.tagId)
         for blockNumber in 0..<MifareMini.blockCount {
@@ -45,17 +57,6 @@ class EncryptedToken : MifareMini {
             let encryptedBlock = encrypt(blockNumber, blockData: clearBlock)
             self.data.appendData(encryptedBlock)
         }
-    }
-    
-    func getDecryptedToken() -> Token {
-        let clearToken : Token = Token(tagId: self.tagId)
-        for blockNumber in 0..<MifareMini.blockCount {
-            let encryptedBlock = block(blockNumber)
-            let clearBlock = decrypt(blockNumber, blockData: encryptedBlock)
-            clearToken.load(blockNumber, blockData: clearBlock)
-        }
-        
-        return clearToken;
     }
     
     func skipEncryption(blockNumber: Int, blockData: NSData) -> Bool {

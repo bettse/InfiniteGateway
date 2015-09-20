@@ -25,7 +25,6 @@ class MifareMini {
         self.tagId = tagId
     }
     
-    
     func nextBlock() -> Int {
         return data.length / MifareMini.blockSize
     }

@@ -54,7 +54,6 @@ class PortalDriver : NSObject {
     get block n -> request block n+1 if n+1 < Token.tokenSize
     */
     func incomingUpdate(update: Update) {
-        print("update: \(update)")
         var updateColor : NSColor = NSColor()
         if (update.direction == Update.Direction.Arriving) {
             updateColor = NSColor.whiteColor()
@@ -135,12 +134,11 @@ class PortalDriver : NSObject {
         if let token = encryptedTokens[response.nfcIndex] {
             token.load(response.blockNumber, blockData: response.blockData)
             if (token.complete()) {
-                let decryptedToken = token.getDecryptedToken()
                 let ledPlatform = ledPlatformOfNfcIndex(response.nfcIndex)
                 let userInfo : [NSObject : AnyObject] = [
                     "nfcIndex": Int(response.nfcIndex),
                     "ledPlatform": Int(ledPlatform.rawValue),
-                    "token": decryptedToken
+                    "token": token.decryptedToken
                 ]
 
                 portal.outputCommand(LightOnCommand(ledPlatform: ledPlatform, color: NSColor.greenColor()))
