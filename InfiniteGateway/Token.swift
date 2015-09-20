@@ -70,6 +70,14 @@ class Token : CustomStringConvertible {
             data.getBytes(&value, range: NSMakeRange(offset, size))
             return value
         }
+        set(newModelId) {
+            let blockNumber : UInt8 = 1
+            let blockIndex : UInt8 = 0
+            let offset = Int(blockNumber * Token.blockSize + blockIndex)
+            var value : UInt32 = newModelId
+            let size = sizeof(value.dynamicType)
+            data.replaceBytesInRange(NSMakeRange(offset, size), withBytes: &value)
+        }
     }
     
     var name : String {
@@ -78,6 +86,7 @@ class Token : CustomStringConvertible {
         }
     }
 
+    //Can also be derived from modelNumber's 100's place value
     var generation : UInt8 {
         get {
             let blockNumber : UInt8 = 1
@@ -86,6 +95,14 @@ class Token : CustomStringConvertible {
             var value : UInt8 = 0
             data.getBytes(&value, range: NSMakeRange(offset, sizeof(value.dynamicType)))
             return value
+        }
+        set(newGeneration) {
+            let blockNumber : UInt8 = 1
+            let blockIndex : UInt8 = 0x09
+            let offset = Int(blockNumber * Token.blockSize + blockIndex)
+            var value : UInt8 = newGeneration
+            let size = sizeof(value.dynamicType)
+            data.replaceBytesInRange(NSMakeRange(offset, size), withBytes: &value)
         }
     }
     
@@ -96,13 +113,24 @@ class Token : CustomStringConvertible {
             let offset = Int(blockNumber * Token.blockSize + blockIndex)
             var value : UInt16 = 0
             primaryDataBlock.getBytes(&value, range: NSMakeRange(offset, sizeof(value.dynamicType)))
+            if (value != Token.DiConstant) {
+                print("DiConstant was \(value) when it should be \(Token.DiConstant)")
+            }
             return value
+        }
+        set (unused) {
+            let blockNumber : UInt8 = 1
+            let blockIndex : UInt8 = 0x0A
+            let offset = Int(blockNumber * Token.blockSize + blockIndex)
+            var value : UInt16 = Token.DiConstant
+            let size = sizeof(value.dynamicType)
+            data.replaceBytesInRange(NSMakeRange(offset, size), withBytes: &value)
         }
     }
     
     var correctDIConstant : Bool {
         get {
-            return diConstant == 0xD11F
+            return diConstant == Token.DiConstant
         }
     }
     
@@ -273,11 +301,17 @@ class Token : CustomStringConvertible {
         return NSData()
     }
     
-    func save() {
+    func dump() {
         let downloads = NSSearchPathForDirectoriesInDomains(.DownloadsDirectory, .UserDomainMask, true)
         let filename = "\(tagId.hexadecimalString)-\(name).bin"
         let fullPath = NSURL(fileURLWithPath: downloads[0]).URLByAppendingPathComponent(filename)
         data.writeToURL(fullPath, atomically: true)
     }
+    
+    func save() {
+        //send to PortalDriver to be re-encrypted before being sent back to token
+    }
+
+    
     
 }
