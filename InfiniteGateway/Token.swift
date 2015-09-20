@@ -275,7 +275,12 @@ class Token : CustomStringConvertible {
     }
 
     func load(blockNumber: UInt8, blockData: NSData) {
-        data.appendData(blockData)
+        if (blockNumber == nextBlock()) {
+            data.appendData(blockData)
+        } else {
+            let blockRange = NSMakeRange(Int(blockNumber * Token.blockSize), Int(Token.blockSize))
+            data.replaceBytesInRange(blockRange, withBytes: blockData.bytes)
+        }
     }
     
     func parseSkills() {
