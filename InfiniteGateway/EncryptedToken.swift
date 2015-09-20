@@ -18,11 +18,11 @@ class EncryptedToken : Token {
             //It is the first 16 bytes of a SHA1 hash of: a hard-coded 16 bytes, 15 bytes of the string "(c) Disney 2013", and the 7 bytes of the tag ID.
             //Each integer, or group of 4 bytes, of the SHA1 hash needs to be reversed because of endianness.
             
-            let prekey = NSMutableData(capacity: PortalDriver.magic.length + PortalDriver.secret.length + tagId.length)!
+            let prekey = NSMutableData(capacity: 38)! //PortalDriver.magic.length + PortalDriver.secret.length + tagId.length
             prekey.appendData(PortalDriver.secret)
             prekey.appendData(PortalDriver.magic)
             prekey.appendData(tagId)
-            if (prekey.length != 16 + 15 + 7) {
+            if (prekey.length != 38) {
                 print("Pre-hashed key wasn't of the correct length")
                 return NSData()
             }
