@@ -187,13 +187,11 @@ class Token : CustomStringConvertible {
     
     var primaryDataBlock : NSData {
         get {
-            var range : NSRange
             if (sequenceA > sequenceB) {
-                range = NSMakeRange(Int(Token.blockSize) * 4, Int(Token.blockSize))
+                return block(4)
             } else {
-                range = NSMakeRange(Int(Token.blockSize) * 8, Int(Token.blockSize))
+                return block(8)
             }
-            return data.subdataWithRange(range)
         }
     }
     
@@ -264,6 +262,16 @@ class Token : CustomStringConvertible {
     
     func complete() -> Bool{
         return (nextBlock() == Token.blockCount)
+    }
+
+    func block(blockNumber: Int) -> NSData {
+        return block(UInt8(blockNumber))
+    }
+    
+    func block(blockNumber: UInt8) -> NSData {
+        let blockStart = Int(blockNumber) * Int(Token.blockSize)
+        let blockRange = NSMakeRange(blockStart, Int(Token.blockSize))
+        return data.subdataWithRange(blockRange)
     }
 
     func load(blockNumber: UInt8, blockData: NSData) {

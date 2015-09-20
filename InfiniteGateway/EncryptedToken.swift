@@ -41,25 +41,19 @@ class EncryptedToken : Token {
     convenience init(from: Token) {
         self.init(tagId: from.tagId)
         for blockNumber in 0..<Token.blockCount {
-            let blockStart = Int(blockNumber) * Int(Token.blockSize)
-            let blockRange = NSMakeRange(blockStart, Int(Token.blockSize))
-            let clearBlock = from.data.subdataWithRange(blockRange)
+            let clearBlock = from.block(blockNumber)
             let encryptedBlock = encrypt(blockNumber, blockData: clearBlock)
             self.data.appendData(encryptedBlock)
         }
     }
     
     func getDecryptedToken() -> Token {
-        let encryptedData : NSData = data
         let clearToken : Token = Token(tagId: self.tagId)
         for blockNumber in 0..<Token.blockCount {
-            let blockStart = Int(blockNumber) * Int(Token.blockSize)
-            let blockRange = NSMakeRange(blockStart, Int(Token.blockSize))
-            let encryptedBlock = encryptedData.subdataWithRange(blockRange)
+            let encryptedBlock = block(blockNumber)
             let clearBlock = decrypt(blockNumber, blockData: encryptedBlock)
             clearToken.load(blockNumber, blockData: clearBlock)
         }
-        
         
         return clearToken;
     }
