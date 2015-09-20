@@ -149,7 +149,7 @@ class PortalDriver : NSObject {
                 })
                 encryptedTokens.removeValueForKey(response.nfcIndex)
             } else {
-                let nextBlock : UInt8 = token.nextBlock()
+                let nextBlock = token.nextBlock()
                 portal.outputCommand(ReadCommand(nfcIndex: response.nfcIndex, block: nextBlock))
             }
         } //end if token

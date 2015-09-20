@@ -58,22 +58,22 @@ class EncryptedToken : Token {
         return clearToken;
     }
     
-    func skipEncryption(blockNumber: UInt8, blockData: NSData) -> Bool {
+    func skipEncryption(blockNumber: Int, blockData: NSData) -> Bool {
         return (blockNumber == 0 || blockNumber == 18 || sectorTrailer(blockNumber) || blockData.isEqualToData(emptyBlock))
     }
     
     //Each block is encrypted with a 128-bit AES key (ECB) unique to that figure.
-    func decrypt(blockNumber: UInt8, blockData: NSData) -> NSData {
+    func decrypt(blockNumber: Int, blockData: NSData) -> NSData {
         return commonCrypt(blockNumber, blockData: blockData, encrypt: false)
     }
 
     //Each block is encrypted with a 128-bit AES key (ECB) unique to that figure.
-    func encrypt(blockNumber: UInt8, blockData: NSData) -> NSData {
+    func encrypt(blockNumber: Int, blockData: NSData) -> NSData {
         return commonCrypt(blockNumber, blockData: blockData, encrypt: true)
     }
 
-    func commonCrypt(blockNumber: UInt8, blockData: NSData, encrypt: Bool) -> NSData {
-        if (UInt8(blockData.length) != Token.blockSize) {
+    func commonCrypt(blockNumber: Int, blockData: NSData, encrypt: Bool) -> NSData {
+        if (blockData.length != Token.blockSize) {
             print("blockData must be exactly \(Token.blockSize) bytes")
             return blockData
         }

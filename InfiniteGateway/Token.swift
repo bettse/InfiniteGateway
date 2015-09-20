@@ -15,13 +15,12 @@ import CommonCRC
 //Tokens can be figures, disks (some are stackable), playsets (clear 3d figure with hex base)
 
 class Token : CustomStringConvertible {
-    static let sectorSize : UInt8 = 4 //Blocks
-    static let sectorCount : UInt8 = 5
-    static let blockCount : UInt8 = sectorSize * sectorCount
-    static let blockSize : UInt8 = 0x10
-    static let tokenSize : UInt8 = blockSize * blockCount
+    static let sectorSize : Int = 4 //Blocks
+    static let sectorCount : Int = 5
+    static let blockCount : Int = sectorSize * sectorCount
+    static let blockSize : Int = 0x10
+    static let tokenSize : Int = blockSize * blockCount
     static let DiConstant : UInt16 = 0xD11F // (i.e. D1sney 1nFinity)
-    static let importantBlockNumbers : [UInt8:UInt8] = [0: 1, 1: 4, 4:8, 8:12]
 
     let DATE_OFFSET = 1356998400 //Jan 1, 2013
     let DATE_COEFFICIENT = 0x7b
@@ -59,18 +58,18 @@ class Token : CustomStringConvertible {
     var modelId : UInt32 {
         get {
             //TODO: Create a mapping of these characteristics to a property name
-            let blockNumber : UInt8 = 1
-            let blockIndex : UInt8 = 0
-            let offset = Int(blockNumber * Token.blockSize + blockIndex)
+            let blockNumber = 1
+            let blockIndex = 0
+            let offset = blockNumber * Token.blockSize + blockIndex
             var value : UInt32 = 0
             let size = sizeof(value.dynamicType)
             data.getBytes(&value, range: NSMakeRange(offset, size))
             return value
         }
         set(newModelId) {
-            let blockNumber : UInt8 = 1
-            let blockIndex : UInt8 = 0
-            let offset = Int(blockNumber * Token.blockSize + blockIndex)
+            let blockNumber = 1
+            let blockIndex = 0
+            let offset = blockNumber * Token.blockSize + blockIndex
             var value : UInt32 = newModelId
             let size = sizeof(value.dynamicType)
             data.replaceBytesInRange(NSMakeRange(offset, size), withBytes: &value)
@@ -86,17 +85,17 @@ class Token : CustomStringConvertible {
     //Can also be derived from modelNumber's 100's place value
     var generation : UInt8 {
         get {
-            let blockNumber : UInt8 = 1
-            let blockIndex : UInt8 = 0x09
-            let offset = Int(blockNumber * Token.blockSize + blockIndex)
+            let blockNumber = 1
+            let blockIndex = 0x09
+            let offset = blockNumber * Token.blockSize + blockIndex
             var value : UInt8 = 0
             data.getBytes(&value, range: NSMakeRange(offset, sizeof(value.dynamicType)))
             return value
         }
         set(newGeneration) {
-            let blockNumber : UInt8 = 1
-            let blockIndex : UInt8 = 0x09
-            let offset = Int(blockNumber * Token.blockSize + blockIndex)
+            let blockNumber = 1
+            let blockIndex = 0x09
+            let offset = blockNumber * Token.blockSize + blockIndex
             var value : UInt8 = newGeneration
             let size = sizeof(value.dynamicType)
             data.replaceBytesInRange(NSMakeRange(offset, size), withBytes: &value)
@@ -105,9 +104,9 @@ class Token : CustomStringConvertible {
     
     var diConstant : UInt16 {
         get {
-            let blockNumber : UInt8 = 1
-            let blockIndex : UInt8 = 0x0A
-            let offset = Int(blockNumber * Token.blockSize + blockIndex)
+            let blockNumber = 1
+            let blockIndex = 0x0A
+            let offset = blockNumber * Token.blockSize + blockIndex
             var value : UInt16 = 0
             primaryDataBlock.getBytes(&value, range: NSMakeRange(offset, sizeof(value.dynamicType)))
             if (value != Token.DiConstant) {
@@ -116,9 +115,9 @@ class Token : CustomStringConvertible {
             return value
         }
         set (unused) {
-            let blockNumber : UInt8 = 1
-            let blockIndex : UInt8 = 0x0A
-            let offset = Int(blockNumber * Token.blockSize + blockIndex)
+            let blockNumber = 1
+            let blockIndex = 0x0A
+            let offset = blockNumber * Token.blockSize + blockIndex
             var value : UInt16 = Token.DiConstant
             let size = sizeof(value.dynamicType)
             data.replaceBytesInRange(NSMakeRange(offset, size), withBytes: &value)
@@ -133,9 +132,9 @@ class Token : CustomStringConvertible {
     
     var manufactureYear : UInt8 {
         get {
-            let blockNumber : UInt8 = 1
-            let blockIndex : UInt8 = 0x04
-            let offset = Int(blockNumber * Token.blockSize + blockIndex)
+            let blockNumber = 1
+            let blockIndex = 0x04
+            let offset = blockNumber * Token.blockSize + blockIndex
             var value : UInt8 = 0
             data.getBytes(&value, range: NSMakeRange(offset, sizeof(value.dynamicType)))
             return value
@@ -144,9 +143,9 @@ class Token : CustomStringConvertible {
     
     var manufactureMonth : UInt8 {
         get {
-            let blockNumber : UInt8 = 1
-            let blockIndex : UInt8 = 0x05
-            let offset = Int(blockNumber * Token.blockSize + blockIndex)
+            let blockNumber = 1
+            let blockIndex = 0x05
+            let offset = blockNumber * Token.blockSize + blockIndex
             var value : UInt8 = 0
             data.getBytes(&value, range: NSMakeRange(offset, sizeof(value.dynamicType)))
             return value
@@ -154,9 +153,9 @@ class Token : CustomStringConvertible {
     }
     var manufactureDay : UInt8 {
         get {
-            let blockNumber : UInt8 = 1
-            let blockIndex : UInt8 = 0x06
-            let offset = Int(blockNumber * Token.blockSize + blockIndex)
+            let blockNumber = 1
+            let blockIndex = 0x06
+            let offset = blockNumber * Token.blockSize + blockIndex
             var value : UInt8 = 0
             data.getBytes(&value, range: NSMakeRange(offset, sizeof(value.dynamicType)))
             return value
@@ -165,9 +164,9 @@ class Token : CustomStringConvertible {
     
     var sequenceA : UInt8 {
         get {
-            let blockNumber : UInt8 = 4
-            let blockIndex : UInt8 = 0x0b
-            let offset = Int(blockNumber * Token.blockSize + blockIndex)
+            let blockNumber = 4
+            let blockIndex = 0x0b
+            let offset = blockNumber * Token.blockSize + blockIndex
             var value : UInt8 = 0
             data.getBytes(&value, range: NSMakeRange(offset, sizeof(value.dynamicType)))
             return value
@@ -176,9 +175,9 @@ class Token : CustomStringConvertible {
     
     var sequenceB : UInt8 {
         get {
-            let blockNumber : UInt8 = 8
-            let blockIndex : UInt8 = 0x0b
-            let offset = Int(blockNumber * Token.blockSize + blockIndex)
+            let blockNumber = 8
+            let blockIndex = 0x0b
+            let offset = blockNumber * Token.blockSize + blockIndex
             var value : UInt8 = 0
             data.getBytes(&value, range: NSMakeRange(offset, sizeof(value.dynamicType)))
             return value
@@ -262,31 +261,36 @@ class Token : CustomStringConvertible {
         self.generation = UInt8(modelId / 100 % 10)
     }
     
-    func nextBlock() -> UInt8 {
-        return UInt8(data.length / Int(Token.blockSize))
+    func nextBlock() -> Int {
+        return data.length / Token.blockSize
     }
     
     func complete() -> Bool{
         return (nextBlock() == Token.blockCount)
     }
 
-    func block(blockNumber: Int) -> NSData {
-        return block(UInt8(blockNumber))
+    func block(blockNumber: UInt8) -> NSData {
+        return block(Int(blockNumber))
     }
     
-    func block(blockNumber: UInt8) -> NSData {
-        let blockStart = Int(blockNumber) * Int(Token.blockSize)
-        let blockRange = NSMakeRange(blockStart, Int(Token.blockSize))
+    func block(blockNumber: Int) -> NSData {
+        let blockStart = blockNumber * Token.blockSize
+        let blockRange = NSMakeRange(blockStart, Token.blockSize)
         return data.subdataWithRange(blockRange)
     }
 
-    func load(blockNumber: UInt8, blockData: NSData) {
+    func load(blockNumber: Int, blockData: NSData) {
         if (blockNumber == nextBlock()) {
             data.appendData(blockData)
         } else {
-            let blockRange = NSMakeRange(Int(blockNumber * Token.blockSize), Int(Token.blockSize))
+            let blockRange = NSMakeRange(blockNumber * Token.blockSize, Token.blockSize)
             data.replaceBytesInRange(blockRange, withBytes: blockData.bytes)
         }
+        
+    }
+    
+    func load(blockNumber: UInt8, blockData: NSData) {
+        load(Int(blockNumber), blockData: blockData)
     }
     
     func parseSkills() {
@@ -300,11 +304,11 @@ class Token : CustomStringConvertible {
 
     }
     
-    func sectorTrailer(blockNumber : UInt8) -> Bool {
+    func sectorTrailer(blockNumber : Int) -> Bool {
         return (blockNumber + 1) % 4 == 0
     }
     
-    func verifyChecksum(blockData: NSData, blockNumber: UInt8) -> Bool {
+    func verifyChecksum(blockData: NSData, blockNumber: Int) -> Bool {
         //Excluded blocks
         if (blockNumber == 0 || blockNumber == 2 || sectorTrailer(blockNumber)) {
             return true
@@ -321,11 +325,16 @@ class Token : CustomStringConvertible {
         return valid
     }
     
-    func correctChecksum(blockNumber: UInt8) {
-        let blockData : NSMutableData = block(blockNumber).subdataWithRange(NSMakeRange(0, Int(Token.blockSize) - sizeof(UInt32))).mutableCopy() as! NSMutableData
-        let checksum = getChecksum(blockData)
-        blockData.appendData(checksum)
-        load(blockNumber, blockData: blockData)
+    func correctChecksum(blockNumber: Int) {
+        let blockData = block(blockNumber)
+        if (!verifyChecksum(blockData, blockNumber: blockNumber)) {
+            //NB: I'm re-defining blockData
+            let blockData = blockData.subdataWithRange(NSMakeRange(0, Int(Token.blockSize) - sizeof(UInt32))).mutableCopy() as! NSMutableData
+            let checksum = getChecksum(blockData)
+            blockData.appendData(checksum)
+            load(blockNumber, blockData: blockData)
+        }
+
     }
     
     func getChecksum(data: NSData) -> NSData {
