@@ -240,18 +240,24 @@ class Token : CustomStringConvertible {
     
     init(modelId: UInt32) {
         //Make 7 bytes uid
-        let uid = NSMutableData(bytes: [0, 0, 0, 0, 0, 0, 0] as [UInt8], length: 7)
-        var value = modelId
-        uid.replaceBytesInRange(NSMakeRange(0, sizeof(modelId.dynamicType)), withBytes: &value)
+        var value = modelId.bigEndian
+        let uid = NSMutableData(bytes:[0x04, 0x0e, 0x00, 0x00, 0x00, 0x00, 0x81] as [UInt8], length: 7)
+        uid.replaceBytesInRange(NSMakeRange(2, sizeof(modelId.dynamicType)), withBytes: &value)
         self.tagId = uid
-        
-        //Load empty data
-        for blockNumber in 0..<Token.blockCount {
-            self.load(blockNumber, blockData: emptyBlock)
+
+        //Block 0
+        let block0 = NSMutableData()
+        block0.appendData(tagId)
+        let block0remainder = (Int(Token.blockSize) - uid.length)
+        block0.appendBytes([UInt8](count: block0remainder, repeatedValue: 0), length: block0remainder)
+        self.load(0, blockData: block0)
+
+        //Fill with zeros
+        while !self.complete() {
+            self.load(self.nextBlock(), blockData: emptyBlock)
         }
-        //Run minimal setters
-        self.data.replaceBytesInRange(NSMakeRange(0, uid.length), withBytes: uid.bytes)
-        self.modelId = modelId
+        
+        self.modelId = modelId.bigEndian
         self.diConstant = Token.DiConstant
         self.generation = UInt8(modelId / 100 % 10)
     }
