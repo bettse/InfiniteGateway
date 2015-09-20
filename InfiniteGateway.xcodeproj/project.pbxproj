@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		6D2078AA1BAF4E3100020B3A /* MifareMini.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6D2078A91BAF4E3100020B3A /* MifareMini.swift */; settings = {ASSET_TAGS = (); }; };
 		6D3AFB671BAB848B00FAE962 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6D3AFB661BAB848B00FAE962 /* AppDelegate.swift */; };
 		6D3AFB691BAB848B00FAE962 /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6D3AFB681BAB848B00FAE962 /* ViewController.swift */; };
 		6D3AFB6C1BAB848B00FAE962 /* InfiniteGateway.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = 6D3AFB6A1BAB848B00FAE962 /* InfiniteGateway.xcdatamodeld */; };
@@ -29,6 +30,7 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		6D2078A91BAF4E3100020B3A /* MifareMini.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MifareMini.swift; sourceTree = "<group>"; };
 		6D3AFB631BAB848B00FAE962 /* InfiniteGateway.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = InfiniteGateway.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		6D3AFB661BAB848B00FAE962 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		6D3AFB681BAB848B00FAE962 /* ViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewController.swift; sourceTree = "<group>"; };
@@ -91,6 +93,7 @@
 				6D3AFB851BAB86FC00FAE962 /* Report.swift */,
 				6D3AFB861BAB86FC00FAE962 /* Response.swift */,
 				6D3AFB871BAB86FC00FAE962 /* ThePoster.swift */,
+				6D2078A91BAF4E3100020B3A /* MifareMini.swift */,
 				6D3AFB881BAB86FC00FAE962 /* Token.swift */,
 				6D3AFB951BAD1A7800FAE962 /* EncryptedToken.swift */,
 				6D3AFB891BAB86FC00FAE962 /* Update.swift */,
@@ -197,6 +200,7 @@
 				6D3AFB941BACD9AE00FAE962 /* PortalDriver.swift in Sources */,
 				6D3AFB961BAD1A7800FAE962 /* EncryptedToken.swift in Sources */,
 				6D3AFB8D1BAB86FC00FAE962 /* Portal.swift in Sources */,
+				6D2078AA1BAF4E3100020B3A /* MifareMini.swift in Sources */,
 				6D3AFB901BAB86FC00FAE962 /* ThePoster.swift in Sources */,
 				6D3AFB8A1BAB86FC00FAE962 /* Command.swift in Sources */,
 				6D3AFB8E1BAB86FC00FAE962 /* Report.swift in Sources */,
@@ -342,6 +346,7 @@
 				6D3AFB771BAB848B00FAE962 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
 

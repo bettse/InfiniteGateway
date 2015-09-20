@@ -14,7 +14,7 @@ import CommonCRC
 
 //Tokens can be figures, disks (some are stackable), playsets (clear 3d figure with hex base)
 
-class Token : CustomStringConvertible {
+class Token : MifareMini, CustomStringConvertible {
     static let sectorSize : Int = 4 //Blocks
     static let sectorCount : Int = 5
     static let blockCount : Int = sectorSize * sectorCount
@@ -43,7 +43,7 @@ class Token : CustomStringConvertible {
         let me = String(self.dynamicType).componentsSeparatedByString(".").last!
         return "\(me)(\(tagId): v\(generation) \(name) L\(level)[\(experience)] | Manuf: \(manufactureYear)/\(manufactureMonth)/\(manufactureDay)"
     }
-    var tagId : NSData
+
     var dateFormat : NSDateFormatter {
         get {
             let dateFormatter = NSDateFormatter()
@@ -233,16 +233,14 @@ class Token : CustomStringConvertible {
         }
     }
 
-    init(tagId: NSData) {
-        self.tagId = tagId
-    }
     
-    init(modelId: UInt32) {
+    convenience init(modelId: UInt32) {
+
         //Make 7 bytes uid
         var value = modelId.bigEndian
         let uid = NSMutableData(bytes:[0x04, 0x0e, 0x00, 0x00, 0x00, 0x00, 0x81] as [UInt8], length: 7)
         uid.replaceBytesInRange(NSMakeRange(2, sizeof(modelId.dynamicType)), withBytes: &value)
-        self.tagId = uid
+        self.init(tagId: uid)
 
         //Block 0
         let block0 = NSMutableData()
