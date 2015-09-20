@@ -40,7 +40,7 @@ class EncryptedToken : Token {
     
     convenience init(from: Token) {
         self.init(tagId: from.tagId)
-        for blockNumber in 0..<Token.blockCount {
+        for blockNumber in 0..<MifareMini.blockCount {
             let clearBlock = from.block(blockNumber)
             let encryptedBlock = encrypt(blockNumber, blockData: clearBlock)
             self.data.appendData(encryptedBlock)
@@ -49,7 +49,7 @@ class EncryptedToken : Token {
     
     func getDecryptedToken() -> Token {
         let clearToken : Token = Token(tagId: self.tagId)
-        for blockNumber in 0..<Token.blockCount {
+        for blockNumber in 0..<MifareMini.blockCount {
             let encryptedBlock = block(blockNumber)
             let clearBlock = decrypt(blockNumber, blockData: encryptedBlock)
             clearToken.load(blockNumber, blockData: clearBlock)
@@ -73,8 +73,8 @@ class EncryptedToken : Token {
     }
 
     func commonCrypt(blockNumber: Int, blockData: NSData, encrypt: Bool) -> NSData {
-        if (blockData.length != Token.blockSize) {
-            print("blockData must be exactly \(Token.blockSize) bytes")
+        if (blockData.length != MifareMini.blockSize) {
+            print("blockData must be exactly \(MifareMini.blockSize) bytes")
             return blockData
         }
         

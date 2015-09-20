@@ -15,19 +15,15 @@ import CommonCRC
 //Tokens can be figures, disks (some are stackable), playsets (clear 3d figure with hex base)
 
 class Token : MifareMini, CustomStringConvertible {
-    static let sectorSize : Int = 4 //Blocks
-    static let sectorCount : Int = 5
-    static let blockCount : Int = sectorSize * sectorCount
-    static let blockSize : Int = 0x10
-    static let tokenSize : Int = blockSize * blockCount
+
     static let DiConstant : UInt16 = 0xD11F // (i.e. D1sney 1nFinity)
 
     let DATE_OFFSET = 1356998400 //Jan 1, 2013
     let DATE_COEFFICIENT = 0x7b
     let BINARY = 2
     let HEX = 0x10
-    let sector_trailor = NSData(bytes: [0, 0, 0, 0, 0, 0, 0x77, 0x87, 0x88, 0, 0, 0, 0, 0, 0, 0,], length: 16)
-    let emptyBlock = NSData(bytes:[UInt8](count: Int(Token.blockSize), repeatedValue: 0), length: Int(Token.blockSize))
+
+    let emptyBlock = NSData(bytes:[UInt8](count: Int(MifareMini.blockSize), repeatedValue: 0), length: Int(MifareMini.blockSize))
     
     //All blocks
     let checksumIndex = 0x0c //all blocks
@@ -60,7 +56,7 @@ class Token : MifareMini, CustomStringConvertible {
             //TODO: Create a mapping of these characteristics to a property name
             let blockNumber = 1
             let blockIndex = 0
-            let offset = blockNumber * Token.blockSize + blockIndex
+            let offset = blockNumber * MifareMini.blockSize + blockIndex
             var value : UInt32 = 0
             let size = sizeof(value.dynamicType)
             data.getBytes(&value, range: NSMakeRange(offset, size))
@@ -69,7 +65,7 @@ class Token : MifareMini, CustomStringConvertible {
         set(newModelId) {
             let blockNumber = 1
             let blockIndex = 0
-            let offset = blockNumber * Token.blockSize + blockIndex
+            let offset = blockNumber * MifareMini.blockSize + blockIndex
             var value : UInt32 = newModelId
             let size = sizeof(value.dynamicType)
             data.replaceBytesInRange(NSMakeRange(offset, size), withBytes: &value)
@@ -87,7 +83,7 @@ class Token : MifareMini, CustomStringConvertible {
         get {
             let blockNumber = 1
             let blockIndex = 0x09
-            let offset = blockNumber * Token.blockSize + blockIndex
+            let offset = blockNumber * MifareMini.blockSize + blockIndex
             var value : UInt8 = 0
             data.getBytes(&value, range: NSMakeRange(offset, sizeof(value.dynamicType)))
             return value
@@ -95,7 +91,7 @@ class Token : MifareMini, CustomStringConvertible {
         set(newGeneration) {
             let blockNumber = 1
             let blockIndex = 0x09
-            let offset = blockNumber * Token.blockSize + blockIndex
+            let offset = blockNumber * MifareMini.blockSize + blockIndex
             var value : UInt8 = newGeneration
             let size = sizeof(value.dynamicType)
             data.replaceBytesInRange(NSMakeRange(offset, size), withBytes: &value)
@@ -106,7 +102,7 @@ class Token : MifareMini, CustomStringConvertible {
         get {
             let blockNumber = 1
             let blockIndex = 0x0A
-            let offset = blockNumber * Token.blockSize + blockIndex
+            let offset = blockNumber * MifareMini.blockSize + blockIndex
             var value : UInt16 = 0
             primaryDataBlock.getBytes(&value, range: NSMakeRange(offset, sizeof(value.dynamicType)))
             if (value != Token.DiConstant) {
@@ -117,7 +113,7 @@ class Token : MifareMini, CustomStringConvertible {
         set (unused) {
             let blockNumber = 1
             let blockIndex = 0x0A
-            let offset = blockNumber * Token.blockSize + blockIndex
+            let offset = blockNumber * MifareMini.blockSize + blockIndex
             var value : UInt16 = Token.DiConstant
             let size = sizeof(value.dynamicType)
             data.replaceBytesInRange(NSMakeRange(offset, size), withBytes: &value)
@@ -134,7 +130,7 @@ class Token : MifareMini, CustomStringConvertible {
         get {
             let blockNumber = 1
             let blockIndex = 0x04
-            let offset = blockNumber * Token.blockSize + blockIndex
+            let offset = blockNumber * MifareMini.blockSize + blockIndex
             var value : UInt8 = 0
             data.getBytes(&value, range: NSMakeRange(offset, sizeof(value.dynamicType)))
             return value
@@ -145,7 +141,7 @@ class Token : MifareMini, CustomStringConvertible {
         get {
             let blockNumber = 1
             let blockIndex = 0x05
-            let offset = blockNumber * Token.blockSize + blockIndex
+            let offset = blockNumber * MifareMini.blockSize + blockIndex
             var value : UInt8 = 0
             data.getBytes(&value, range: NSMakeRange(offset, sizeof(value.dynamicType)))
             return value
@@ -155,7 +151,7 @@ class Token : MifareMini, CustomStringConvertible {
         get {
             let blockNumber = 1
             let blockIndex = 0x06
-            let offset = blockNumber * Token.blockSize + blockIndex
+            let offset = blockNumber * MifareMini.blockSize + blockIndex
             var value : UInt8 = 0
             data.getBytes(&value, range: NSMakeRange(offset, sizeof(value.dynamicType)))
             return value
@@ -166,7 +162,7 @@ class Token : MifareMini, CustomStringConvertible {
         get {
             let blockNumber = 4
             let blockIndex = 0x0b
-            let offset = blockNumber * Token.blockSize + blockIndex
+            let offset = blockNumber * MifareMini.blockSize + blockIndex
             var value : UInt8 = 0
             data.getBytes(&value, range: NSMakeRange(offset, sizeof(value.dynamicType)))
             return value
@@ -177,7 +173,7 @@ class Token : MifareMini, CustomStringConvertible {
         get {
             let blockNumber = 8
             let blockIndex = 0x0b
-            let offset = blockNumber * Token.blockSize + blockIndex
+            let offset = blockNumber * MifareMini.blockSize + blockIndex
             var value : UInt8 = 0
             data.getBytes(&value, range: NSMakeRange(offset, sizeof(value.dynamicType)))
             return value
@@ -214,7 +210,6 @@ class Token : MifareMini, CustomStringConvertible {
     var ownerId : UInt32 = 0
     var loadCount : UInt8 = 0
     var skills : UInt32 = 0
-    var data : NSMutableData = NSMutableData()
     
     var type : String {
         get {
@@ -245,7 +240,7 @@ class Token : MifareMini, CustomStringConvertible {
         //Block 0
         let block0 = NSMutableData()
         block0.appendData(tagId)
-        let block0remainder = (Int(Token.blockSize) - uid.length)
+        let block0remainder = (Int(MifareMini.blockSize) - uid.length)
         block0.appendBytes([UInt8](count: block0remainder, repeatedValue: 0), length: block0remainder)
         self.load(0, blockData: block0)
 
@@ -258,38 +253,7 @@ class Token : MifareMini, CustomStringConvertible {
         self.diConstant = Token.DiConstant
         self.generation = UInt8(modelId / 100 % 10)
     }
-    
-    func nextBlock() -> Int {
-        return data.length / Token.blockSize
-    }
-    
-    func complete() -> Bool{
-        return (nextBlock() == Token.blockCount)
-    }
 
-    func block(blockNumber: UInt8) -> NSData {
-        return block(Int(blockNumber))
-    }
-    
-    func block(blockNumber: Int) -> NSData {
-        let blockStart = blockNumber * Token.blockSize
-        let blockRange = NSMakeRange(blockStart, Token.blockSize)
-        return data.subdataWithRange(blockRange)
-    }
-
-    func load(blockNumber: Int, blockData: NSData) {
-        if (blockNumber == nextBlock()) {
-            data.appendData(blockData)
-        } else {
-            let blockRange = NSMakeRange(blockNumber * Token.blockSize, Token.blockSize)
-            data.replaceBytesInRange(blockRange, withBytes: blockData.bytes)
-        }
-        
-    }
-    
-    func load(blockNumber: UInt8, blockData: NSData) {
-        load(Int(blockNumber), blockData: blockData)
-    }
     
     func parseSkills() {
         //Choose the up skill for my first skill and it became
@@ -301,10 +265,7 @@ class Token : MifareMini, CustomStringConvertible {
         }
 
     }
-    
-    func sectorTrailer(blockNumber : Int) -> Bool {
-        return (blockNumber + 1) % 4 == 0
-    }
+
     
     func verifyChecksum(blockData: NSData, blockNumber: Int) -> Bool {
         //Excluded blocks
@@ -327,7 +288,7 @@ class Token : MifareMini, CustomStringConvertible {
         let blockData = block(blockNumber)
         if (!verifyChecksum(blockData, blockNumber: blockNumber)) {
             //NB: I'm re-defining blockData
-            let blockData = blockData.subdataWithRange(NSMakeRange(0, Int(Token.blockSize) - sizeof(UInt32))).mutableCopy() as! NSMutableData
+            let blockData = blockData.subdataWithRange(NSMakeRange(0, Int(MifareMini.blockSize) - sizeof(UInt32))).mutableCopy() as! NSMutableData
             let checksum = getChecksum(blockData)
             blockData.appendData(checksum)
             load(blockNumber, blockData: blockData)
