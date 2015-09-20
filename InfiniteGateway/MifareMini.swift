@@ -15,7 +15,8 @@ class MifareMini {
     static let blockSize : Int = 0x10
     static let tokenSize : Int = blockSize * blockCount
     
-    let sector_trailor = NSData(bytes: [0, 0, 0, 0, 0, 0, 0x77, 0x87, 0x88, 0, 0, 0, 0, 0, 0, 0,], length: 16)
+    let sector_trailor = NSData(bytes: [0, 0, 0, 0, 0, 0, 0x77, 0x87, 0x88, 0, 0, 0, 0, 0, 0, 0,], length: 16)    
+    let emptyBlock = NSData(bytes:[UInt8](count: Int(MifareMini.blockSize), repeatedValue: 0), length: Int(MifareMini.blockSize))
     
     var tagId : NSData
     var data : NSMutableData = NSMutableData()
@@ -59,5 +60,12 @@ class MifareMini {
     
     func sectorTrailer(blockNumber : Int) -> Bool {
         return (blockNumber + 1) % 4 == 0
+    }
+    
+    func dump() {
+        let downloads = NSSearchPathForDirectoriesInDomains(.DownloadsDirectory, .UserDomainMask, true)
+        let filename = "\(tagId.hexadecimalString).bin"
+        let fullPath = NSURL(fileURLWithPath: downloads[0]).URLByAppendingPathComponent(filename)
+        data.writeToURL(fullPath, atomically: true)
     }
 }

@@ -12,7 +12,7 @@ import CommonCrypto
 import CommonCRC
 
 
-class EncryptedToken : Token {
+class EncryptedToken : MifareMini {
     var key : NSData {
         get {
             //It is the first 16 bytes of a SHA1 hash of: a hard-coded 16 bytes, 15 bytes of the string "(c) Disney 2013", and the 7 bytes of the tag ID.

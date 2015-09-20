@@ -23,8 +23,6 @@ class Token : MifareMini, CustomStringConvertible {
     let BINARY = 2
     let HEX = 0x10
 
-    let emptyBlock = NSData(bytes:[UInt8](count: Int(MifareMini.blockSize), repeatedValue: 0), length: Int(MifareMini.blockSize))
-    
     //All blocks
     let checksumIndex = 0x0c //all blocks
     
@@ -310,7 +308,7 @@ class Token : MifareMini, CustomStringConvertible {
         return NSData()
     }
     
-    func dump() {
+    override func dump() {
         let downloads = NSSearchPathForDirectoriesInDomains(.DownloadsDirectory, .UserDomainMask, true)
         let filename = "\(tagId.hexadecimalString)-\(name).bin"
         let fullPath = NSURL(fileURLWithPath: downloads[0]).URLByAppendingPathComponent(filename)
@@ -319,8 +317,6 @@ class Token : MifareMini, CustomStringConvertible {
     
     func save() {
         //send to PortalDriver to be re-encrypted before being sent back to token
-    }
-
-    
+    }    
     
 }
