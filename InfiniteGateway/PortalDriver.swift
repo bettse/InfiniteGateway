@@ -44,15 +44,7 @@ class PortalDriver : NSObject {
     func deviceConnected(notification: NSNotification) {
         portal.outputCommand(ActivateCommand())
     }
-
-
     
-    /* General flow is such:
-    Update (new token) -> request TagId
-    get TagId -> create in memory token and request Block 0
-    get block 0 -> request block n
-    get block n -> request block n+1 if n+1 < Token.tokenSize
-    */
     func incomingUpdate(update: Update) {
         var updateColor : NSColor = NSColor()
         if (update.direction == Update.Direction.Arriving) {
@@ -88,12 +80,8 @@ class PortalDriver : NSObject {
             portal.output(report)
         } else if let response = response as? ReadResponse {
             tokenRead(response)
-        } else if let _ = response as? WriteResponse {
-            //Idea: DIMP (business logic) always writes to protal any new token data, then the
-            //write response is used to kick off a read of that block, which then updates the in
-            //memory token.
-            //Counterpoint: DIMP needs to know what the block data would look like; or Token needs to be
-            //updated first (setSkill(...)) then have a "getChangedBlocks" and have DIMP loop and send them
+        } else if let response = response as? WriteResponse {
+            print(response)
         } else if let _ = response as? LightOnResponse {
         } else if let _ = response as? LightFadeResponse {
         } else if let _ = response as? LightFlashResponse {
