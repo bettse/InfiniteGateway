@@ -33,6 +33,7 @@ class Message : CustomStringConvertible {
         case Hex = 1
         case Left = 2
         case Right = 3
+        case None = 0xFF
         func desc() -> String {
             return String(self).componentsSeparatedByString(".").last!
         }

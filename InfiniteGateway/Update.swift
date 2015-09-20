@@ -23,7 +23,7 @@ class Update : Message {
 
     
     //Setting defaults so I don't have to deal with '?' style variables yet
-    var ledPlatform : LedPlatform = .All
+    var ledPlatform : LedPlatform = .None
     var nfcIndex : UInt8 = 0
     var direction : Direction = .Arriving
     

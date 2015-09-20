@@ -24,7 +24,8 @@ class PortalDriver : NSObject {
         }
     }
 
-    var presence = Dictionary<Message.LedPlatform, Array<UInt8>>()
+    var presence = Dictionary<Message.LedPlatform, [UInt8]>()
+    
     var encryptedTokens : [UInt8:EncryptedToken] = [:]
     
     override init() {
@@ -34,6 +35,7 @@ class PortalDriver : NSObject {
             thread.start()
         }
 
+
         NSNotificationCenter.defaultCenter().addObserver(self, selector: "deviceConnected:", name: "deviceConnected", object: nil)
         NSNotificationCenter.defaultCenter().addObserver(self, selector: "incomingMessage:", name: "incomingMessage", object: nil)
         //NSNotificationCenter.defaultCenter().addObserver(self, selector: "deviceDisconnected:", name: "deviceDisconnected", object: nil)
@@ -42,6 +44,8 @@ class PortalDriver : NSObject {
     func deviceConnected(notification: NSNotification) {
         portal.outputCommand(ActivateCommand())
     }
+
+
     
     /* General flow is such:
     Update (new token) -> request TagId
@@ -50,26 +54,23 @@ class PortalDriver : NSObject {
     get block n -> request block n+1 if n+1 < Token.tokenSize
     */
     func incomingUpdate(update: Update) {
+        print("update: \(update)")
         var updateColor : NSColor = NSColor()
         if (update.direction == Update.Direction.Arriving) {
             updateColor = NSColor.whiteColor()
-            presence[update.ledPlatform]?.append(update.nfcIndex)
+            updatePresence(update.ledPlatform, nfcIndex: update.nfcIndex)
             portal.outputCommand(TagIdCommand(nfcIndex: update.nfcIndex))
         } else if (update.direction == Update.Direction.Departing) {
             updateColor = NSColor.blackColor()
-            if let pIndex = presence[update.ledPlatform]?.indexOf(update.nfcIndex) {
-                presence[update.ledPlatform]?.removeAtIndex(pIndex)
-            }
             let userInfo : [NSObject : AnyObject] = [
                 "nfcIndex": Int(update.nfcIndex),
                 "ledPlatform": Int(update.ledPlatform.rawValue)
             ]
+            removePresence(update.ledPlatform, nfcIndex: update.nfcIndex)
             dispatch_async(dispatch_get_main_queue(), {
                 NSNotificationCenter.defaultCenter().postNotificationName("tokenLeft", object: nil, userInfo: userInfo)
             })
-            
-        }
-        
+        }        
         portal.outputCommand(LightOnCommand(ledPlatform: update.ledPlatform, color: updateColor))
     }
     
@@ -78,7 +79,10 @@ class PortalDriver : NSObject {
             let report = Report(cmd: PresenceCommand())
             portal.output(report)
         } else if let response = response as? PresenceResponse {
-            presence = response.details
+            for (ledPlatform, nfcIndicies) in response.details {
+                let temp = presence[ledPlatform] ?? [UInt8]() //Define if not already defined
+                presence[ledPlatform] = temp + nfcIndicies
+            }
         } else if let response = response as? TagIdResponse {
             encryptedTokens[response.nfcIndex] = EncryptedToken(tagId: response.tagId)
             let report = Report(cmd: ReadCommand(nfcIndex: response.nfcIndex, block: 0))
@@ -101,7 +105,7 @@ class PortalDriver : NSObject {
     }
 
     func ledPlatformOfNfcIndex(nfcIndex: UInt8) -> Message.LedPlatform {
-        var led = Message.LedPlatform.All
+        var led = Message.LedPlatform.None
         for (ledPlatform, nfcIndices) in presence {
             if (nfcIndices.contains(nfcIndex)) {
                 led = ledPlatform
@@ -110,16 +114,36 @@ class PortalDriver : NSObject {
         return led
     }
     
+    func updatePresence(ledPlatform: Message.LedPlatform, nfcIndex: UInt8) {
+        presence[ledPlatform] = presence[ledPlatform] ?? [UInt8]() //Define if not already defined
+        if var nfcIndicies = presence[ledPlatform] {
+            nfcIndicies.append(nfcIndex)
+        }
+    }
+    
+    func removePresence(ledPlatform: Message.LedPlatform, nfcIndex: UInt8) {
+        presence[ledPlatform] = presence[ledPlatform] ?? [UInt8]() //Define if not already defined
+        if var nfcIndicies = presence[ledPlatform] {
+            if let nfcFound = nfcIndicies.indexOf(nfcIndex) {
+                nfcIndicies.removeAtIndex(nfcFound)
+            }
+        }
+        
+    }
+    
     func tokenRead(response: ReadResponse) {
         if let token = encryptedTokens[response.nfcIndex] {
             token.load(response.blockNumber, blockData: response.blockData)
             if (token.complete()) {
                 let decryptedToken = token.getDecryptedToken()
+                let ledPlatform = ledPlatformOfNfcIndex(response.nfcIndex)
                 let userInfo : [NSObject : AnyObject] = [
                     "nfcIndex": Int(response.nfcIndex),
-                    "ledPlatform": Int(ledPlatformOfNfcIndex(response.nfcIndex).rawValue),
+                    "ledPlatform": Int(ledPlatform.rawValue),
                     "token": decryptedToken
                 ]
+
+                portal.outputCommand(LightOnCommand(ledPlatform: ledPlatform, color: NSColor.greenColor()))
                 dispatch_async(dispatch_get_main_queue(), {
                     NSNotificationCenter.defaultCenter().postNotificationName("tokenLoaded", object: nil, userInfo: userInfo)
                 })
