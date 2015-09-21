@@ -28,8 +28,6 @@ class ViewController: NSViewController, NSTableViewDataSource, NSTableViewDelega
         // Do any additional setup after loading the view.
         status?.stringValue = "Portal Disconnected"
         
-        modelSelection?.dataSource = self
-        
         NSNotificationCenter.defaultCenter().addObserver(self, selector: "deviceConnected:", name: "deviceConnected", object: nil)
         NSNotificationCenter.defaultCenter().addObserver(self, selector: "deviceDisconnected:", name: "deviceDisconnected", object: nil)
         
