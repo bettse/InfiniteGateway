@@ -22,9 +22,6 @@ class Token : MifareMini, CustomStringConvertible {
     let DATE_COEFFICIENT = 0x7b
     let BINARY = 2
     let HEX = 0x10
-
-    //All blocks
-    let checksumIndex = 0x0c //all blocks
     
     //block 0x05/0x09
     let skillsIndex = 0x00
@@ -112,7 +109,7 @@ class Token : MifareMini, CustomStringConvertible {
             let blockNumber = 1
             let blockIndex = 0x0A
             let offset = blockNumber * MifareMini.blockSize + blockIndex
-            var value : UInt16 = Token.DiConstant
+            var value : UInt16 = Token.DiConstant.bigEndian
             let size = sizeof(value.dynamicType)
             data.replaceBytesInRange(NSMakeRange(offset, size), withBytes: &value)
         }
@@ -133,6 +130,14 @@ class Token : MifareMini, CustomStringConvertible {
             data.getBytes(&value, range: NSMakeRange(offset, sizeof(value.dynamicType)))
             return value
         }
+        set(newYear) {
+            let blockNumber = 1
+            let blockIndex = 0x04
+            let offset = blockNumber * MifareMini.blockSize + blockIndex
+            var value : UInt8 = newYear
+            let size = sizeof(value.dynamicType)
+            data.replaceBytesInRange(NSMakeRange(offset, size), withBytes: &value)
+        }
     }
     
     var manufactureMonth : UInt8 {
@@ -144,6 +149,14 @@ class Token : MifareMini, CustomStringConvertible {
             data.getBytes(&value, range: NSMakeRange(offset, sizeof(value.dynamicType)))
             return value
         }
+        set(newMonth) {
+            let blockNumber = 1
+            let blockIndex = 0x05
+            let offset = blockNumber * MifareMini.blockSize + blockIndex
+            var value : UInt8 = newMonth
+            let size = sizeof(value.dynamicType)
+            data.replaceBytesInRange(NSMakeRange(offset, size), withBytes: &value)
+        }
     }
     var manufactureDay : UInt8 {
         get {
@@ -153,6 +166,14 @@ class Token : MifareMini, CustomStringConvertible {
             var value : UInt8 = 0
             data.getBytes(&value, range: NSMakeRange(offset, sizeof(value.dynamicType)))
             return value
+        }
+        set(newDay) {
+            let blockNumber = 1
+            let blockIndex = 0x06
+            let offset = blockNumber * MifareMini.blockSize + blockIndex
+            var value : UInt8 = newDay
+            let size = sizeof(value.dynamicType)
+            data.replaceBytesInRange(NSMakeRange(offset, size), withBytes: &value)
         }
     }
     
@@ -228,11 +249,10 @@ class Token : MifareMini, CustomStringConvertible {
 
     
     convenience init(modelId: UInt32) {
-
         //Make 7 bytes uid
         var value = modelId.bigEndian
         let uid = NSMutableData(bytes:[0x04, 0x0e, 0x00, 0x00, 0x00, 0x00, 0x81] as [UInt8], length: 7)
-        uid.replaceBytesInRange(NSMakeRange(2, sizeof(modelId.dynamicType)), withBytes: &value)
+        uid.replaceBytesInRange(NSMakeRange(2, sizeof(value.dynamicType)), withBytes: &value)
         self.init(tagId: uid)
 
         //Block 0
@@ -247,9 +267,19 @@ class Token : MifareMini, CustomStringConvertible {
             self.load(self.nextBlock(), blockData: emptyBlock)
         }
         
+        //Setters for known values
         self.modelId = modelId.bigEndian
+        self.manufactureYear = 14
+        self.manufactureMonth = 7
+        self.manufactureDay = 3
         self.diConstant = Token.DiConstant
-        self.generation = UInt8(modelId / 100 % 10)
+        self.generation = UInt8(modelId / 100 % 10) + 1
+        
+        //Other misc
+        var bytes : [UInt8] = [0x02]
+        let miscRange = NSMakeRange(MifareMini.blockSize + 7, 1)
+        data.replaceBytesInRange(miscRange, withBytes: &bytes)
+        correctChecksum(1)
     }
 
     
@@ -265,11 +295,12 @@ class Token : MifareMini, CustomStringConvertible {
     }
 
     
-    func verifyChecksum(blockData: NSData, blockNumber: Int) -> Bool {
+    func verifyChecksum(blockData: NSData, blockNumber: Int, update: Bool = false) -> Bool {
         //Excluded blocks
         if (blockNumber == 0 || blockNumber == 2 || sectorTrailer(blockNumber)) {
             return true
         }
+        let checksumIndex = Token.blockSize - sizeof(UInt32) //12
         
         let existingChecksum = blockData.subdataWithRange(NSMakeRange(checksumIndex, sizeof(UInt32)))
         let data = blockData.subdataWithRange(NSMakeRange(0, checksumIndex)).reverse
@@ -278,20 +309,19 @@ class Token : MifareMini, CustomStringConvertible {
         let valid = (existingChecksum.isEqualToData(checksumResult))
         if (!valid) {
             print("Expected checksum \(checksumResult) but tag had \(existingChecksum)")
+            if (update) {
+                let blockDataWithChecksum : NSMutableData = NSMutableData()
+                blockDataWithChecksum.appendData(blockData.subdataWithRange(NSMakeRange(0, checksumIndex)))
+                blockDataWithChecksum.appendData(checksumResult)
+                load(blockNumber, blockData: blockDataWithChecksum)
+            }
         }
         return valid
     }
     
     func correctChecksum(blockNumber: Int) {
         let blockData = block(blockNumber)
-        if (!verifyChecksum(blockData, blockNumber: blockNumber)) {
-            //NB: I'm re-defining blockData
-            let blockData = blockData.subdataWithRange(NSMakeRange(0, Int(MifareMini.blockSize) - sizeof(UInt32))).mutableCopy() as! NSMutableData
-            let checksum = getChecksum(blockData)
-            blockData.appendData(checksum)
-            load(blockNumber, blockData: blockData)
-        }
-
+        verifyChecksum(blockData, blockNumber: blockNumber, update: true)
     }
     
     func getChecksum(data: NSData) -> NSData {

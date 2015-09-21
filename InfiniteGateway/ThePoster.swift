@@ -38,7 +38,7 @@ class Model : NSObject {
     }
     var generation : UInt8 {
         get {
-            return UInt8(id / 100 % 10)
+            return UInt8(id / 100 % 10) + 1
         }
     }
     var name : String {
