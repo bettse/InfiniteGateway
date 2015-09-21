@@ -69,7 +69,7 @@ class Token : MifareMini, CustomStringConvertible {
     
     var name : String {
         get {
-            return ThePoster.getName(modelId.bigEndian)
+            return model.name
         }
     }
 
@@ -230,23 +230,22 @@ class Token : MifareMini, CustomStringConvertible {
     var loadCount : UInt8 = 0
     var skills : UInt32 = 0
     
-    var type : String {
+    var model : Model {
         get {
-            switch modelId {
-            case 1000000..<2000000:
-                return "Figure"
-            case 2000000..<3000000:
-                return "Play Sets / Toy Box"
-            case 3000000..<4000000:
-                return "Round Power Disc"
-            case 4000000..<5000000:
-                return "Hexagonal Power Disc"
-            default:
-                return "Unknown"
-            }
+            return Model(id: modelId)
         }
     }
 
+    var shortDisplay : String {
+        get {
+            switch model.shape {
+            case Model.Shape.Figure:
+                return "\(model): Level \(level) [\(experience)]"
+            default:
+                return model.description
+            }
+        }
+    }
     
     convenience init(modelId: UInt32) {
         //Make 7 bytes uid

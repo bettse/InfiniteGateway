@@ -17,12 +17,14 @@ import Foundation
 class Model : NSObject {
     let DECIMAL = 10
     var id : UInt32
-    var typeValue : Int {
-        return Int(id) / 1000000 % DECIMAL
-    }
-    var type : String {
-        get {
-            switch typeValue {
+    enum Shape : Int {
+        case None = 0
+        case Figure = 1
+        case PlaySet = 2
+        case RoundPowerDisk = 3
+        case HexPowerDisk = 4
+        func desc() -> String {
+            switch self.rawValue {
             case 1:
                 return "Figure"
             case 2:
@@ -36,6 +38,12 @@ class Model : NSObject {
             }
         }
     }
+    var shape : Shape {
+        get {
+            let shapeVal = Int(id) / 1000000 % DECIMAL
+            return Shape(rawValue: shapeVal)!
+        }
+    }
     var generation : UInt8 {
         get {
             return UInt8(id / 100 % 10) + 1
@@ -45,8 +53,14 @@ class Model : NSObject {
         return ThePoster.getName(id)
     }
     
+    override var description: String {
+        get {
+            return "DI \(generation).0 \(name)"
+        }
+    }
+    
     init(id: UInt32) {
-        self.id = id
+        self.id = id.bigEndian
     }
     
     func copyWithZone(zone: NSZone) -> Model {
