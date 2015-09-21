@@ -14,7 +14,7 @@ class ViewController: NSViewController, NSTableViewDataSource, NSTableViewDelega
     @IBOutlet weak var nfcTable: NSTableView?
     @IBOutlet weak var modelSelection: NSComboBox?
     
-    var nfcMap : [UInt8:Token] = [:]
+    var nfcMap : [Int:Token] = [:]
     
     var portal : Portal {
         get {
@@ -37,7 +37,7 @@ class ViewController: NSViewController, NSTableViewDataSource, NSTableViewDelega
         NSNotificationCenter.defaultCenter().addObserver(self, selector: "tokenLeft:", name: "tokenLeft", object: nil)
         
     }
-
+    
     override var representedObject: AnyObject? {
         didSet {
         // Update the view, if already loaded.
@@ -51,11 +51,32 @@ class ViewController: NSViewController, NSTableViewDataSource, NSTableViewDelega
             let t = Token(modelId: model.id)
             let et = EncryptedToken(from: t)
             et.dump()
-
         }
-
     }
 
+    
+    @IBAction func openFile(sender: AnyObject?) {
+        let myFileDialog: NSOpenPanel = NSOpenPanel()
+        let response = myFileDialog.runModal()
+        if(response == NSModalResponseOK){
+            if let image = NSData(contentsOfURL: myFileDialog.URL!) {
+                if (image.length == MifareMini.tokenSize) {
+                    let token = EncryptedToken(tagId: image.subdataWithRange(NSMakeRange(0, 7)))
+                    token.data = image.mutableCopy() as! NSMutableData
+                    if (token.complete()) {
+                        let userInfo : [String : AnyObject] = [
+                            "nfcIndex": -1,
+                            "token": token.decryptedToken
+                        ]
+                        dispatch_async(dispatch_get_main_queue(), {
+                            NSNotificationCenter.defaultCenter().postNotificationName("tokenLoaded", object: nil, userInfo: userInfo)
+                        })
+                    }
+                }
+            }
+        }
+    }
+    
 
     func deviceDisconnected(notification: NSNotification) {
         status?.stringValue = "Portal Disconnected"
@@ -69,11 +90,16 @@ class ViewController: NSViewController, NSTableViewDataSource, NSTableViewDelega
         if let userInfo = notificaiton.userInfo {
             if let token = userInfo["token"] as? Token {
                 if let nfcIndex = userInfo["nfcIndex"] as? Int {
-                    nfcMap[UInt8(nfcIndex)] = token
+                    if (nfcIndex == -1) { //token from disk image
+                        
+                    } else {
+                        nfcMap[nfcIndex] = token
+                    }
                 }
             }
         }
         if let table = nfcTable {
+            print(nfcMap)
             table.reloadData()
         }
     }
@@ -81,10 +107,11 @@ class ViewController: NSViewController, NSTableViewDataSource, NSTableViewDelega
     func tokenLeft(notificaiton: NSNotification) {
         if let userInfo = notificaiton.userInfo {
             if let nfcIndex = userInfo["nfcIndex"] as? Int {
-                nfcMap.removeValueForKey(UInt8(nfcIndex))
+                nfcMap.removeValueForKey(nfcIndex)
             }
         }
         if let table = nfcTable {
+            print(nfcMap)
             table.reloadData()
         }
     }
@@ -95,7 +122,7 @@ class ViewController: NSViewController, NSTableViewDataSource, NSTableViewDelega
     }
     
     func tableView(tableView: NSTableView, viewForTableColumn: NSTableColumn?, row: Int) -> NSView? {
-        if let token = nfcMap[UInt8(row)] {
+        if let token = nfcMap[row] {
             if let cell = tableView.makeViewWithIdentifier("tableCell", owner: self) as? NSTableCellView {
                 cell.textField!.stringValue = token.description
                 return cell
