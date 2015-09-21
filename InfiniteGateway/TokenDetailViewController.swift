@@ -9,16 +9,36 @@
 import Cocoa
 
 class TokenDetailViewController : NSViewController {
+    
+    @IBOutlet weak var nameLabel: NSTextField?
+    @IBOutlet weak var shapeLabel: NSTextField?
+    @IBOutlet weak var generationLabel: NSTextField?
+    @IBOutlet weak var experienceLabel: NSTextField?
+    @IBOutlet weak var experience: NSSlider?
+    @IBOutlet weak var levelLabel: NSTextField?
+    @IBOutlet weak var uidLabel: NSTextField?
+    
     override func viewDidLoad() {
         super.viewDidLoad()        
         // Do any additional setup after loading the view.
-        print("\(self.description) loaded")
+        let token = representedObject as! Token
+        nameLabel?.stringValue = token.name
+        shapeLabel?.stringValue = "\(token.model.shape)"
+        generationLabel?.stringValue = "\(token.generation).0"
+        experience?.integerValue = Int(token.experience)
+        experienceLabel?.integerValue = Int(token.experience)
+        levelLabel?.integerValue = Int(token.level)
+        uidLabel?.stringValue = token.tagId.hexadecimalString as String
+        
+        experience!.target = self
+        experience!.action = "experienceUpdate"
     }
     
     override var representedObject: AnyObject? {
         didSet {
             // Update the view, if already loaded.
-            print("represented object is \(representedObject)")
+            let token = representedObject as! Token
+            print("represented object is \(token)")
         }
     }
     
@@ -28,4 +48,15 @@ class TokenDetailViewController : NSViewController {
         }
     }
 
+    
+    @IBAction func saveToken(sender: AnyObject?) {
+        let token = representedObject as! Token
+        token.experience = UInt16((experience?.integerValue)!)
+        let encryptedToken = EncryptedToken(from: token)        
+        encryptedToken.dump()
+    }
+    
+    func experienceUpdate() {
+        experienceLabel?.integerValue = (experience?.integerValue)!        
+    }
 }

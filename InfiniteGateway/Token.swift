@@ -216,7 +216,19 @@ class Token : MifareMini, CustomStringConvertible {
             primaryDataBlock.getBytes(&value, range: NSMakeRange(blockIndex, sizeof(value.dynamicType)))
             return value
         }
+        set(newExperience) {
+            let blockIndex = 0x03
+            var value : UInt16 = newExperience
+            var blockNumber = 4
+            if (sequenceB > sequenceA) {
+                blockNumber += 4
+            }
+            let updatedBlock : NSMutableData = block(blockNumber).mutableCopy() as! NSMutableData
+            updatedBlock.replaceBytesInRange(NSMakeRange(blockIndex, sizeof(value.dynamicType)), withBytes: &value)
+            load(blockNumber, blockData: updatedBlock)
+        }
     }
+    
     var level : UInt8 {
         get {
             let blockIndex = 0x04
@@ -321,6 +333,12 @@ class Token : MifareMini, CustomStringConvertible {
     func correctChecksum(blockNumber: Int) {
         let blockData = block(blockNumber)
         verifyChecksum(blockData, blockNumber: blockNumber, update: true)
+    }
+    
+    func correctAllChecsums() {
+        for blockNumber in 0..<MifareMini.blockCount {
+            correctChecksum(blockNumber)
+        }
     }
     
     func getChecksum(data: NSData) -> NSData {

@@ -125,7 +125,9 @@ class ViewController: NSViewController {
     func tokenLeft(notificaiton: NSNotification) {
         if let userInfo = notificaiton.userInfo {
             if let nfcIndex = userInfo["nfcIndex"] as? Int {
-                nfcMap.removeValueForKey(nfcIndex)
+                if (nfcMap.keys.contains(nfcIndex)) {
+                    nfcMap.removeValueForKey(nfcIndex)
+                }
             }
         }
         if let table = nfcTable {
