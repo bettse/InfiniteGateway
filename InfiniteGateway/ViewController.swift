@@ -91,7 +91,7 @@ class ViewController: NSViewController, NSTableViewDataSource, NSTableViewDelega
             if let token = userInfo["token"] as? Token {
                 if let nfcIndex = userInfo["nfcIndex"] as? Int {
                     if (nfcIndex == -1) { //token from disk image
-                        
+                        self.performSegueWithIdentifier("TokenDetail", sender: self)
                     } else {
                         nfcMap[nfcIndex] = token
                     }
@@ -99,7 +99,6 @@ class ViewController: NSViewController, NSTableViewDataSource, NSTableViewDelega
             }
         }
         if let table = nfcTable {
-            print(nfcMap)
             table.reloadData()
         }
     }
@@ -111,22 +110,21 @@ class ViewController: NSViewController, NSTableViewDataSource, NSTableViewDelega
             }
         }
         if let table = nfcTable {
-            print(nfcMap)
             table.reloadData()
         }
     }
     
     // MARK: - NSTable stuff
     func numberOfRowsInTableView(tableView: NSTableView) -> Int {
-        return nfcMap.count
+        return nfcMap.values.count
     }
     
     func tableView(tableView: NSTableView, viewForTableColumn: NSTableColumn?, row: Int) -> NSView? {
-        if let token = nfcMap[row] {
-            if let cell = tableView.makeViewWithIdentifier("tableCell", owner: self) as? NSTableCellView {
-                cell.textField!.stringValue = token.description
-                return cell
-            }
+        let tokens : [Token] = Array(nfcMap.values)
+        let token = tokens[row]
+        if let cell = tableView.makeViewWithIdentifier("tableCell", owner: self) as? NSTableCellView {
+            cell.textField!.stringValue = "\(token.name): Level \(token.level) [\(token.experience)]"
+            return cell
         }
         return nil
     }
