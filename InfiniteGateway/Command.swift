@@ -61,7 +61,7 @@ class Command : Message {
 class ActivateCommand : Command {
     override init() {
         super.init()
-        type = commandType.Activate
+        type = .Activate
         params = PortalDriver.magic
     }
 }
@@ -69,7 +69,7 @@ class ActivateCommand : Command {
 class SeedCommand : Command {
     override init() {
         super.init()
-        type = commandType.Seed
+        type = .Seed
         params = NSData(bytes: [0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00] as [UInt8], length: 8)
     }
 }
@@ -77,14 +77,14 @@ class SeedCommand : Command {
 class NextCommand : Command {
     override init() {
         super.init()
-        type = commandType.Next
+        type = .Next
     }
 }
 
 class PresenceCommand : Command {
     override init() {
         super.init()
-        type = commandType.Presence
+        type = .Presence
     }
 }
 
@@ -93,7 +93,7 @@ class TagIdCommand : Command {
     init(nfcIndex: UInt8) {
         self.nfcIndex = nfcIndex
         super.init()
-        type = commandType.TagId
+        type = .TagId
         params = NSData(bytes: [nfcIndex] as [UInt8], length: 1)
     }
 }
@@ -106,7 +106,7 @@ class ReadCommand : Command {
         self.nfcIndex = nfcIndex
         self.blockNumber = block
         super.init()
-        type = commandType.Read
+        type = .Read
         params = NSData(bytes: [nfcIndex, 0x00, block] as [UInt8], length: 3)
     }
     
@@ -125,7 +125,7 @@ class WriteCommand : Command {
         self.blockNumber = block
         self.blockData = blockData
         super.init()
-        type = commandType.Write
+        type = .Write
         let temp : NSMutableData = NSMutableData(bytes: [nfcIndex, 0x00, block] as [UInt8], length: 3)
         temp.appendData(blockData)
         params = NSData(data: temp)
@@ -146,7 +146,7 @@ class LightOnCommand : Command {
         self.green = green
         self.blue = blue
         super.init()
-        type = commandType.LightOn
+        type = .LightOn
         params = NSData(bytes: [ledPlatform.rawValue, red, green, blue] as [UInt8], length: 4)
     }
 
@@ -181,7 +181,7 @@ class LightFadeCommand : Command {
         self.speed = speed
         self.count = count
         super.init()
-        type = commandType.LightOn
+        type = .LightOn
         params = NSData(bytes: [ledPlatform.rawValue, red, green, blue, speed, count] as [UInt8], length: 6)
     }
     
@@ -223,7 +223,7 @@ class LightFlashCommand : Command {
         self.timeOld = timeOld
         self.count = count
         super.init()
-        type = commandType.LightOn
+        type = .LightOn
         params = NSData(bytes: [ledPlatform.rawValue, red, green, blue, timeNew, timeOld, count] as [UInt8], length: 6)
     }
 
