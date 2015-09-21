@@ -8,8 +8,7 @@
 
 import Cocoa
 
-class ViewController: NSViewController, NSTableViewDataSource, NSTableViewDelegate, NSComboBoxDataSource {
-
+class ViewController: NSViewController {
     @IBOutlet weak var status: NSTextField?
     @IBOutlet weak var nfcTable: NSTableView?
     @IBOutlet weak var modelSelection: NSComboBox?
@@ -127,12 +126,11 @@ class ViewController: NSViewController, NSTableViewDataSource, NSTableViewDelega
             table.reloadData()
         }
     }
-    
-    // MARK: - NSTable stuff
-    func numberOfRowsInTableView(tableView: NSTableView) -> Int {
-        return nfcMap.values.count
-    }
-    
+ 
+}
+
+// MARK: - NSTableViewDataSource
+extension ViewController: NSTableViewDataSource {
     func tableView(tableView: NSTableView, viewForTableColumn: NSTableColumn?, row: Int) -> NSView? {
         let tokens : [Token] = Array(nfcMap.values)
         let token = tokens[row]
@@ -142,10 +140,16 @@ class ViewController: NSViewController, NSTableViewDataSource, NSTableViewDelega
         }
         return nil
     }
- 
-    
-    // MARK: - NSComboBoxDataSource
-    
+}
+
+extension ViewController: NSTableViewDelegate {
+    func numberOfRowsInTableView(tableView: NSTableView) -> Int {
+        return nfcMap.values.count
+    }
+}
+
+// MARK: - NSComboBoxDataSource
+extension ViewController: NSComboBoxDataSource {
     func numberOfItemsInComboBox(aComboBox: NSComboBox) -> Int {
         return ThePoster.models.count
     }
@@ -153,6 +157,5 @@ class ViewController: NSViewController, NSTableViewDataSource, NSTableViewDelega
     func comboBox(aComboBox: NSComboBox, objectValueForItemAtIndex index: Int) -> AnyObject {
         return ThePoster.models[index].name
     }
-
 }
 
