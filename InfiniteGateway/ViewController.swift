@@ -136,7 +136,7 @@ class ViewController: NSViewController, NSTableViewDataSource, NSTableViewDelega
     func tableView(tableView: NSTableView, viewForTableColumn: NSTableColumn?, row: Int) -> NSView? {
         let tokens : [Token] = Array(nfcMap.values)
         let token = tokens[row]
-        if let cell = tableView.makeViewWithIdentifier("tableCell", owner: self) as? NSTableCellView {
+        if let cell = tableView.makeViewWithIdentifier(viewForTableColumn!.identifier, owner: self) as? NSTableCellView {
             cell.textField!.stringValue = "\(token.name): Level \(token.level) [\(token.experience)]"
             return cell
         }

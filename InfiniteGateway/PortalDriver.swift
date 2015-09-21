@@ -73,6 +73,9 @@ class PortalDriver : NSObject {
             for (ledPlatform, nfcIndicies) in response.details {
                 let temp = presence[ledPlatform] ?? [UInt8]() //Define if not already defined
                 presence[ledPlatform] = temp + nfcIndicies
+                for nfcIndex in nfcIndicies { //Get data for existing tokens
+                    portal.outputCommand(TagIdCommand(nfcIndex: nfcIndex))
+                }
             }
         } else if let response = response as? TagIdResponse {
             encryptedTokens[response.nfcIndex] = EncryptedToken(tagId: response.tagId)
