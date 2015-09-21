@@ -32,7 +32,8 @@ class ViewController: NSViewController {
         
         NSNotificationCenter.defaultCenter().addObserver(self, selector: "tokenLoaded:", name: "tokenLoaded", object: nil)
         NSNotificationCenter.defaultCenter().addObserver(self, selector: "tokenLeft:", name: "tokenLeft", object: nil)
-        
+        self.nfcTable?.doubleAction = "tableViewDoubleAction"
+        self.nfcTable?.target = self
     }
     
     override var representedObject: AnyObject? {
@@ -90,6 +91,11 @@ class ViewController: NSViewController {
         }
     }
     
+    
+    func tableViewDoubleAction() {
+        self.performSegueWithIdentifier("TokenDetail", sender: self)
+    }
+    
 
     func deviceDisconnected(notification: NSNotification) {
         status?.stringValue = "Portal Disconnected"
@@ -145,6 +151,12 @@ extension ViewController: NSTableViewDataSource {
 extension ViewController: NSTableViewDelegate {
     func numberOfRowsInTableView(tableView: NSTableView) -> Int {
         return nfcMap.values.count
+    }
+    
+    //https://developer.apple.com/library/mac/documentation/Cocoa/Reference/NSTableViewDelegate_Protocol/#//apple_ref/occ/intfm/NSTableViewDelegate/tableView:rowActionsForRow:edge:
+    @available(OSX 10.11, *)
+    func tableView(tableView: NSTableView, rowActionsForRow row: Int, edge: NSTableRowActionEdge) -> [NSTableViewRowAction] {
+        return []
     }
 }
 
