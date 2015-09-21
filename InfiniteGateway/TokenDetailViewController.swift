@@ -20,7 +20,12 @@ class TokenDetailViewController : NSViewController {
             // Update the view, if already loaded.
             print("represented object is \(representedObject)")
         }
-
+    }
+    
+    var token : Token {
+        get {
+            return representedObject as! Token
+        }
     }
 
 }

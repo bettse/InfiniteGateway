@@ -77,6 +77,22 @@ class ViewController: NSViewController, NSTableViewDataSource, NSTableViewDelega
         }
     }
     
+    override func prepareForSegue(segue: NSStoryboardSegue, sender: AnyObject?) {
+        if (segue.identifier == "TokenDetail") {
+            if let tokenDetailViewController = segue.destinationController as? TokenDetailViewController {
+                if let token = sender as? Token {
+                    tokenDetailViewController.representedObject = token
+                } else {
+                    if let table = nfcTable {
+                        if let token = nfcMap[table.selectedRow] {
+                            tokenDetailViewController.representedObject = token
+                        }
+                    }
+                }
+            }
+        }
+    }
+    
 
     func deviceDisconnected(notification: NSNotification) {
         status?.stringValue = "Portal Disconnected"
@@ -91,7 +107,7 @@ class ViewController: NSViewController, NSTableViewDataSource, NSTableViewDelega
             if let token = userInfo["token"] as? Token {
                 if let nfcIndex = userInfo["nfcIndex"] as? Int {
                     if (nfcIndex == -1) { //token from disk image
-                        self.performSegueWithIdentifier("TokenDetail", sender: self)
+                        self.performSegueWithIdentifier("TokenDetail", sender: token)
                     } else {
                         nfcMap[nfcIndex] = token
                     }
