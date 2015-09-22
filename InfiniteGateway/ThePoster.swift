@@ -70,11 +70,9 @@ class Model : NSObject {
 }
 
 class ThePoster {
-    static var models : [Model] {
-        get {
-            return names.keys.map{return Model(id: $0)}
-        }
-    }
+    static var models : [Model] = {
+        return names.keys.map{return Model(id: $0)}.sort({ $0.description < $1.description })
+    }()
     
     static func getName(id: Int) -> String {
         return names.get(id, defaultValue: "<Unknown>")
