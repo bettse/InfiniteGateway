@@ -16,7 +16,7 @@ import Foundation
 
 class Model : NSObject {
     let DECIMAL = 10
-    var id : UInt32
+    var id : Int
     enum Shape : Int {
         case None = 0
         case Figure = 1
@@ -40,7 +40,7 @@ class Model : NSObject {
     }
     var shape : Shape {
         get {
-            let shapeVal = Int(id) / 1000000 % DECIMAL
+            let shapeVal = id / 1000000 % DECIMAL
             return Shape(rawValue: shapeVal)!
         }
     }
@@ -59,7 +59,7 @@ class Model : NSObject {
         }
     }
     
-    init(id: UInt32) {
+    init(id: Int) {
         self.id = id
     }
     
@@ -76,14 +76,14 @@ class ThePoster {
         }
     }
     
-    static func getName(id: UInt32) -> String {
+    static func getName(id: Int) -> String {
         return names.get(id, defaultValue: "<Unknown>")
     }
 
     //http://disneyinfinity.wikia.com/wiki/Disney_Infinity/Model_Numbers
     //http://www.disneyinfinityfans.com/viewtopic.php?f=9&t=2269&start=63
     //Look into more complex structure containing name, generation (or get from token data), type (disk, playset, etc)
-    static let names : [UInt32:String] = [
+    static let names : [Int:String] = [
         1000001 : "Mr. Incredible",
         1000002 : "Sulley",
         1000003 : "Captain Jack Sparrow",

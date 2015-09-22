@@ -44,12 +44,12 @@ class ViewController: NSViewController {
     
     @IBAction func buildBlank(sender: AnyObject?) {
         if let comboBox = modelSelection {
-            var modelId : UInt32 = 0
+            var modelId = 0
             let index = comboBox.indexOfSelectedItem
             if (index == -1) { //Write in
-                modelId = UInt32(comboBox.integerValue)
+                modelId = comboBox.integerValue
             } else {
-                modelId = UInt32(ThePoster.models[index].id)
+                modelId = ThePoster.models[index].id
             }
             let t = Token(modelId: modelId)
             let et = EncryptedToken(from: t)

@@ -244,7 +244,7 @@ class Token : MifareMini, CustomStringConvertible {
     
     var model : Model {
         get {
-            return Model(id: modelId)
+            return Model(id: Int(modelId))
         }
     }
 
@@ -259,9 +259,9 @@ class Token : MifareMini, CustomStringConvertible {
         }
     }
     
-    convenience init(modelId: UInt32) {
+    convenience init(modelId: Int) {
         //Make 7 bytes uid
-        var value = modelId.bigEndian
+        var value = UInt32(modelId).bigEndian
         let uid = NSMutableData(bytes:[0x04, 0x0e, 0x00, 0x00, 0x00, 0x00, 0x81] as [UInt8], length: 7)
         uid.replaceBytesInRange(NSMakeRange(2, sizeof(value.dynamicType)), withBytes: &value)
         self.init(tagId: uid)
@@ -279,7 +279,7 @@ class Token : MifareMini, CustomStringConvertible {
         }
         
         //Setters for known values
-        self.modelId = modelId.bigEndian
+        self.modelId = value
         self.manufactureYear = 14
         self.manufactureMonth = 7
         self.manufactureDay = 3
