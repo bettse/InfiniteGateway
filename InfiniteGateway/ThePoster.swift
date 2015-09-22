@@ -60,7 +60,7 @@ class Model : NSObject {
     }
     
     init(id: UInt32) {
-        self.id = id.bigEndian
+        self.id = id
     }
     
     func copyWithZone(zone: NSZone) -> Model {

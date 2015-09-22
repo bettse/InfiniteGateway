@@ -44,9 +44,14 @@ class ViewController: NSViewController {
     
     @IBAction func buildBlank(sender: AnyObject?) {
         if let comboBox = modelSelection {
+            var modelId : UInt32 = 0
             let index = comboBox.indexOfSelectedItem
-            let model = ThePoster.models[index]
-            let t = Token(modelId: model.id)
+            if (index == -1) { //Write in
+                modelId = UInt32(comboBox.integerValue)
+            } else {
+                modelId = UInt32(ThePoster.models[index].id)
+            }
+            let t = Token(modelId: modelId)
             let et = EncryptedToken(from: t)
             et.dump()
         }
@@ -169,7 +174,7 @@ extension ViewController: NSComboBoxDataSource {
     }
     
     func comboBox(aComboBox: NSComboBox, objectValueForItemAtIndex index: Int) -> AnyObject {
-        return ThePoster.models[index].name
+        return ThePoster.models[index].description
     }
 }
 
