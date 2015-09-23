@@ -118,13 +118,6 @@ class EncryptedToken : MifareMini {
         
         return cryptData.subdataWithRange(NSMakeRange(0, blockData.length))
     }
-    
-    override func dump() {
-        let downloads = NSSearchPathForDirectoriesInDomains(.DownloadsDirectory, .UserDomainMask, true)
-        let filename = "\(tagId.hexadecimalString)-Encrypted.bin"
-        let fullPath = NSURL(fileURLWithPath: downloads[0]).URLByAppendingPathComponent(filename)
-        data.writeToURL(fullPath, atomically: true)
-    }
 }
 
 

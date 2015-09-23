@@ -55,13 +55,13 @@ class Token : MifareMini, CustomStringConvertible {
             var value : UInt32 = 0
             let size = sizeof(value.dynamicType)
             data.getBytes(&value, range: NSMakeRange(offset, size))
-            return value
+            return value.bigEndian
         }
         set(newModelId) {
             let blockNumber = 1
             let blockIndex = 0
             let offset = blockNumber * MifareMini.blockSize + blockIndex
-            var value : UInt32 = newModelId
+            var value : UInt32 = newModelId.littleEndian
             let size = sizeof(value.dynamicType)
             data.replaceBytesInRange(NSMakeRange(offset, size), withBytes: &value)
         }
@@ -319,12 +319,13 @@ class Token : MifareMini, CustomStringConvertible {
         
         let valid = (existingChecksum.isEqualToData(checksumResult))
         if (!valid) {
-            print("Expected checksum \(checksumResult) but tag had \(existingChecksum)")
             if (update) {
                 let blockDataWithChecksum : NSMutableData = NSMutableData()
                 blockDataWithChecksum.appendData(blockData.subdataWithRange(NSMakeRange(0, checksumIndex)))
                 blockDataWithChecksum.appendData(checksumResult)
                 load(blockNumber, blockData: blockDataWithChecksum)
+            } else {
+                print("Expected checksum \(checksumResult) but tag had \(existingChecksum)")
             }
         }
         return valid
