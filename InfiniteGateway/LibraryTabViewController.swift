@@ -41,8 +41,8 @@ class LibraryTabViewController: NSViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        self.libraryTable?.doubleAction = "tableViewDoubleAction"
         self.libraryTable?.target = self
+        self.libraryTable?.doubleAction = "tableViewDoubleAction"
     }
     
     override var representedObject: AnyObject? {
@@ -55,9 +55,9 @@ class LibraryTabViewController: NSViewController {
     override func prepareForSegue(segue: NSStoryboardSegue, sender: AnyObject?) {
         if (segue.identifier == "TokenDetail") {
             if let tokenDetailViewController = segue.destinationController as? TokenDetailViewController {
-                if let token = sender as? Token {
+                if let table = libraryTable {
+                    let token = fileList[table.selectedRow]
                     tokenDetailViewController.representedObject = token
-                } else {
                 }
             }
         }
