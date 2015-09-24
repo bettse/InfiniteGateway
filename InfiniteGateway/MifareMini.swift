@@ -21,6 +21,12 @@ class MifareMini {
     var tagId : NSData
     var data : NSMutableData = NSMutableData()
     
+    var filename : String {
+        get {
+            return "\(tagId.hexadecimalString).bin"
+        }
+    }
+    
     init(tagId: NSData) {
         self.tagId = tagId
     }
@@ -61,10 +67,8 @@ class MifareMini {
         return (blockNumber + 1) % 4 == 0
     }
     
-    func dump() {
-        let downloads = NSSearchPathForDirectoriesInDomains(.DownloadsDirectory, .UserDomainMask, true)
-        let filename = "\(tagId.hexadecimalString).bin"
-        let fullPath = NSURL(fileURLWithPath: downloads[0]).URLByAppendingPathComponent(filename)
+    func dump(path: NSURL) {
+        let fullPath = path.URLByAppendingPathComponent(filename)
         data.writeToURL(fullPath, atomically: true)
     }
 }

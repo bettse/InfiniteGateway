@@ -34,6 +34,13 @@ class Token : MifareMini, CustomStringConvertible {
         let me = String(self.dynamicType).componentsSeparatedByString(".").last!
         return "\(me)(\(tagId): v\(generation) \(name) L\(level)[\(experience)] | Manuf: \(manufactureYear)/\(manufactureMonth)/\(manufactureDay)"
     }
+    
+    override var filename : String {
+        get {
+            return "\(tagId.hexadecimalString)-\(name).bin"
+        }
+    }
+
 
     var dateFormat : NSDateFormatter {
         get {
@@ -414,13 +421,6 @@ class Token : MifareMini, CustomStringConvertible {
             return checksumResult
         }
         return NSData()
-    }
-    
-    override func dump() {
-        let downloads = NSSearchPathForDirectoriesInDomains(.DownloadsDirectory, .UserDomainMask, true)
-        let filename = "\(tagId.hexadecimalString)-\(name).bin"
-        let fullPath = NSURL(fileURLWithPath: downloads[0]).URLByAppendingPathComponent(filename)
-        data.writeToURL(fullPath, atomically: true)
     }
     
     func save() {

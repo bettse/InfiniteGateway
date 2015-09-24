@@ -23,13 +23,26 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         // Insert code here to tear down your application
     }
 
+    lazy var toyboxDirectory : NSURL  = {
+        let toyboxName = "Toybox"
+        let fileManager = NSFileManager.defaultManager()
+        let url = self.applicationDocumentsDirectory.URLByAppendingPathComponent(toyboxName)
+        do {
+            try fileManager.createDirectoryAtURL(url, withIntermediateDirectories: true, attributes: nil)
+        } catch let error as NSError {
+            NSLog("\(error.localizedDescription)")
+        }
+        return url
+    }()
+    
     // MARK: - Core Data stack
 
     lazy var applicationDocumentsDirectory: NSURL = {
         // The directory the application uses to store the Core Data store file. This code uses a directory named "org.ericbetts.InfiniteGateway" in the user's Application Support directory.
+        let bundleId = NSBundle.mainBundle().bundleIdentifier
         let urls = NSFileManager.defaultManager().URLsForDirectory(.ApplicationSupportDirectory, inDomains: .UserDomainMask)
         let appSupportURL = urls[urls.count - 1]
-        return appSupportURL.URLByAppendingPathComponent("org.ericbetts.InfiniteGateway")
+        return appSupportURL.URLByAppendingPathComponent(bundleId!)
     }()
 
     lazy var managedObjectModel: NSManagedObjectModel = {

@@ -15,12 +15,15 @@ class LibraryTabViewController: NSViewController {
     var _fileList : [Token]?
     var fileList : [Token] {
         get {
+            //Simplistic memoization
             if (_fileList != nil) {
                 return _fileList!
             }            
             _fileList = [Token]()
             let fileManager = NSFileManager()
-            let files = fileManager.enumeratorAtURL(toyboxDirectory, includingPropertiesForKeys: nil, options: NSDirectoryEnumerationOptions.SkipsHiddenFiles, errorHandler: nil)
+            let appDelegate = NSApplication.sharedApplication().delegate as! AppDelegate
+
+            let files = fileManager.enumeratorAtURL(appDelegate.toyboxDirectory, includingPropertiesForKeys: nil, options: NSDirectoryEnumerationOptions.SkipsHiddenFiles, errorHandler: nil)
             while let file = files?.nextObject() as? NSURL {
                 if file.absoluteString.hasSuffix("bin") { // checks the extension
                     if let image = NSData(contentsOfURL: file) {
@@ -34,39 +37,7 @@ class LibraryTabViewController: NSViewController {
             return _fileList!.sort({ $0.model.description < $1.model.description })
         }
     }
-    
-    var applicationDirectory : NSURL {
-        get {
-            let bundleId = NSBundle.mainBundle().bundleIdentifier
-            let fileManager = NSFileManager.defaultManager()
-            var dirPath : NSURL
-            let applicationSupportDir = fileManager.URLsForDirectory(.ApplicationSupportDirectory, inDomains: .UserDomainMask)
-            if applicationSupportDir.count > 0 {
-                dirPath = applicationSupportDir[0].URLByAppendingPathComponent(bundleId!)
-                do {
-                    try fileManager.createDirectoryAtURL(dirPath, withIntermediateDirectories: true, attributes: nil)
-                } catch let error as NSError {
-                    NSLog("\(error.localizedDescription)")
-                }
-                return dirPath
-            }
-            return NSURL()
-        }
-    }
-    
-    var toyboxDirectory : NSURL {
-        get {
-            let toyboxName = "Toybox"
-            let fileManager = NSFileManager.defaultManager()
-            let dirPath : NSURL = applicationDirectory.URLByAppendingPathComponent(toyboxName)
-            do {
-                try fileManager.createDirectoryAtURL(dirPath, withIntermediateDirectories: true, attributes: nil)
-            } catch let error as NSError {
-                NSLog("\(error.localizedDescription)")
-            }
-            return dirPath
-        }
-    }
+
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -107,7 +78,8 @@ class LibraryTabViewController: NSViewController {
             }
             let t = Token(modelId: modelId)
             let et = EncryptedToken(from: t)
-            et.dump()
+            let appDelegate = NSApplication.sharedApplication().delegate as! AppDelegate
+            et.dump(appDelegate.toyboxDirectory)
         }
     }
     

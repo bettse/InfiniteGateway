@@ -54,10 +54,11 @@ class TokenDetailViewController : NSViewController {
 
     
     @IBAction func saveToken(sender: AnyObject?) {
+        let appDelegate = NSApplication.sharedApplication().delegate as! AppDelegate
         let token = representedObject as! Token
         token.experience = UInt16((experience?.integerValue)!)
-        let encryptedToken = EncryptedToken(from: token)        
-        encryptedToken.dump()
+        let encryptedToken = EncryptedToken(from: token)
+        encryptedToken.dump(appDelegate.toyboxDirectory)
     }
     
     func experienceUpdate() {
