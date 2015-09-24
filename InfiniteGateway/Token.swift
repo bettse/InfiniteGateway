@@ -99,7 +99,7 @@ class Token : MifareMini, CustomStringConvertible {
             let blockIndex = 0x0A
             let offset = blockNumber * MifareMini.blockSize + blockIndex
             var value : UInt16 = 0
-            primaryDataBlock.getBytes(&value, range: NSMakeRange(offset, sizeof(value.dynamicType)))
+            data.getBytes(&value, range: NSMakeRange(offset, sizeof(value.dynamicType)))
             if (value != Token.DiConstant) {
                 print("DiConstant was \(value) when it should be \(Token.DiConstant)")
             }
@@ -237,10 +237,83 @@ class Token : MifareMini, CustomStringConvertible {
             return value
         }
     }
+
+    var lastPlayed : UInt32 {
+        get {
+            //Multiply first 3 bytes by 0x7B, multiple top two MSB of 4th byte by 0x1E, sum.
+            //This is the number of seconds since Jan 1, 2013 at the international date line.
+            let blockIndex = 0x05
+            var value : UInt32 = 0
+            primaryDataBlock.getBytes(&value, range: NSMakeRange(blockIndex, sizeof(value.dynamicType)))
+            return value
+        }
+    }
     
-    var ownerId : UInt32 = 0
-    var loadCount : UInt8 = 0
-    var skills : UInt32 = 0
+    var ownerId : UInt16 {
+        get {
+            let blockNumber = 0x0C
+            let blockIndex = 0x08
+            let offset = blockNumber * MifareMini.blockSize + blockIndex
+            var value : UInt16 = 0
+            data.getBytes(&value, range: NSMakeRange(offset, sizeof(value.dynamicType)))
+            return value
+        }
+    }
+
+    var loadCount : UInt8 {
+        get {
+            let blockNumber = 0x0C
+            let blockIndex = 0x0B
+            let offset = blockNumber * MifareMini.blockSize + blockIndex
+            var value : UInt8 = 0
+            data.getBytes(&value, range: NSMakeRange(offset, sizeof(value.dynamicType)))
+            return value
+        }
+    }
+
+    var skillSequenceA : UInt8 {
+        get {
+            let blockNumber = 0x05
+            let blockIndex = 0x0B
+            let offset = blockNumber * MifareMini.blockSize + blockIndex
+            var value : UInt8 = 0
+            data.getBytes(&value, range: NSMakeRange(offset, sizeof(value.dynamicType)))
+            return value
+        }
+    }
+
+    var skillSequenceB : UInt8 {
+        get {
+            let blockNumber = 0x09
+            let blockIndex = 0x0B
+            let offset = blockNumber * MifareMini.blockSize + blockIndex
+            var value : UInt8 = 0
+            data.getBytes(&value, range: NSMakeRange(offset, sizeof(value.dynamicType)))
+            return value
+        }
+    }
+
+    
+    var skillTree : UInt64 {
+        get {
+            var primarySkillBlock : NSData
+            if (skillSequenceA > skillSequenceB) {
+                primarySkillBlock = block(5)
+            } else {
+                primarySkillBlock = block(9)
+            }
+
+            //Choose the up skill for my first skill and it became
+            //00 00 00 10 00 00 00 00 00 00 00 01
+            //Choose the next further up skill and it became:
+            //01 00 00 10 00 00 00 00 00 00 00 01
+            
+            print(primarySkillBlock)
+            var value : UInt64 = 0
+            primarySkillBlock.getBytes(&value, range: NSMakeRange(0, sizeof(value.dynamicType)))
+            return value
+        }
+    }
     
     var model : Model {
         get {
@@ -293,19 +366,6 @@ class Token : MifareMini, CustomStringConvertible {
         correctChecksum(1)
     }
 
-    
-    func parseSkills() {
-        //Choose the up skill for my first skill and it became
-        //00 00 00 10 00 00 00 00 00 00 00 01
-        //Choose the next further up skill and it became:
-        //01 00 00 10 00 00 00 00 00 00 00 01 
-        if (skills > 0) {
-            //print("Skills: \(String(skills, radix: BINARY))")
-        }
-
-    }
-
-    
     func verifyChecksum(blockData: NSData, blockNumber: Int, update: Bool = false) -> Bool {
         //Excluded blocks
         if (blockNumber == 0 || blockNumber == 2 || sectorTrailer(blockNumber)) {

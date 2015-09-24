@@ -17,6 +17,9 @@ class TokenDetailViewController : NSViewController {
     @IBOutlet weak var experience: NSSlider?
     @IBOutlet weak var levelLabel: NSTextField?
     @IBOutlet weak var uidLabel: NSTextField?
+    @IBOutlet weak var skillLabel: NSTextField?
+    
+    let BINARY = 2
     
     override func viewDidLoad() {
         super.viewDidLoad()        
@@ -29,6 +32,7 @@ class TokenDetailViewController : NSViewController {
         experienceLabel?.integerValue = Int(token.experience)
         levelLabel?.integerValue = Int(token.level)
         uidLabel?.stringValue = token.tagId.hexadecimalString as String
+        skillLabel?.stringValue = String(token.skillTree, radix: BINARY)
         
         experience!.target = self
         experience!.action = "experienceUpdate"

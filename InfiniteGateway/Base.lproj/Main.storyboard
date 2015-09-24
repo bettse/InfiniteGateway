@@ -869,6 +869,14 @@ Gw
                                                 <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                                             </textFieldCell>
                                         </textField>
+                                        <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" setsMaxLayoutWidthAtFirstLayout="YES" translatesAutoresizingMaskIntoConstraints="NO" id="XzU-6z-XfZ">
+                                            <rect key="frame" x="20" y="78" width="364" height="17"/>
+                                            <textFieldCell key="cell" lineBreakMode="charWrapping" sendsActionOnEndEditing="YES" alignment="justified" title="Skills" id="YjB-m6-m6N">
+                                                <font key="font" size="13" name="Monaco"/>
+                                                <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
+                                                <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
+                                            </textFieldCell>
+                                        </textField>
                                     </subviews>
                                 </view>
                                 <color key="borderColor" white="0.0" alpha="0.41999999999999998" colorSpace="calibratedWhite"/>
@@ -893,6 +901,7 @@ Gw
                         <outlet property="levelLabel" destination="Gax-mB-5KE" id="rm5-2x-gpI"/>
                         <outlet property="nameLabel" destination="4bK-3n-1h5" id="9q0-em-jwE"/>
                         <outlet property="shapeLabel" destination="Wiu-Pg-hlZ" id="w0f-qg-QmL"/>
+                        <outlet property="skillLabel" destination="XzU-6z-XfZ" id="gXc-Ft-lT2"/>
                         <outlet property="uidLabel" destination="8Oe-Dr-XvJ" id="XqQ-qj-9Tu"/>
                     </connections>
                 </viewController>
