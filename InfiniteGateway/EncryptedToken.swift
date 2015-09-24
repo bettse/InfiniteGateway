@@ -59,6 +59,14 @@ class EncryptedToken : MifareMini {
             self.data.appendData(encryptedBlock)
         }
     }
+
+
+    convenience init(image: NSData) {
+        self.init(tagId: image.subdataWithRange(NSMakeRange(0, 7)))
+        self.data = image.mutableCopy() as! NSMutableData
+    }
+
+
     
     func skipEncryption(blockNumber: Int, blockData: NSData) -> Bool {
         return (blockNumber == 0 || blockNumber == 18 || sectorTrailer(blockNumber) || blockData.isEqualToData(emptyBlock))

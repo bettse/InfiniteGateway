@@ -12,9 +12,62 @@ class LibraryTabViewController: NSViewController {
     @IBOutlet weak var libraryTable: NSTableView?
     @IBOutlet weak var modelSelection: NSComboBox?
 
+    var fileList : [Token] {
+        get {
+            var tokens : [Token] = [Token]()
+            let fileManager = NSFileManager()
+            let files = fileManager.enumeratorAtURL(toyboxDirectory, includingPropertiesForKeys: nil, options: NSDirectoryEnumerationOptions.SkipsHiddenFiles, errorHandler: nil)
+            while let file = files?.nextObject() as? NSURL {
+                if file.absoluteString.hasSuffix("bin") { // checks the extension
+                    if let image = NSData(contentsOfURL: file) {
+                        if (image.length == MifareMini.tokenSize) {
+                            let et : EncryptedToken = EncryptedToken(image: image)
+                            tokens.append(et.decryptedToken)
+                        }
+                    }
+                }
+            }
+            return tokens
+        }
+    }
+    
+    var applicationDirectory : NSURL {
+        get {
+            let bundleId = NSBundle.mainBundle().bundleIdentifier
+            let fileManager = NSFileManager.defaultManager()
+            var dirPath : NSURL
+            let applicationSupportDir = fileManager.URLsForDirectory(.ApplicationSupportDirectory, inDomains: .UserDomainMask)
+            if applicationSupportDir.count > 0 {
+                dirPath = applicationSupportDir[0].URLByAppendingPathComponent(bundleId!)
+                do {
+                    try fileManager.createDirectoryAtURL(dirPath, withIntermediateDirectories: true, attributes: nil)
+                } catch let error as NSError {
+                    NSLog("\(error.localizedDescription)")
+                }
+                return dirPath
+            }
+            return NSURL()
+        }
+    }
+    
+    var toyboxDirectory : NSURL {
+        get {
+            let toyboxName = "Toybox"
+            let fileManager = NSFileManager.defaultManager()
+            let dirPath : NSURL = applicationDirectory.URLByAppendingPathComponent(toyboxName)
+            do {
+                try fileManager.createDirectoryAtURL(dirPath, withIntermediateDirectories: true, attributes: nil)
+            } catch let error as NSError {
+                NSLog("\(error.localizedDescription)")
+            }
+            return dirPath
+        }
+    }
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        self.libraryTable?.doubleAction = "tableViewDoubleAction"
+        self.libraryTable?.target = self
     }
     
     override var representedObject: AnyObject? {
@@ -22,6 +75,7 @@ class LibraryTabViewController: NSViewController {
             // Update the view, if already loaded.
         }
     }
+
     
     override func prepareForSegue(segue: NSStoryboardSegue, sender: AnyObject?) {
         if (segue.identifier == "TokenDetail") {
@@ -32,6 +86,10 @@ class LibraryTabViewController: NSViewController {
                 }
             }
         }
+    }
+
+    func tableViewDoubleAction() {
+        self.performSegueWithIdentifier("TokenDetail", sender: self)
     }
     
     @IBAction func buildBlank(sender: AnyObject?) {
@@ -83,5 +141,31 @@ extension LibraryTabViewController: NSComboBoxDataSource {
     
     func comboBox(aComboBox: NSComboBox, objectValueForItemAtIndex index: Int) -> AnyObject {
         return ThePoster.models[index].description
+    }
+}
+
+
+
+// MARK: - NSTableViewDataSource
+extension LibraryTabViewController: NSTableViewDataSource {
+    func tableView(tableView: NSTableView, viewForTableColumn: NSTableColumn?, row: Int) -> NSView? {
+        let token : Token = fileList[row]
+        if let cell = tableView.makeViewWithIdentifier(viewForTableColumn!.identifier, owner: self) as? NSTableCellView {
+            cell.textField!.stringValue = token.shortDisplay
+            return cell
+        }
+        return nil
+    }
+}
+
+extension LibraryTabViewController: NSTableViewDelegate {
+    func numberOfRowsInTableView(tableView: NSTableView) -> Int {
+        return fileList.count
+    }
+    
+    //https://developer.apple.com/library/mac/documentation/Cocoa/Reference/NSTableViewDelegate_Protocol/#//apple_ref/occ/intfm/NSTableViewDelegate/tableView:rowActionsForRow:edge:
+    @available(OSX 10.11, *)
+    func tableView(tableView: NSTableView, rowActionsForRow row: Int, edge: NSTableRowActionEdge) -> [NSTableViewRowAction] {
+        return []
     }
 }
