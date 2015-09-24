@@ -12,9 +12,13 @@ class LibraryTabViewController: NSViewController {
     @IBOutlet weak var libraryTable: NSTableView?
     @IBOutlet weak var modelSelection: NSComboBox?
 
+    var _fileList : [Token]?
     var fileList : [Token] {
         get {
-            var tokens : [Token] = [Token]()
+            if (_fileList != nil) {
+                return _fileList!
+            }            
+            _fileList = [Token]()
             let fileManager = NSFileManager()
             let files = fileManager.enumeratorAtURL(toyboxDirectory, includingPropertiesForKeys: nil, options: NSDirectoryEnumerationOptions.SkipsHiddenFiles, errorHandler: nil)
             while let file = files?.nextObject() as? NSURL {
@@ -22,12 +26,12 @@ class LibraryTabViewController: NSViewController {
                     if let image = NSData(contentsOfURL: file) {
                         if (image.length == MifareMini.tokenSize) {
                             let et : EncryptedToken = EncryptedToken(image: image)
-                            tokens.append(et.decryptedToken)
+                            _fileList!.append(et.decryptedToken)
                         }
                     }
                 }
             }
-            return tokens
+            return _fileList!.sort({ $0.model.description < $1.model.description })
         }
     }
     

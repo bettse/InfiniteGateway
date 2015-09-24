@@ -819,9 +819,9 @@
                                     <action selector="buildBlank:" target="ugq-C5-Py8" id="Jvn-1F-HPS"/>
                                 </connections>
                             </button>
-                            <scrollView fixedFrame="YES" autohidesScrollers="YES" horizontalLineScroll="19" horizontalPageScroll="10" verticalLineScroll="19" verticalPageScroll="10" usesPredominantAxisScrolling="NO" translatesAutoresizingMaskIntoConstraints="NO" id="cXd-mV-jmh">
+                            <scrollView autohidesScrollers="YES" horizontalLineScroll="19" horizontalPageScroll="10" verticalLineScroll="19" verticalPageScroll="10" usesPredominantAxisScrolling="NO" translatesAutoresizingMaskIntoConstraints="NO" id="cXd-mV-jmh">
                                 <rect key="frame" x="25" y="53" width="405" height="227"/>
-                                <clipView key="contentView" ambiguous="YES" id="quZ-qS-TVZ">
+                                <clipView key="contentView" id="quZ-qS-TVZ">
                                     <rect key="frame" x="1" y="1" width="403" height="225"/>
                                     <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                     <subviews>
@@ -884,11 +884,15 @@
                             </scrollView>
                         </subviews>
                         <constraints>
+                            <constraint firstItem="cXd-mV-jmh" firstAttribute="top" secondItem="7Rs-N5-swl" secondAttribute="top" constant="20" id="42E-aZ-X4S"/>
                             <constraint firstAttribute="bottom" secondItem="PTK-Fh-Iny" secondAttribute="bottom" constant="20" id="9PW-Ze-zKo"/>
+                            <constraint firstAttribute="trailing" secondItem="cXd-mV-jmh" secondAttribute="trailing" constant="20" id="A6v-sG-pZR"/>
                             <constraint firstItem="PTK-Fh-Iny" firstAttribute="leading" secondItem="jX6-ia-v2r" secondAttribute="trailing" constant="22" id="PxD-7n-pOq"/>
+                            <constraint firstItem="jX6-ia-v2r" firstAttribute="top" secondItem="cXd-mV-jmh" secondAttribute="bottom" constant="13" id="ROE-WS-xL9"/>
                             <constraint firstItem="jX6-ia-v2r" firstAttribute="leading" secondItem="7Rs-N5-swl" secondAttribute="leading" constant="25" id="Ytb-Op-apP"/>
                             <constraint firstAttribute="bottom" secondItem="jX6-ia-v2r" secondAttribute="bottom" constant="20" id="gmM-iu-84N"/>
                             <constraint firstAttribute="trailing" secondItem="PTK-Fh-Iny" secondAttribute="trailing" constant="15" id="mA8-LZ-6l8"/>
+                            <constraint firstItem="cXd-mV-jmh" firstAttribute="leading" secondItem="7Rs-N5-swl" secondAttribute="leading" constant="25" id="xCi-9Y-2Ru"/>
                         </constraints>
                     </view>
                     <connections>
