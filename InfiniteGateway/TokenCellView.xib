@@ -51,11 +51,20 @@
                         <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                     </textFieldCell>
                 </textField>
+                <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="lXF-Qc-znj">
+                    <rect key="frame" x="4" y="6" width="38" height="17"/>
+                    <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" id="fJ9-CN-ybp">
+                        <font key="font" metaFont="system"/>
+                        <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
+                        <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
+                    </textFieldCell>
+                </textField>
             </subviews>
             <connections>
                 <outlet property="generationLabel" destination="oWm-y7-SC7" id="0HG-4r-ypk"/>
                 <outlet property="levelLabel" destination="avA-73-S7F" id="MjE-TA-LRk"/>
                 <outlet property="modelLabel" destination="TXz-Oe-0hs" id="8ZF-7h-ZdU"/>
+                <outlet property="nfcLabel" destination="lXF-Qc-znj" id="54k-Em-nit"/>
                 <outlet property="shapeLabel" destination="F6v-d1-Xkm" id="Yge-sn-vB9"/>
                 <outlet property="uidLabel" destination="3Ch-v1-iCi" id="dQT-Ri-tX2"/>
             </connections>

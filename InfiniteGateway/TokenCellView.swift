@@ -14,6 +14,7 @@ class TokenCellView : NSTableCellView {
     @IBOutlet weak var generationLabel: NSTextField!
     @IBOutlet weak var levelLabel: NSTextField!
     @IBOutlet weak var shapeLabel: NSTextField!
+    @IBOutlet weak var nfcLabel: NSTextField!
     
     weak var representedObject : AnyObject? {
         didSet {

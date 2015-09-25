@@ -109,6 +109,7 @@ extension DeviceTabViewController: NSTableViewDataSource {
         let token = tokens[row]
         if let cell = tableView.makeViewWithIdentifier("TokenCellView", owner: self) as? TokenCellView {
             cell.representedObject = token
+            cell.nfcLabel.stringValue = "NFC Index #\(row)"
             return cell
         }
         return nil
