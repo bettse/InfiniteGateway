@@ -126,8 +126,8 @@ extension LibraryTabViewController: NSComboBoxDataSource {
 extension LibraryTabViewController: NSTableViewDataSource {
     func tableView(tableView: NSTableView, viewForTableColumn: NSTableColumn?, row: Int) -> NSView? {
         let token : Token = fileList[row]
-        if let cell = tableView.makeViewWithIdentifier(viewForTableColumn!.identifier, owner: self) as? NSTableCellView {
-            cell.textField!.stringValue = token.shortDisplay
+        if let cell = tableView.makeViewWithIdentifier(viewForTableColumn!.identifier, owner: self) as? TokenCellView {
+            cell.representedObject = token
             return cell
         }
         return nil

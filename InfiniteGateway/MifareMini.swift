@@ -21,6 +21,12 @@ class MifareMini {
     var tagId : NSData
     var data : NSMutableData = NSMutableData()
     
+    var uid : NSData {
+        get {
+            return tagId
+        }
+    }
+    
     var filename : String {
         get {
             return "\(tagId.hexadecimalString).bin"

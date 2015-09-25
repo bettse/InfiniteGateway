@@ -819,13 +819,13 @@
                                     <action selector="buildBlank:" target="ugq-C5-Py8" id="Jvn-1F-HPS"/>
                                 </connections>
                             </button>
-                            <scrollView autohidesScrollers="YES" horizontalLineScroll="19" horizontalPageScroll="10" verticalLineScroll="19" verticalPageScroll="10" usesPredominantAxisScrolling="NO" translatesAutoresizingMaskIntoConstraints="NO" id="cXd-mV-jmh">
+                            <scrollView autohidesScrollers="YES" horizontalLineScroll="52" horizontalPageScroll="10" verticalLineScroll="52" verticalPageScroll="10" usesPredominantAxisScrolling="NO" translatesAutoresizingMaskIntoConstraints="NO" id="cXd-mV-jmh">
                                 <rect key="frame" x="25" y="53" width="405" height="227"/>
                                 <clipView key="contentView" id="quZ-qS-TVZ">
                                     <rect key="frame" x="1" y="1" width="403" height="225"/>
                                     <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                     <subviews>
-                                        <tableView verticalHuggingPriority="750" allowsExpansionToolTips="YES" columnAutoresizingStyle="lastColumnOnly" alternatingRowBackgroundColors="YES" columnReordering="NO" columnResizing="NO" multipleSelection="NO" emptySelection="NO" autosaveColumns="NO" rowSizeStyle="automatic" viewBased="YES" id="gEl-iw-Vob">
+                                        <tableView verticalHuggingPriority="750" allowsExpansionToolTips="YES" columnAutoresizingStyle="lastColumnOnly" alternatingRowBackgroundColors="YES" columnReordering="NO" columnResizing="NO" multipleSelection="NO" emptySelection="NO" autosaveColumns="NO" rowHeight="50" viewBased="YES" id="gEl-iw-Vob">
                                             <rect key="frame" x="0.0" y="0.0" width="403" height="225"/>
                                             <autoresizingMask key="autoresizingMask"/>
                                             <size key="intercellSpacing" width="3" height="2"/>
@@ -845,12 +845,12 @@
                                                     </textFieldCell>
                                                     <tableColumnResizingMask key="resizingMask" resizeWithTable="YES" userResizable="YES"/>
                                                     <prototypeCellViews>
-                                                        <tableCellView id="gwj-tn-X8B">
-                                                            <rect key="frame" x="1" y="1" width="400" height="17"/>
+                                                        <tableCellView id="gwj-tn-X8B" customClass="TokenCellView" customModule="InfiniteGateway" customModuleProvider="target">
+                                                            <rect key="frame" x="1" y="1" width="400" height="50"/>
                                                             <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                                             <subviews>
                                                                 <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="4C5-iV-JbX">
-                                                                    <rect key="frame" x="0.0" y="0.0" width="399" height="17"/>
+                                                                    <rect key="frame" x="0.0" y="33" width="399" height="17"/>
                                                                     <textFieldCell key="cell" lineBreakMode="truncatingTail" sendsActionOnEndEditing="YES" title="Table View Cell" id="0nT-Ss-uqR">
                                                                         <font key="font" metaFont="system"/>
                                                                         <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
@@ -860,9 +860,18 @@
                                                                         <segue destination="xIk-2E-0H0" kind="sheet" identifier="TokenDetail" id="WqU-6B-Wh9"/>
                                                                     </connections>
                                                                 </textField>
+                                                                <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="5xc-wL-dhy">
+                                                                    <rect key="frame" x="3" y="3" width="99" height="17"/>
+                                                                    <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title="Label" id="E7V-9K-Swb">
+                                                                        <font key="font" metaFont="system"/>
+                                                                        <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
+                                                                        <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
+                                                                    </textFieldCell>
+                                                                </textField>
                                                             </subviews>
                                                             <connections>
-                                                                <outlet property="textField" destination="4C5-iV-JbX" id="d6c-kU-faG"/>
+                                                                <outlet property="modelLabel" destination="4C5-iV-JbX" id="J7S-PL-YeP"/>
+                                                                <outlet property="uidLabel" destination="5xc-wL-dhy" id="E58-k5-DqR"/>
                                                             </connections>
                                                         </tableCellView>
                                                     </prototypeCellViews>
