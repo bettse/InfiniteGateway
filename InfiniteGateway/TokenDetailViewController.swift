@@ -59,6 +59,8 @@ class TokenDetailViewController : NSViewController {
         token.experience = UInt16((experience?.integerValue)!)
         let encryptedToken = EncryptedToken(from: token)
         encryptedToken.dump(appDelegate.toyboxDirectory)
+        NSNotificationCenter.defaultCenter().postNotificationName("tokenSaved", object: nil, userInfo: nil)
+        self.dismissViewController(self)
     }
     
     func experienceUpdate() {

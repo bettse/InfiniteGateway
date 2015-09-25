@@ -38,11 +38,11 @@ class LibraryTabViewController: NSViewController {
         }
     }
 
-    
     override func viewDidLoad() {
         super.viewDidLoad()
         self.libraryTable?.target = self
         self.libraryTable?.doubleAction = "tableViewDoubleAction"
+        NSNotificationCenter.defaultCenter().addObserver(self, selector: "bustFileList:", name: "tokenSaved", object: nil)
     }
     
     override var representedObject: AnyObject? {
@@ -50,8 +50,12 @@ class LibraryTabViewController: NSViewController {
             // Update the view, if already loaded.
         }
     }
-
     
+    func bustFileList(notification: NSNotification) {
+        self._fileList = nil
+        self.libraryTable?.reloadData()
+    }
+
     override func prepareForSegue(segue: NSStoryboardSegue, sender: AnyObject?) {
         if (segue.identifier == "TokenDetail") {
             if let tokenDetailViewController = segue.destinationController as? TokenDetailViewController {
@@ -119,7 +123,6 @@ extension LibraryTabViewController: NSComboBoxDataSource {
         return ThePoster.models[index].description
     }
 }
-
 
 
 // MARK: - NSTableViewDataSource
