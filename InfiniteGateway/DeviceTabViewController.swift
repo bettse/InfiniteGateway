@@ -106,8 +106,8 @@ extension DeviceTabViewController: NSTableViewDataSource {
     func tableView(tableView: NSTableView, viewForTableColumn: NSTableColumn?, row: Int) -> NSView? {
         let tokens : [Token] = Array(nfcMap.values)
         let token = tokens[row]
-        if let cell = tableView.makeViewWithIdentifier(viewForTableColumn!.identifier, owner: self) as? NSTableCellView {
-            cell.textField!.stringValue = token.shortDisplay
+        if let cell = tableView.makeViewWithIdentifier(viewForTableColumn!.identifier, owner: self) as? TokenCellView {
+            cell.representedObject = token
             return cell
         }
         return nil
