@@ -23,7 +23,8 @@ class DeviceTabViewController: NSViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        
+        nfcTable!.registerNib(NSNib(nibNamed: "TokenCellView", bundle: nil), forIdentifier: "TokenCellView")
+
         // Do any additional setup after loading the view.
         status?.stringValue = "Portal Disconnected"
         
@@ -106,7 +107,7 @@ extension DeviceTabViewController: NSTableViewDataSource {
     func tableView(tableView: NSTableView, viewForTableColumn: NSTableColumn?, row: Int) -> NSView? {
         let tokens : [Token] = Array(nfcMap.values)
         let token = tokens[row]
-        if let cell = tableView.makeViewWithIdentifier(viewForTableColumn!.identifier, owner: self) as? TokenCellView {
+        if let cell = tableView.makeViewWithIdentifier("TokenCellView", owner: self) as? TokenCellView {
             cell.representedObject = token
             return cell
         }

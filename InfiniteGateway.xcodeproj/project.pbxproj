@@ -13,6 +13,7 @@
 		6D269B4F1BB4584500D0EF97 /* DeviceTabViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6D269B4E1BB4584500D0EF97 /* DeviceTabViewController.swift */; settings = {ASSET_TAGS = (); }; };
 		6D269B511BB4591300D0EF97 /* LibraryTabViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6D269B501BB4591300D0EF97 /* LibraryTabViewController.swift */; settings = {ASSET_TAGS = (); }; };
 		6D269B531BB4C2FE00D0EF97 /* TokenCellView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6D269B521BB4C2FE00D0EF97 /* TokenCellView.swift */; settings = {ASSET_TAGS = (); }; };
+		6D2BC2E41BB5022500933E7F /* TokenCellView.xib in Resources */ = {isa = PBXBuildFile; fileRef = 6D2BC2E31BB5022500933E7F /* TokenCellView.xib */; settings = {ASSET_TAGS = (); }; };
 		6D3AFB671BAB848B00FAE962 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6D3AFB661BAB848B00FAE962 /* AppDelegate.swift */; };
 		6D3AFB691BAB848B00FAE962 /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6D3AFB681BAB848B00FAE962 /* ViewController.swift */; };
 		6D3AFB6C1BAB848B00FAE962 /* InfiniteGateway.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = 6D3AFB6A1BAB848B00FAE962 /* InfiniteGateway.xcdatamodeld */; };
@@ -41,6 +42,7 @@
 		6D269B4E1BB4584500D0EF97 /* DeviceTabViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DeviceTabViewController.swift; sourceTree = "<group>"; };
 		6D269B501BB4591300D0EF97 /* LibraryTabViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = LibraryTabViewController.swift; sourceTree = "<group>"; };
 		6D269B521BB4C2FE00D0EF97 /* TokenCellView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TokenCellView.swift; sourceTree = "<group>"; };
+		6D2BC2E31BB5022500933E7F /* TokenCellView.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = TokenCellView.xib; sourceTree = "<group>"; };
 		6D3AFB631BAB848B00FAE962 /* InfiniteGateway.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = InfiniteGateway.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		6D3AFB661BAB848B00FAE962 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		6D3AFB681BAB848B00FAE962 /* ViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewController.swift; sourceTree = "<group>"; };
@@ -100,6 +102,7 @@
 				6D269B501BB4591300D0EF97 /* LibraryTabViewController.swift */,
 				6D269B4E1BB4584500D0EF97 /* DeviceTabViewController.swift */,
 				6D2078AD1BAFAD7D00020B3A /* TokenDetailViewController.swift */,
+				6D2BC2E31BB5022500933E7F /* TokenCellView.xib */,
 				6D269B521BB4C2FE00D0EF97 /* TokenCellView.swift */,
 				6D3AFB931BACD9AE00FAE962 /* PortalDriver.swift */,
 				6D3AFB841BAB86FC00FAE962 /* Portal.swift */,
@@ -189,6 +192,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				6D2BC2E41BB5022500933E7F /* TokenCellView.xib in Resources */,
 				6D3AFB6E1BAB848B00FAE962 /* Assets.xcassets in Resources */,
 				6D3AFB711BAB848B00FAE962 /* Main.storyboard in Resources */,
 			);

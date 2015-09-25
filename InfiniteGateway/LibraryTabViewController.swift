@@ -40,6 +40,8 @@ class LibraryTabViewController: NSViewController {
 
     override func viewDidLoad() {
         super.viewDidLoad()
+        libraryTable!.registerNib(NSNib(nibNamed: "TokenCellView", bundle: nil), forIdentifier: "TokenCellView")
+
         self.libraryTable?.target = self
         self.libraryTable?.doubleAction = "tableViewDoubleAction"
         NSNotificationCenter.defaultCenter().addObserver(self, selector: "bustFileList:", name: "tokenSaved", object: nil)
@@ -129,7 +131,7 @@ extension LibraryTabViewController: NSComboBoxDataSource {
 extension LibraryTabViewController: NSTableViewDataSource {
     func tableView(tableView: NSTableView, viewForTableColumn: NSTableColumn?, row: Int) -> NSView? {
         let token : Token = fileList[row]
-        if let cell = tableView.makeViewWithIdentifier(viewForTableColumn!.identifier, owner: self) as? TokenCellView {
+        if let cell = tableView.makeViewWithIdentifier("TokenCellView", owner: self) as? TokenCellView {
             cell.representedObject = token
             return cell
         }
