@@ -424,6 +424,10 @@ class Token : MifareMini, CustomStringConvertible {
     
     func save() {
         //send to PortalDriver to be re-encrypted before being sent back to token
+        let encryptedToken = EncryptedToken(from: self)
+        let blockData = encryptedToken.block(primaryDataBlockNumber)
+        let nfcIndex : UInt8 = 0//TODO: Fix this.
+        portalDriver.portal.outputCommand(WriteCommand(nfcIndex: nfcIndex, block: primaryDataBlockNumber, blockData: blockData))
     }    
     
 }
