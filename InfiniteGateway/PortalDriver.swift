@@ -15,14 +15,13 @@ class PortalDriver : NSObject {
     
     static let magic : NSData = "(c) Disney 2013".dataUsingEncoding(NSASCIIStringEncoding)!
     static let secret : NSData = NSData(bytes: [0xAF, 0x62, 0xD2, 0xEC, 0x04, 0x91, 0x96, 0x8C, 0xC5, 0x2A, 0x1A, 0x71, 0x65, 0xF8, 0x65, 0xFE] as [UInt8], length: 0x10)
+    static let singleton = PortalDriver()
     
     var portalThread : NSThread?
     
-    var portal : Portal {
-        get {
-            return Portal.singleton
-        }
-    }
+    lazy var portal : Portal  = {
+        return Portal.singleton
+    }()
 
     var presence = Dictionary<Message.LedPlatform, [UInt8]>()
     

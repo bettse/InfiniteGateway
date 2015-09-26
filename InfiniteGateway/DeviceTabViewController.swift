@@ -15,11 +15,9 @@ class DeviceTabViewController: NSViewController {
     
     var nfcMap : [Int:Token] = [:]
     
-    var portal : Portal {
-        get {
-            return Portal.singleton
-        }
-    }
+    lazy var portal : Portal  = {
+        return Portal.singleton
+    }()
     
     override func viewDidLoad() {
         super.viewDidLoad()
