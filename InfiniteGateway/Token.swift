@@ -23,12 +23,9 @@ class Token : MifareMini, CustomStringConvertible {
     let BINARY = 2
     let HEX = 0x10
     
-    //block 0x05/0x09
-    let skillsIndex = 0x00
-    let skillsSequenceIndex = 0x00
-    
-    let ownerIdIndex = 0x08 //block 0x0c
-    let loadCountIndex = 0x0b //block 0x0c
+    lazy var portalDriver : PortalDriver  = {
+        return PortalDriver.singleton
+    }()
     
     var description: String {
         let me = String(self.dynamicType).componentsSeparatedByString(".").last!
@@ -206,13 +203,15 @@ class Token : MifareMini, CustomStringConvertible {
         }
     }
     
+    var primaryDataBlockNumber : Int {
+        get {
+            return (sequenceA > sequenceB) ? 4 : 8
+        }
+    }
+    
     var primaryDataBlock : NSData {
         get {
-            if (sequenceA > sequenceB) {
-                return block(4)
-            } else {
-                return block(8)
-            }
+            return block(primaryDataBlockNumber)
         }
     }
     
