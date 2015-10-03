@@ -12,9 +12,7 @@ import Foundation
 @NSApplicationMain
 class AppDelegate: NSObject, NSApplicationDelegate {
     
-    lazy var portadDriver : PortalDriver = {
-        return PortalDriver.singleton
-    }()
+    var portadDriver : PortalDriver  = PortalDriver.singleton
     
     func applicationDidFinishLaunching(aNotification: NSNotification) {
         // Insert code here to initialize your application

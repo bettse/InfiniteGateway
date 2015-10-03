@@ -19,9 +19,7 @@ class PortalDriver : NSObject {
     
     var portalThread : NSThread?
     
-    lazy var portal : Portal  = {
-        return Portal.singleton
-    }()
+    var portal : Portal = Portal.singleton
 
     var presence = Dictionary<Message.LedPlatform, [UInt8]>()
     
@@ -29,15 +27,15 @@ class PortalDriver : NSObject {
     
     override init() {
         super.init()
-        portalThread = NSThread(target: portal, selector:"initUsb", object: nil)
-        if let thread = portalThread {
-            thread.start()
-        }
-
-
+        
         NSNotificationCenter.defaultCenter().addObserver(self, selector: "deviceConnected:", name: "deviceConnected", object: nil)
         NSNotificationCenter.defaultCenter().addObserver(self, selector: "incomingMessage:", name: "incomingMessage", object: nil)
         //NSNotificationCenter.defaultCenter().addObserver(self, selector: "deviceDisconnected:", name: "deviceDisconnected", object: nil)
+        
+        portalThread = NSThread(target: self.portal, selector:"initUsb", object: nil)
+        if let thread = portalThread {
+            thread.start()
+        }
     }
 
     func deviceConnected(notification: NSNotification) {
