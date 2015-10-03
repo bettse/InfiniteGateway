@@ -15,9 +15,7 @@ class DeviceTabViewController: NSViewController {
     
     var nfcMap : [Int:Token] = [:]
     
-    lazy var portal : Portal  = {
-        return Portal.singleton
-    }()
+    var portalDriver : PortalDriver = PortalDriver.singleton
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -29,8 +27,9 @@ class DeviceTabViewController: NSViewController {
         NSNotificationCenter.defaultCenter().addObserver(self, selector: "deviceConnected:", name: "deviceConnected", object: nil)
         NSNotificationCenter.defaultCenter().addObserver(self, selector: "deviceDisconnected:", name: "deviceDisconnected", object: nil)
         
-        NSNotificationCenter.defaultCenter().addObserver(self, selector: "tokenLoaded:", name: "tokenLoaded", object: nil)
-        NSNotificationCenter.defaultCenter().addObserver(self, selector: "tokenLeft:", name: "tokenLeft", object: nil)
+        portalDriver.registerTokenLoaded(self.tokenLoaded)
+        portalDriver.registerTokenLeft(self.tokenLeft)
+        
         self.nfcTable?.doubleAction = "tableViewDoubleAction"
         self.nfcTable?.target = self
     }
@@ -40,6 +39,18 @@ class DeviceTabViewController: NSViewController {
             // Update the view, if already loaded.
         }
     }
+
+    func tokenLoaded(ledPlatform: Message.LedPlatform, nfcIndex: Int, token: Token) {
+        if (nfcIndex == -1) { //token from disk image
+            self.performSegueWithIdentifier("TokenDetail", sender: token)
+        } else {
+            nfcMap[Int(nfcIndex)] = token
+        }
+        if let table = nfcTable {
+            table.reloadData()
+        }
+    }
+    
     
     override func prepareForSegue(segue: NSStoryboardSegue, sender: AnyObject?) {
         if (segue.identifier == "TokenDetail") {
@@ -67,31 +78,11 @@ class DeviceTabViewController: NSViewController {
         status?.stringValue = "Portal Connected"
     }
     
-    func tokenLoaded(notificaiton: NSNotification) {
-        if let userInfo = notificaiton.userInfo {
-            if let token = userInfo["token"] as? Token {
-                if let nfcIndex = userInfo["nfcIndex"] as? Int {
-                    if (nfcIndex == -1) { //token from disk image
-                        self.performSegueWithIdentifier("TokenDetail", sender: token)
-                    } else {
-                        nfcMap[nfcIndex] = token
-                    }
-                }
-            }
+    func tokenLeft(ledPlatform: Message.LedPlatform, nfcIndex: Int) {
+        if (nfcMap.keys.contains(nfcIndex)) {
+            nfcMap.removeValueForKey(nfcIndex)
         }
-        if let table = nfcTable {
-            table.reloadData()
-        }
-    }
-    
-    func tokenLeft(notificaiton: NSNotification) {
-        if let userInfo = notificaiton.userInfo {
-            if let nfcIndex = userInfo["nfcIndex"] as? Int {
-                if (nfcMap.keys.contains(nfcIndex)) {
-                    nfcMap.removeValueForKey(nfcIndex)
-                }
-            }
-        }
+
         if let table = nfcTable {
             table.reloadData()
         }

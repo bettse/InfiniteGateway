@@ -11,19 +11,21 @@ import Cocoa
 
 //Handles initial activation, requestion more token data, notification about new tokens
 
+typealias tokenLoad = (Message.LedPlatform, Int, Token) -> Void
+typealias tokenLeft = (Message.LedPlatform, Int) -> Void
 class PortalDriver : NSObject {
     
     static let magic : NSData = "(c) Disney 2013".dataUsingEncoding(NSASCIIStringEncoding)!
     static let secret : NSData = NSData(bytes: [0xAF, 0x62, 0xD2, 0xEC, 0x04, 0x91, 0x96, 0x8C, 0xC5, 0x2A, 0x1A, 0x71, 0x65, 0xF8, 0x65, 0xFE] as [UInt8], length: 0x10)
     static let singleton = PortalDriver()
-    
     var portalThread : NSThread?
-    
     var portal : Portal = Portal.singleton
 
     var presence = Dictionary<Message.LedPlatform, [UInt8]>()
-    
     var encryptedTokens : [UInt8:EncryptedToken] = [:]
+    
+    var loadTokenCallbacks : [tokenLoad] = []
+    var leftTokenCallbacks : [tokenLeft] = []
     
     override init() {
         super.init()
@@ -36,6 +38,13 @@ class PortalDriver : NSObject {
         if let thread = portalThread {
             thread.start()
         }
+    }
+    
+    func registerTokenLoaded(callback: tokenLoad) {
+        loadTokenCallbacks.append(callback)
+    }
+    func registerTokenLeft(callback: tokenLeft) {
+        leftTokenCallbacks.append(callback)
     }
 
     func deviceConnected(notification: NSNotification) {
@@ -50,13 +59,11 @@ class PortalDriver : NSObject {
             portal.outputCommand(TagIdCommand(nfcIndex: update.nfcIndex))
         } else if (update.direction == Update.Direction.Departing) {
             updateColor = NSColor.blackColor()
-            let userInfo : [NSObject : AnyObject] = [
-                "nfcIndex": Int(update.nfcIndex),
-                "ledPlatform": Int(update.ledPlatform.rawValue)
-            ]
             removePresence(update.ledPlatform, nfcIndex: update.nfcIndex)
             dispatch_async(dispatch_get_main_queue(), {
-                NSNotificationCenter.defaultCenter().postNotificationName("tokenLeft", object: nil, userInfo: userInfo)
+                for callback in self.leftTokenCallbacks {
+                    callback(update.ledPlatform, Int(update.nfcIndex))
+                }
             })
         }        
         portal.outputCommand(LightOnCommand(ledPlatform: update.ledPlatform, color: updateColor))
@@ -123,15 +130,11 @@ class PortalDriver : NSObject {
             token.load(response.blockNumber, blockData: response.blockData)
             if (token.complete()) {
                 let ledPlatform = ledPlatformOfNfcIndex(response.nfcIndex)
-                let userInfo : [NSObject : AnyObject] = [
-                    "nfcIndex": Int(response.nfcIndex),
-                    "ledPlatform": Int(ledPlatform.rawValue),
-                    "token": token.decryptedToken
-                ]
-
                 portal.outputCommand(LightOnCommand(ledPlatform: ledPlatform, color: NSColor.greenColor()))
                 dispatch_async(dispatch_get_main_queue(), {
-                    NSNotificationCenter.defaultCenter().postNotificationName("tokenLoaded", object: nil, userInfo: userInfo)
+                    for callback in self.loadTokenCallbacks {
+                        callback(ledPlatform, Int(response.nfcIndex), token.decryptedToken)
+                    }
                 })
                 encryptedTokens.removeValueForKey(response.nfcIndex)
             } else {

@@ -88,29 +88,7 @@ class LibraryTabViewController: NSViewController {
             et.dump(appDelegate.toyboxDirectory)
         }
     }
-    
-    
-    @IBAction func openFile(sender: AnyObject?) {
-        let myFileDialog: NSOpenPanel = NSOpenPanel()
-        let response = myFileDialog.runModal()
-        if(response == NSModalResponseOK){
-            if let image = NSData(contentsOfURL: myFileDialog.URL!) {
-                if (image.length == MifareMini.tokenSize) {
-                    let token = EncryptedToken(tagId: image.subdataWithRange(NSMakeRange(0, 7)))
-                    token.data = image.mutableCopy() as! NSMutableData
-                    if (token.complete()) {
-                        let userInfo : [String : AnyObject] = [
-                            "nfcIndex": -1,
-                            "token": token.decryptedToken
-                        ]
-                        dispatch_async(dispatch_get_main_queue(), {
-                            NSNotificationCenter.defaultCenter().postNotificationName("tokenLoaded", object: nil, userInfo: userInfo)
-                        })
-                    }
-                }
-            }
-        }
-    }
+        
 }
 
 
