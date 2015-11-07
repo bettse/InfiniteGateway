@@ -1,5 +1,0 @@
-module CommonCRC [system] {
-    header "/usr/include/CommonCrypto/CommonNumerics.h"
-    header "/usr/include/CommonCrypto/CommonCRC.h"
-    export *
-}

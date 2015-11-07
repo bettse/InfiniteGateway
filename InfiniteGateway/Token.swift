@@ -8,10 +8,6 @@
 
 import Foundation
 
-import CommonCrypto
-import CommonCRC
-
-
 //Tokens can be figures, disks (some are stackable), playsets (clear 3d figure with hex base)
 
 class Token : MifareMini, CustomStringConvertible {
@@ -409,17 +405,9 @@ class Token : MifareMini, CustomStringConvertible {
     }
     
     func getChecksum(data: NSData) -> NSData {
-        let dataBytes = UnsafePointer<UInt8>(data.bytes)
-        let dataLength : size_t = size_t(data.length)
-        
-        var temp : UInt64 = 0
-        let algoritm : CNcrc = UInt32(kCN_CRC_32_POSIX)
-        let status : CNStatus = CNCRC(algoritm, dataBytes, dataLength, &temp)
-        let checksumResult = NSData(bytes: &temp, length: sizeof(UInt32)).reverse.negation
-        if (UInt32(status) == UInt32(kCNSuccess)) {
-            return checksumResult
-        }
-        return NSData()
+        let crc32 = data.crc32()
+        let checksumResult = crc32!.reverse.negation
+        return checksumResult
     }
     
     func save() {

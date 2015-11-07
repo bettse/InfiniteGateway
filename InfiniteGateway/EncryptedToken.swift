@@ -7,9 +7,7 @@
 //
 
 import Foundation
-
-import CommonCrypto
-import CommonCRC
+import CryptoSwift
 
 
 class EncryptedToken : MifareMini {
@@ -27,14 +25,9 @@ class EncryptedToken : MifareMini {
                 return NSData()
             }
             
-            let sha = NSMutableData(length: Int(CC_SHA1_DIGEST_LENGTH))!
-            let shaBytes = UnsafeMutablePointer<CUnsignedChar>(sha.mutableBytes)
-            CC_SHA1(prekey.bytes, CC_LONG(prekey.length), shaBytes)
-            let truncatedSha = sha.subdataWithRange(NSMakeRange(0, 16))
-            
+            let sha = prekey.sha1()!.subdataWithRange(NSMakeRange(0, 16))
             //Swap bytes for endianness
-            let swappedKey = truncatedSha.bigEndianUInt32
-            return NSData(data: swappedKey)
+            return sha.bigEndianUInt32
         }
     }
     
@@ -59,15 +52,12 @@ class EncryptedToken : MifareMini {
             self.data.appendData(encryptedBlock)
         }
     }
-
-
+    
     convenience init(image: NSData) {
         self.init(tagId: image.subdataWithRange(NSMakeRange(0, 7)))
         self.data = image.mutableCopy() as! NSMutableData
     }
 
-
-    
     func skipEncryption(blockNumber: Int, blockData: NSData) -> Bool {
         return (blockNumber == 0 || blockNumber == 18 || sectorTrailer(blockNumber) || blockData.isEqualToData(emptyBlock))
     }
@@ -81,7 +71,7 @@ class EncryptedToken : MifareMini {
     func encrypt(blockNumber: Int, blockData: NSData) -> NSData {
         return commonCrypt(blockNumber, blockData: blockData, encrypt: true)
     }
-
+    
     func commonCrypt(blockNumber: Int, blockData: NSData, encrypt: Bool) -> NSData {
         if (blockData.length != MifareMini.blockSize) {
             print("blockData must be exactly \(MifareMini.blockSize) bytes")
@@ -92,39 +82,16 @@ class EncryptedToken : MifareMini {
             return blockData
         }
         
-        var operation : CCOperation
+        let aes = try! AES(key: key.arrayOfBytes(), blockMode: .ECB)
+        var newBytes : [UInt8]
+        
         if (encrypt) {
-            operation = UInt32(kCCEncrypt)
+            newBytes = try! aes.encrypt(blockData.arrayOfBytes(), padding: nil)
         } else {
-            operation = UInt32(kCCDecrypt)
+            newBytes = try! aes.decrypt(blockData.arrayOfBytes(), padding: nil)
         }
         
-
-        let algoritm : CCAlgorithm = UInt32(kCCAlgorithmAES128)
-        let options : CCOptions   = UInt32(kCCOptionECBMode)
-        
-        let keyBytes = UnsafePointer<UInt8>(key.bytes)
-        let keyLength : size_t = size_t(kCCKeySizeAES128)
-        
-        let dataBytes = UnsafePointer<UInt8>(blockData.bytes)
-        let dataLength : size_t = size_t(blockData.length)
-        
-        let cryptData = NSMutableData(length: Int(blockData.length) + kCCBlockSizeAES128)!
-        let cryptPointer = UnsafeMutablePointer<UInt8>(cryptData.mutableBytes)
-        let cryptLength : size_t = size_t(cryptData.length)
-        var numBytesEncrypted : size_t = 0
-        
-        let cryptStatus : CCCryptorStatus = CCCrypt(
-            operation, algoritm, options,
-            keyBytes, keyLength, nil,
-            dataBytes, dataLength,
-            cryptPointer, cryptLength, &numBytesEncrypted)
-        
-        if (UInt32(cryptStatus) != UInt32(kCCSuccess)) {
-            print("Encryption failed")
-        }
-        
-        return cryptData.subdataWithRange(NSMakeRange(0, blockData.length))
+        return NSData(bytes: newBytes)
     }
 }
 
