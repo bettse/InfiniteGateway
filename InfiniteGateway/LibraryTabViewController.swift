@@ -82,6 +82,10 @@ class LibraryTabViewController: NSViewController {
             } else {
                 modelId = ThePoster.models[index].id
             }
+            if (modelId == 0) {
+                print("buildBlank couldn't set modelId")
+                return
+            }
             let t = Token(modelId: modelId)
             let et = EncryptedToken(from: t)
             let appDelegate = NSApplication.sharedApplication().delegate as! AppDelegate

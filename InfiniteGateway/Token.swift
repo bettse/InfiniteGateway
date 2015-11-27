@@ -359,7 +359,7 @@ class Token : MifareMini, CustomStringConvertible {
         self.manufactureMonth = 7
         self.manufactureDay = 3
         self.diConstant = Token.DiConstant
-        self.generation = UInt8(modelId / 100 % 10) + 1
+        self.generation = Model(id: modelId).generation
         
         //Other misc
         var bytes : [UInt8] = [0x02]

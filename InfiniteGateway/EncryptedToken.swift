@@ -90,8 +90,10 @@ class EncryptedToken : MifareMini {
         } else {
             newBytes = try! aes.decrypt(blockData.arrayOfBytes(), padding: nil)
         }
-        
-        return NSData(bytes: newBytes)
+        if (newBytes.count != MifareMini.blockSize) {
+            print("Number of bytes after encryption/decryption was \(newBytes.count), but will be truncated")
+        }
+        return NSData(bytes: newBytes).subdataWithRange(NSMakeRange(0, MifareMini.blockSize))
     }
 }
 
