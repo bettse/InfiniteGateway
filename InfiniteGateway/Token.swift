@@ -398,7 +398,7 @@ class Token : MifareMini, CustomStringConvertible {
         verifyChecksum(blockData, blockNumber: blockNumber, update: true)
     }
     
-    func correctAllChecsums() {
+    func correctAllChecksums() {
         for blockNumber in 0..<MifareMini.blockCount {
             correctChecksum(blockNumber)
         }

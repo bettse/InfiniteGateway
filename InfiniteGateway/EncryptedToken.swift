@@ -45,7 +45,7 @@ class EncryptedToken : MifareMini {
     
     convenience init(from: Token) {
         self.init(tagId: from.tagId)
-        from.correctAllChecsums()
+        from.correctAllChecksums()
         for blockNumber in 0..<MifareMini.blockCount {
             let clearBlock = from.block(blockNumber)
             let encryptedBlock = encrypt(blockNumber, blockData: clearBlock)
