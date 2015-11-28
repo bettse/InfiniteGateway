@@ -43,13 +43,4 @@ extension NSData {
         return NSData(data: result)
     }
     
-    public var reverse: NSData {
-        let result = NSMutableData(data: self)
-        let resultBytes = UnsafeMutablePointer<UInt8>(result.mutableBytes)
-        for i in 0..<result.length {
-            resultBytes[i] = resultBytes[i].reverse
-        }
-        return NSData(data: result)
-    }
-    
 }

@@ -25,7 +25,7 @@ class Token : MifareMini, CustomStringConvertible {
     
     var description: String {
         let me = String(self.dynamicType).componentsSeparatedByString(".").last!
-        return "\(me)(\(tagId): v\(generation) \(name) L\(level)[\(experience)] | Manuf: \(manufactureYear)/\(manufactureMonth)/\(manufactureDay)"
+        return "\(me)(\(tagId): v\(generation) \(name) L\(level)[\(experience)] | Manuf: \(manufactureYear)/\(manufactureMonth)/\(manufactureDay))"
     }
     
     override var filename : String {
@@ -376,7 +376,7 @@ class Token : MifareMini, CustomStringConvertible {
         let checksumIndex = Token.blockSize - sizeof(UInt32) //12
         
         let existingChecksum = blockData.subdataWithRange(NSMakeRange(checksumIndex, sizeof(UInt32)))
-        let data = blockData.subdataWithRange(NSMakeRange(0, checksumIndex)).reverse
+        let data = blockData.subdataWithRange(NSMakeRange(0, checksumIndex))
         let checksumResult = getChecksum(data)
         
         let valid = (existingChecksum.isEqualToData(checksumResult))
@@ -404,10 +404,12 @@ class Token : MifareMini, CustomStringConvertible {
         }
     }
     
+    func reverseBytes(value: UInt32) -> UInt32 {
+        return ((value & 0x000000FF) << 24) | ((value & 0x0000FF00) << 8) | ((value & 0x00FF0000) >> 8)  | ((value & 0xFF000000) >> 24);
+    }
+    
     func getChecksum(data: NSData) -> NSData {
-        let crc32 = data.crc32()
-        let checksumResult = crc32!.reverse.negation
-        return checksumResult
+        return data.crc32()!
     }
     
     func save() {
