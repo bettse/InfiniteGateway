@@ -71,7 +71,7 @@ class Model : NSObject {
 
 class ThePoster {
     static var models : [Model] = {
-        return names.keys.map{return Model(id: $0)}.sort({ $0.description < $1.description })
+        return names.keys.map{return Model(id: $0)}.sort({ $0.id < $1.id })
     }()
     
     static func getName(id: Int) -> String {
