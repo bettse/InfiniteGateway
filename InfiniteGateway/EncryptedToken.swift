@@ -43,6 +43,18 @@ class EncryptedToken : MifareMini {
         }
     }
     
+    var name : String {
+        get {
+            return decryptedToken.model.name
+        }
+    }
+    
+    override var filename : String {
+        get {
+            return "\(tagId.hexadecimalString)-\(name).bin"
+        }
+    }
+    
     convenience init(from: Token) {
         self.init(tagId: from.tagId)
         from.correctAllChecksums()

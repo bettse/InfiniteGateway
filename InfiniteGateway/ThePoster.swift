@@ -75,7 +75,7 @@ class ThePoster {
     }()
     
     static func getName(id: Int) -> String {
-        return names.get(id, defaultValue: "<Unknown>")
+        return names.get(id, defaultValue: "<\(id)>")
     }
 
     //http://disneyinfinity.wikia.com/wiki/Disney_Infinity/Model_Numbers
