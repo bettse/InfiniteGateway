@@ -18,7 +18,9 @@ class Portal : NSObject {
     var device : IOHIDDevice? = nil
     
     func input(inResult: IOReturn, inSender: UnsafeMutablePointer<Void>, type: IOHIDReportType, reportId: UInt32, report: UnsafeMutablePointer<UInt8>, reportLength: CFIndex) {
-        let report = Report(data: NSData(bytes: report, length: reportLength))
+        let raw = NSData(bytes: report, length: reportLength)
+        //print("IN: \(raw)")
+        let report = Report(data: raw)
         if let msg = report.content {
             dispatch_async(dispatch_get_main_queue(), {
                 NSNotificationCenter.defaultCenter().postNotificationName("incomingMessage", object: self, userInfo: ["message": msg])
