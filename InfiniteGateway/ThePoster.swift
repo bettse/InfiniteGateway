@@ -81,6 +81,7 @@ class ThePoster {
     //http://disneyinfinity.wikia.com/wiki/Disney_Infinity/Model_Numbers
     //http://www.disneyinfinityfans.com/viewtopic.php?f=9&t=2269&start=63
     //Look into more complex structure containing name, generation (or get from token data), type (disk, playset, etc)
+
     static let names : [Int:String] = [
         1000001 : "Mr. Incredible",
         1000002 : "Sulley",
@@ -180,6 +181,8 @@ class ThePoster {
         1000236 : "Nick Wilde",
         1000237 : "Judy Hopps",
         1000238 : "Hulkbuster",
+        1000239 : "Anakin Skywalker Light FX",
+        1000240 : "Obi-Wan Kenobi Light FX",
         2000001 : "Starter Pack Playsets",
         2000002 : "The Lone Ranger Play Set",
         2000003 : "Cars Play Set",
@@ -193,6 +196,10 @@ class ThePoster {
         2000106 : "Brave Forest Siege",
         2000200 : "Inside Out Playset",
         2000202 : "Star Wars: Twilight of the Republic Play Set",
+        2000203 : "Star Wars: Rise Against the Empire Play Set",
+        2000204 : "Star Wars: The Force Awakens Play Set",
+        2000205 : "Marvel Battlegrounds",
+        2000206 : "Toy Box Speedways",
         2000207 : "Toy Box Takeover",
         3000003 : "Bolt's Super Strength",
         3000004 : "Ralph's Power of Destruction",
@@ -211,6 +218,9 @@ class ThePoster {
         3000017 : "Sorcerer Mickey's Hat",
         3000062 : "Emperor Zurg's Wrath (Rare)",
         3000063 : "Merlin's Summon (Rare)",
+        3000165 : "Enchanted Rose",
+        3000166 : "Mulan's Training Uniform",
+        3000167 : "Flubber",
         3000168 : "S.H.I.E.L.D. Helicarrier Strike",
         3000169 : "Zeus' Thunderbolts",
         3000170 : "King Louie's Monkeys",
@@ -236,6 +246,9 @@ class ThePoster {
         3000191 : "Space Armor",
         3000192 : "Rags to Riches",
         3000193 : "Ultimate Falcon",
+        3000200 : "Timebomb",
+        3000206 : "Mace Windu Team Up",
+        3000231 : "Kingdom Hearts Mickey",
         4000018 : "Mickey's Car",
         4000019 : "Cinderella's Coach",
         4000020 : "Electric Mayhem Bus",
@@ -341,6 +354,16 @@ class ThePoster {
         4000194 : "Spider-Cycle (Rare)",
         4000195 : "The Avenjet",
         4000196 : "Spider-Glider",
+        4000201 : "Retro Gun",
+        4000202 : "Tomorrowland Terrain",
+        4000203 : "Tomorrowland Skydome",
+        4000204 : "Falusha Skydome",
+        4000205 : "Falusha Terrain",
+        4000207 : "Grevious Bike",
+        4000212 : "Arlo",
+        4000213 : "Nash",
+        4000214 : "Butch",
+        4000215 : "Ramsey",
         8032386 : "Disney Infinity Base",
     ]
 }
