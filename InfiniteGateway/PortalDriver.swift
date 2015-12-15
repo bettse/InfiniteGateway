@@ -71,8 +71,7 @@ class PortalDriver : NSObject {
     
     func incomingResponse(response: Response) {
         if let _ = response as? ActivateResponse {
-            let report = Report(cmd: PresenceCommand())
-            portal.output(report)
+            portal.outputCommand(LightOnCommand(ledPlatform: .All, color: NSColor.blackColor()))
         } else if let response = response as? PresenceResponse {
             for (ledPlatform, nfcIndicies) in response.details {
                 let temp = presence[ledPlatform] ?? [UInt8]() //Define if not already defined
