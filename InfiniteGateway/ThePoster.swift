@@ -71,7 +71,7 @@ class Model : NSObject {
 
 class ThePoster {
     static var models : [Model] = {
-        return names.keys.map{return Model(id: $0)}.sort({ $0.id < $1.id })
+        return names.keys.map{return Model(id: $0)}.sort({ $0.description < $1.description })
     }()
     
     static func getName(id: Int) -> String {
@@ -81,7 +81,6 @@ class ThePoster {
     //http://disneyinfinity.wikia.com/wiki/Disney_Infinity/Model_Numbers
     //http://www.disneyinfinityfans.com/viewtopic.php?f=9&t=2269&start=63
     //Look into more complex structure containing name, generation (or get from token data), type (disk, playset, etc)
-
     static let names : [Int:String] = [
         1000001 : "Mr. Incredible",
         1000002 : "Sulley",
@@ -151,7 +150,9 @@ class ThePoster {
         1000128 : "Yondu",
         1000129 : "Jasmine",
         1000134 : "Black Suit Spider-Man",
+        1000150 : "Sam Flynn",
         1000151 : "Quorra",
+        1000152 : "Clu",
         1000200 : "Anakin Skywalker",
         1000201 : "Obi-Wan Kenobi",
         1000202 : "Yoda",
@@ -177,12 +178,22 @@ class ThePoster {
         1000223 : "Mulan",
         1000224 : "Olaf",
         1000226 : "Ultron",
+        1000230 : "Finn",
+        1000231 : "Kylo Ren",
+        1000232 : "Poe Dameron",
+        1000233 : "Rey",
         1000235 : "Spot",
         1000236 : "Nick Wilde",
         1000237 : "Judy Hopps",
         1000238 : "Hulkbuster",
         1000239 : "Anakin Skywalker Light FX",
         1000240 : "Obi-Wan Kenobi Light FX",
+        1000241 : "Yoda Light FX",
+        1000242 : "Luke Skywalker Light FX",
+        1000243 : "Darth Vader Light FX",
+        1000244 : "Kanan Jarrus Light FX",
+        1000245 : "Kylo Ren Light FX",
+        //MARK- Hex playsets
         2000001 : "Starter Pack Playsets",
         2000002 : "The Lone Ranger Play Set",
         2000003 : "Cars Play Set",
@@ -201,6 +212,8 @@ class ThePoster {
         2000205 : "Marvel Battlegrounds",
         2000206 : "Toy Box Speedways",
         2000207 : "Toy Box Takeover",
+        2000208 : "SW: The Force Awakens play set 2",
+        //MARK- Round powerdisks
         3000003 : "Bolt's Super Strength",
         3000004 : "Ralph's Power of Destruction",
         3000005 : "Chernabog's Power",
@@ -246,9 +259,10 @@ class ThePoster {
         3000191 : "Space Armor",
         3000192 : "Rags to Riches",
         3000193 : "Ultimate Falcon",
-        3000200 : "Timebomb",
-        3000206 : "Mace Windu Team Up",
+        3000200 : "Tomorrowland Time Bomb",
+        3000206 : "Galactic Team-Up: Mace Windu",
         3000231 : "Kingdom Hearts Mickey",
+        //MARK- Hex powerdisks
         4000018 : "Mickey's Car",
         4000019 : "Cinderella's Coach",
         4000020 : "Electric Mayhem Bus",
@@ -355,15 +369,16 @@ class ThePoster {
         4000195 : "The Avenjet",
         4000196 : "Spider-Glider",
         4000201 : "Retro Gun",
-        4000202 : "Tomorrowland Terrain",
-        4000203 : "Tomorrowland Skydome",
-        4000204 : "Falusha Skydome",
-        4000205 : "Falusha Terrain",
-        4000207 : "Grevious Bike",
+        4000202 : "Tomorrowland Futurescape",
+        4000203 : "Tomorrowland Stratosphere",
+        4000204 : "Skies over Felucia",
+        4000205 : "Forest of Felucia",
+        4000207 : "General Grievous' Wheel Bike",
+        4000210 : "Star Wars Slave 1",
+        4000211 : "Star Wars Y-Wing",
         4000212 : "Arlo",
         4000213 : "Nash",
         4000214 : "Butch",
         4000215 : "Ramsey",
-        8032386 : "Disney Infinity Base",
     ]
 }
