@@ -71,6 +71,11 @@ class ActivateResponse : Response {
         params = data.subdataWithRange(NSMakeRange(paramsIndex, data.length - paramsIndex))
         super.init(data: data)
     }
+    
+    override var description: String {
+        let me = String(self.dynamicType).componentsSeparatedByString(".").last!
+        return "\(me)(\(params))"
+    }
 }
 
 class TagIdResponse : Response {
