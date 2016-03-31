@@ -43,8 +43,8 @@ class LibraryTabViewController: NSViewController {
         libraryTable!.registerNib(NSNib(nibNamed: "TokenCellView", bundle: nil), forIdentifier: "TokenCellView")
 
         self.libraryTable?.target = self
-        self.libraryTable?.doubleAction = "tableViewDoubleAction"
-        NSNotificationCenter.defaultCenter().addObserver(self, selector: "bustFileList:", name: "tokenSaved", object: nil)
+        self.libraryTable?.doubleAction = #selector(LibraryTabViewController.tableViewDoubleAction)
+        NSNotificationCenter.defaultCenter().addObserver(self, selector: #selector(LibraryTabViewController.bustFileList(_:)), name: "tokenSaved", object: nil)
     }
     
     override var representedObject: AnyObject? {

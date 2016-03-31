@@ -24,13 +24,13 @@ class DeviceTabViewController: NSViewController {
         // Do any additional setup after loading the view.
         status?.stringValue = "Portal Disconnected"
         
-        NSNotificationCenter.defaultCenter().addObserver(self, selector: "deviceConnected:", name: "deviceConnected", object: nil)
-        NSNotificationCenter.defaultCenter().addObserver(self, selector: "deviceDisconnected:", name: "deviceDisconnected", object: nil)
+        NSNotificationCenter.defaultCenter().addObserver(self, selector: #selector(DeviceTabViewController.deviceConnected(_:)), name: "deviceConnected", object: nil)
+        NSNotificationCenter.defaultCenter().addObserver(self, selector: #selector(DeviceTabViewController.deviceDisconnected(_:)), name: "deviceDisconnected", object: nil)
         
         portalDriver.registerTokenLoaded(self.tokenLoaded)
         portalDriver.registerTokenLeft(self.tokenLeft)
         
-        self.nfcTable?.doubleAction = "tableViewDoubleAction"
+        self.nfcTable?.doubleAction = #selector(DeviceTabViewController.tableViewDoubleAction)
         self.nfcTable?.target = self
     }
     

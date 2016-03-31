@@ -14,14 +14,14 @@ class Command : Message {
     let corrolationIdIndex = 1
     let paramsIndex = 2
 
-    static var corrolationGenerator = Range(start: 1, end: UInt8.max - 1).generate()
+    static var corrolationGenerator = (1..<UInt8.max-1).generate()
     static var nextSequence : UInt8 {
         get {
             if let next = corrolationGenerator.next() {
                 return next
             }
             //Implicitly else
-            corrolationGenerator = Range(start: 1, end: UInt8.max - 1).generate()
+            corrolationGenerator = (1..<UInt8.max-1).generate()
             return 0
         }
     }

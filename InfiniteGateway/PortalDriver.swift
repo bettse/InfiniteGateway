@@ -30,11 +30,11 @@ class PortalDriver : NSObject {
     override init() {
         super.init()
         
-        NSNotificationCenter.defaultCenter().addObserver(self, selector: "deviceConnected:", name: "deviceConnected", object: nil)
-        NSNotificationCenter.defaultCenter().addObserver(self, selector: "incomingMessage:", name: "incomingMessage", object: nil)
+        NSNotificationCenter.defaultCenter().addObserver(self, selector: #selector(PortalDriver.deviceConnected(_:)), name: "deviceConnected", object: nil)
+        NSNotificationCenter.defaultCenter().addObserver(self, selector: #selector(PortalDriver.incomingMessage(_:)), name: "incomingMessage", object: nil)
         //NSNotificationCenter.defaultCenter().addObserver(self, selector: "deviceDisconnected:", name: "deviceDisconnected", object: nil)
         
-        portalThread = NSThread(target: self.portal, selector:"initUsb", object: nil)
+        portalThread = NSThread(target: self.portal, selector:#selector(Portal.initUsb), object: nil)
         if let thread = portalThread {
             thread.start()
         }

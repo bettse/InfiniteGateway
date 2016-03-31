@@ -35,7 +35,7 @@ class TokenDetailViewController : NSViewController {
         skillLabel?.stringValue = String(token.skillTree, radix: BINARY)
         
         experience!.target = self
-        experience!.action = "experienceUpdate"
+        experience!.action = #selector(TokenDetailViewController.experienceUpdate)
     }
     
     override var representedObject: AnyObject? {
