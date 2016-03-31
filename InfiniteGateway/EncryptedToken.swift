@@ -37,7 +37,11 @@ class EncryptedToken : MifareMini {
             for blockNumber in 0..<MifareMini.blockCount {
                 let encryptedBlock = block(blockNumber)
                 let clearBlock = decrypt(blockNumber, blockData: encryptedBlock)
-                clearToken.load(blockNumber, blockData: clearBlock)
+                if(clearToken.verifyChecksum(clearBlock, blockNumber: blockNumber)) {
+                    clearToken.load(blockNumber, blockData: clearBlock)
+                } else {
+                    print("Could not load block \(blockNumber) due to failed checksum")
+                }
             }
             return clearToken;
         }
