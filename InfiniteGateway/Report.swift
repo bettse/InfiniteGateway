@@ -53,11 +53,9 @@ class Report {
     
     init(data: NSData) {
         //Extract type and checksum
-        data.getBytes(&type, range: NSMakeRange(typeIndex, sizeof(MessageType)))
-        data.getBytes(&length, range: NSMakeRange(lengthIndex, sizeof(UInt8)))
-        data.getBytes(&checksum, range: NSMakeRange(lengthIndex + length, sizeof(UInt8)))
-        
-        //print("report with \(String(type.rawValue, radix:0x10)) \(length) \(checksum)")
+        type = MessageType.init(rawValue: data[typeIndex])!
+        length = Int(data[lengthIndex])
+        checksum = data[lengthIndex + length]
         
         //Case statement for C R U
         switch type {
