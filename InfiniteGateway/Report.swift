@@ -69,7 +69,7 @@ class Report {
         case .Command:
             content = Command(data: data.subdataWithRange(NSMakeRange(contentIndex, length)))
         default:
-            print("Fuck, default", terminator: "\n")
+            print("Report type \(String(type.rawValue, radix:0x10)) len:\(length) checksum:\(checksum)")
         }
     }
     
