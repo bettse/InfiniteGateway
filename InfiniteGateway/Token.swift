@@ -409,7 +409,7 @@ class Token : MifareMini, CustomStringConvertible {
     }
     
     func getChecksum(data: NSData) -> NSData {
-        return data.crc32()!
+        return data.crc32(0)!.negation
     }
     
     func save() {
