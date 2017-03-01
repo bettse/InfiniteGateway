@@ -11,18 +11,18 @@ import CryptoSwift
 
 
 class EncryptedToken : MifareMini {
-    var key : NSData {
+    var key : Data {
         get {
             //It is the first 16 bytes of a SHA1 hash of: a hard-coded 16 bytes, 15 bytes of the string "(c) Disney 2013", and the 7 bytes of the tag ID.
             //Each integer, or group of 4 bytes, of the SHA1 hash needs to be reversed because of endianness.
             
             let prekey = NSMutableData(capacity: 38)! //PortalDriver.magic.length + PortalDriver.secret.length + tagId.length
-            prekey.appendData(PortalDriver.secret)
-            prekey.appendData(PortalDriver.magic)
-            prekey.appendData(tagId)
+            prekey.append(PortalDriver.secret as Data)
+            prekey.append(PortalDriver.magic as Data)
+            prekey.append(tagId as Data)
             if (prekey.length != 38) {
                 print("Pre-hashed key wasn't of the correct length")
-                return NSData()
+                return Data()
             }
             
             let sha = prekey.sha1()!.subdataWithRange(NSMakeRange(0, 16))
@@ -65,31 +65,31 @@ class EncryptedToken : MifareMini {
         for blockNumber in 0..<MifareMini.blockCount {
             let clearBlock = from.block(blockNumber)
             let encryptedBlock = encrypt(blockNumber, blockData: clearBlock)
-            self.data.appendData(encryptedBlock)
+            self.data.append(encryptedBlock)
         }
     }
     
-    convenience init(image: NSData) {
-        self.init(tagId: image.subdataWithRange(NSMakeRange(0, 7)))
-        self.data = image.mutableCopy() as! NSMutableData
+    convenience init(image: Data) {
+        self.init(tagId: image.subdata(in: NSMakeRange(0, 7)))
+        self.data = (image as NSData).mutableCopy() as! NSMutableData
     }
 
-    func skipEncryption(blockNumber: Int, blockData: NSData) -> Bool {
-        return (blockNumber == 0 || blockNumber == 18 || sectorTrailer(blockNumber) || blockData.isEqualToData(emptyBlock))
+    func skipEncryption(_ blockNumber: Int, blockData: Data) -> Bool {
+        return (blockNumber == 0 || blockNumber == 18 || sectorTrailer(blockNumber) || (blockData == emptyBlock))
     }
     
     //Each block is encrypted with a 128-bit AES key (ECB) unique to that figure.
-    func decrypt(blockNumber: Int, blockData: NSData) -> NSData {
+    func decrypt(_ blockNumber: Int, blockData: Data) -> Data {
         return commonCrypt(blockNumber, blockData: blockData, encrypt: false)
     }
 
     //Each block is encrypted with a 128-bit AES key (ECB) unique to that figure.
-    func encrypt(blockNumber: Int, blockData: NSData) -> NSData {
+    func encrypt(_ blockNumber: Int, blockData: Data) -> Data {
         return commonCrypt(blockNumber, blockData: blockData, encrypt: true)
     }
     
-    func commonCrypt(blockNumber: Int, blockData: NSData, encrypt: Bool) -> NSData {
-        if (blockData.length != MifareMini.blockSize) {
+    func commonCrypt(_ blockNumber: Int, blockData: Data, encrypt: Bool) -> Data {
+        if (blockData.count != MifareMini.blockSize) {
             print("blockData must be exactly \(MifareMini.blockSize) bytes")
             return blockData
         }
@@ -109,7 +109,7 @@ class EncryptedToken : MifareMini {
         if (newBytes.count != MifareMini.blockSize) {
             print("Number of bytes after encryption/decryption was \(newBytes.count), but will be truncated")
         }
-        return NSData(bytes: newBytes).subdataWithRange(NSMakeRange(0, MifareMini.blockSize))
+        return Data(bytes: newBytes).subdataWithRange(NSMakeRange(0, MifareMini.blockSize))
     }
 }
 

@@ -18,11 +18,11 @@ class Model : NSObject {
     let DECIMAL = 10
     var id : Int
     enum Shape : Int {
-        case None = 0
-        case Figure = 1
-        case PlaySet = 2
-        case RoundPowerDisk = 3
-        case HexPowerDisk = 4
+        case none = 0
+        case figure = 1
+        case playSet = 2
+        case roundPowerDisk = 3
+        case hexPowerDisk = 4
         func desc() -> String {
             switch self.rawValue {
             case 1:
@@ -63,7 +63,7 @@ class Model : NSObject {
         self.id = id
     }
     
-    func copyWithZone(zone: NSZone) -> Model {
+    func copyWithZone(_ zone: NSZone?) -> Model {
         return Model(id: self.id)
     }
     
@@ -71,10 +71,10 @@ class Model : NSObject {
 
 class ThePoster {
     static var models : [Model] = {
-        return names.keys.map{return Model(id: $0)}.sort({ $0.description < $1.description })
+        return names.keys.map{return Model(id: $0)}.sorted(by: { $0.description < $1.description })
     }()
     
-    static func getName(id: Int) -> String {
+    static func getName(_ id: Int) -> String {
         return names.get(id, defaultValue: "<\(id)>")
     }
 

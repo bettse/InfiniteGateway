@@ -14,21 +14,21 @@ class Command : Message {
     let corrolationIdIndex = 1
     let paramsIndex = 2
 
-    static var corrolationGenerator = (1..<UInt8.max-1).generate()
+    static var corrolationGenerator = (1..<UInt8.max-1).makeIterator()
     static var nextSequence : UInt8 {
         get {
             if let next = corrolationGenerator.next() {
                 return next
             }
             //Implicitly else
-            corrolationGenerator = (1..<UInt8.max-1).generate()
+            corrolationGenerator = (1..<UInt8.max-1).makeIterator()
             return 0
         }
     }
     
-    var type : commandType = .Activate
+    var type : commandType = .activate
     var corrolationId : UInt8 = 0
-    var params : NSData = NSData()
+    var params : Data = Data()
     
     override init() {
         corrolationId = Command.nextSequence
@@ -37,54 +37,54 @@ class Command : Message {
     }
     
     //Parseing from NSData
-    init(data: NSData) {
-        data.getBytes(&type, range: NSMakeRange(typeIndex, sizeof(commandType)))
-        data.getBytes(&corrolationId, range: NSMakeRange(corrolationIdIndex, sizeof(UInt8)))
-        params = data.subdataWithRange(NSMakeRange(paramsIndex, data.length - paramsIndex))
+    init(data: Data) {
+        (data as NSData).getBytes(&type, range: NSMakeRange(typeIndex, MemoryLayout<commandType>.size))
+        (data as NSData).getBytes(&corrolationId, range: NSMakeRange(corrolationIdIndex, MemoryLayout<UInt8>.size))
+        params = data.subdata(in: NSMakeRange(paramsIndex, data.count - paramsIndex))
     }
     
     override var description: String {
-        let me = String(self.dynamicType).componentsSeparatedByString(".").last!
+        let me = String(describing: type(of: self)).components(separatedBy: ".").last!
         return "\(me)(\(type.desc()))"
     }
     
-    func serialize() -> NSData {
+    func serialize() -> Data {
         let data = NSMutableData()
         var rawType : UInt8 = type.rawValue
-        data.appendBytes(&rawType, length: sizeof(UInt8))
-        data.appendBytes(&corrolationId, length: sizeof(UInt8))
-        data.appendData(params)
-        return data
+        data.append(&rawType, length: MemoryLayout<UInt8>.size)
+        data.append(&corrolationId, length: MemoryLayout<UInt8>.size)
+        data.append(params)
+        return data as Data
     }
 }
 
 class ActivateCommand : Command {
     override init() {
         super.init()
-        type = .Activate
-        params = PortalDriver.magic
+        type = .activate
+        params = PortalDriver.magic as Data
     }
 }
 
 class SeedCommand : Command {
     override init() {
         super.init()
-        type = .Seed
-        params = NSData(bytes: [0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00] as [UInt8], length: 8)
+        type = .seed
+        params = Data(bytes: UnsafePointer<UInt8>([0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00] as [UInt8]), count: 8)
     }
 }
 
 class NextCommand : Command {
     override init() {
         super.init()
-        type = .Next
+        type = .next
     }
 }
 
 class PresenceCommand : Command {
     override init() {
         super.init()
-        type = .Presence
+        type = .presence
     }
 }
 
@@ -93,8 +93,8 @@ class TagIdCommand : Command {
     init(nfcIndex: UInt8) {
         self.nfcIndex = nfcIndex
         super.init()
-        type = .TagId
-        params = NSData(bytes: [nfcIndex] as [UInt8], length: 1)
+        type = .tagId
+        params = Data(bytes: UnsafePointer<UInt8>([nfcIndex] as [UInt8]), count: 1)
     }
 }
 
@@ -106,8 +106,8 @@ class ReadCommand : Command {
         self.nfcIndex = nfcIndex
         self.blockNumber = block
         super.init()
-        type = .Read
-        params = NSData(bytes: [nfcIndex, 0x00, block] as [UInt8], length: 3)
+        type = .read
+        params = Data(bytes: UnsafePointer<UInt8>([nfcIndex, 0x00, block] as [UInt8]), count: 3)
     }
     
     convenience init(nfcIndex: UInt8, block: Int) {
@@ -118,20 +118,20 @@ class ReadCommand : Command {
 class WriteCommand : Command {
     var nfcIndex : UInt8
     var blockNumber : UInt8
-    var blockData : NSData
+    var blockData : Data
     
-    init(nfcIndex: UInt8, block: UInt8, blockData: NSData) {
+    init(nfcIndex: UInt8, block: UInt8, blockData: Data) {
         self.nfcIndex = nfcIndex
         self.blockNumber = block
         self.blockData = blockData
         super.init()
-        type = .Write
+        type = .write
         let temp : NSMutableData = NSMutableData(bytes: [nfcIndex, 0x00, block] as [UInt8], length: 3)
-        temp.appendData(blockData)
-        params = NSData(data: temp)
+        temp.append(blockData)
+        params = NSData(data: temp as Data) as Data
     }
     
-    convenience init(nfcIndex: UInt8, block: Int, blockData: NSData) {
+    convenience init(nfcIndex: UInt8, block: Int, blockData: Data) {
         self.init(nfcIndex: nfcIndex, block: UInt8(block), blockData: blockData)
     }
 }
@@ -146,8 +146,8 @@ class LightOnCommand : Command {
         self.green = green
         self.blue = blue
         super.init()
-        type = .LightOn
-        params = NSData(bytes: [ledPlatform.rawValue, red, green, blue] as [UInt8], length: 4)
+        type = .lightOn
+        params = Data(bytes: UnsafePointer<UInt8>([ledPlatform.rawValue, red, green, blue] as [UInt8]), count: 4)
     }
 
     convenience init(ledPlatform: LedPlatform, red : Int, green: Int, blue : Int) {
@@ -157,7 +157,7 @@ class LightOnCommand : Command {
     convenience init(ledPlatform: LedPlatform, color : NSColor) {
         var r : UInt8 = 0, g: UInt8 = 0, b : UInt8 = 0
         let scale : CGFloat = CGFloat(UInt8.max)
-        if let calibratedColor : NSColor = color.colorUsingColorSpaceName(NSCalibratedRGBColorSpace) {
+        if let calibratedColor : NSColor = color.usingColorSpaceName(NSCalibratedRGBColorSpace) {
             r = UInt8(Int(calibratedColor.redComponent * scale))
             g = UInt8(Int(calibratedColor.greenComponent * scale))
             b = UInt8(Int(calibratedColor.blueComponent * scale))
@@ -181,8 +181,8 @@ class LightFadeCommand : Command {
         self.speed = speed
         self.count = count
         super.init()
-        type = .LightOn
-        params = NSData(bytes: [ledPlatform.rawValue, red, green, blue, speed, count] as [UInt8], length: 6)
+        type = .lightOn
+        params = Data(bytes: UnsafePointer<UInt8>([ledPlatform.rawValue, red, green, blue, speed, count] as [UInt8]), count: 6)
     }
     
     convenience init(ledPlatform: LedPlatform, red : Int, green: Int, blue : Int, speed: Int, count: Int) {
@@ -192,7 +192,7 @@ class LightFadeCommand : Command {
     convenience init(ledPlatform: LedPlatform, color : NSColor, speed: UInt8, count: UInt8) {
         var r : UInt8 = 0, g: UInt8 = 0, b : UInt8 = 0
         let scale : CGFloat = CGFloat(UInt8.max)
-        if let calibratedColor : NSColor = color.colorUsingColorSpaceName(NSCalibratedRGBColorSpace) {
+        if let calibratedColor : NSColor = color.usingColorSpaceName(NSCalibratedRGBColorSpace) {
             r = UInt8(Int(calibratedColor.redComponent * scale))
             g = UInt8(Int(calibratedColor.greenComponent * scale))
             b = UInt8(Int(calibratedColor.blueComponent * scale))
@@ -223,14 +223,14 @@ class LightFlashCommand : Command {
         self.timeOld = timeOld
         self.count = count
         super.init()
-        type = .LightOn
-        params = NSData(bytes: [ledPlatform.rawValue, red, green, blue, timeNew, timeOld, count] as [UInt8], length: 6)
+        type = .lightOn
+        params = Data(bytes: UnsafePointer<UInt8>([ledPlatform.rawValue, red, green, blue, timeNew, timeOld, count] as [UInt8]), count: 6)
     }
 
     convenience init(ledPlatform: LedPlatform, color : NSColor, timeNew : UInt8, timeOld : UInt8, count: UInt8) {
         var r : UInt8 = 0, g: UInt8 = 0, b : UInt8 = 0
         let scale : CGFloat = CGFloat(UInt8.max)
-        if let calibratedColor : NSColor = color.colorUsingColorSpaceName(NSCalibratedRGBColorSpace) {
+        if let calibratedColor : NSColor = color.usingColorSpaceName(NSCalibratedRGBColorSpace) {
             r = UInt8(Int(calibratedColor.redComponent * scale))
             g = UInt8(Int(calibratedColor.greenComponent * scale))
             b = UInt8(Int(calibratedColor.blueComponent * scale))

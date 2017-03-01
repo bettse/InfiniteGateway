@@ -14,35 +14,35 @@ import Foundation
 //CustomStringConvertible make the 'description' method possible
 class Message : CustomStringConvertible {
     enum commandType : UInt8 {
-        case Activate = 0x80
-        case Seed = 0x81
-        case Next = 0x83
-        case LightOn = 0x90
-        case LightFade = 0x92
-        case LightFlash = 0x93
-        case Presence = 0xA1
-        case Read = 0xA2
-        case Write = 0xA3
-        case TagId = 0xB4
+        case activate = 0x80
+        case seed = 0x81
+        case next = 0x83
+        case lightOn = 0x90
+        case lightFade = 0x92
+        case lightFlash = 0x93
+        case presence = 0xA1
+        case read = 0xA2
+        case write = 0xA3
+        case tagId = 0xB4
         func desc() -> String {
-            return String(self).componentsSeparatedByString(".").last!
+            return String(describing: self).components(separatedBy: ".").last!
         }
     }    
     enum LedPlatform : UInt8 {
-        case All = 0
-        case Hex = 1
-        case Left = 2
-        case Right = 3
-        case None = 0xFF
+        case all = 0
+        case hex = 1
+        case left = 2
+        case right = 3
+        case none = 0xFF
         func desc() -> String {
-            return String(self).componentsSeparatedByString(".").last!
+            return String(describing: self).components(separatedBy: ".").last!
         }
     }
     
     static var archive = [UInt8: Message]()
     
     var description: String {
-        let me = String(self.dynamicType).componentsSeparatedByString(".").last!
+        let me = String(describing: type(of: self)).components(separatedBy: ".").last!
         return "\(me)"
     }
 

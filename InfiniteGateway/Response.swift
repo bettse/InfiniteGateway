@@ -25,55 +25,55 @@ class Response : Message {
         }
     }
     
-    init(data: NSData) {
+    init(data: Data) {
         super.init()
-        data.getBytes(&corrolationId, range: NSMakeRange(corrolationIdIndex, sizeof(UInt8)))
+        (data as NSData).getBytes(&corrolationId, range: NSMakeRange(corrolationIdIndex, MemoryLayout<UInt8>.size))
         
     }
     
-    static func parse(data: NSData) -> Response {
+    static func parse(_ data: Data) -> Response {
         let r : Response = Response(data: data)
         switch r.command.type {
-        case .Activate:
+        case .activate:
             return ActivateResponse(data: data)
-        case .TagId:
+        case .tagId:
             return TagIdResponse(data: data)
-        case .Presence:
+        case .presence:
             return PresenceResponse(data: data)
-        case .Read:
+        case .read:
             return ReadResponse(data: data)
-        case .Write:
+        case .write:
             return WriteResponse(data: data)
-        case .LightOn:
+        case .lightOn:
             return LightOnResponse(data: data)
-        case .LightFade:
+        case .lightFade:
             return LightFadeResponse(data: data)
-        case .LightFlash:
+        case .lightFlash:
             return LightFlashResponse(data: data)
-        case .Seed:
+        case .seed:
             return SeedResponse(data: data)
-        case .Next:
+        case .next:
             return NextResponse(data: data)
         }
     }
     
     override var description: String {
-        let me = String(self.dynamicType).componentsSeparatedByString(".").last!
+        let me = String(describing: type(of: self)).components(separatedBy: ".").last!
         return "\(me)(\(type.desc()))"
     }
 }
 
 class ActivateResponse : Response {
-    var params : NSData
+    var params : Data
     let paramsIndex = 1
     
-    override init(data: NSData) {
-        params = data.subdataWithRange(NSMakeRange(paramsIndex, data.length - paramsIndex))
+    override init(data: Data) {
+        params = data.subdata(in: NSMakeRange(paramsIndex, data.count - paramsIndex))
         super.init(data: data)
     }
     
     override var description: String {
-        let me = String(self.dynamicType).componentsSeparatedByString(".").last!
+        let me = String(describing: type(of: self)).components(separatedBy: ".").last!
         return "\(me)(\(params))"
     }
 }
@@ -88,15 +88,15 @@ class TagIdResponse : Response {
             return 0
         }
     }
-    var tagId : NSData
+    var tagId : Data
     
-    override init(data: NSData) {
-        tagId = data.subdataWithRange(NSMakeRange(tagIdIndex, data.length - tagIdIndex))
+    override init(data: Data) {
+        tagId = data.subdata(in: NSMakeRange(tagIdIndex, data.count - tagIdIndex))
         super.init(data: data)        
     }
 
     override var description: String {
-        let me = String(self.dynamicType).componentsSeparatedByString(".").last!
+        let me = String(describing: type(of: self)).components(separatedBy: ".").last!
         return "\(me)(NFC #\(nfcIndex): \(tagId))"
     }
 }
@@ -105,25 +105,25 @@ class TagIdResponse : Response {
 class PresenceResponse : Response {
     var details = Dictionary<Message.LedPlatform, Array<UInt8>>()
     
-    override init(data: NSData) {
-        let bytes = UnsafePointer<UInt8>(data.bytes)
-        for i in 1..<data.length {
+    override init(data: Data) {
+        let bytes = (data as NSData).bytes.bindMemory(to: UInt8.self, capacity: data.count)
+        for i in 1..<data.count {
             if (bytes[i] != 0x09) {
                 let led = LedPlatform(rawValue: bytes[i].high_nibble) as LedPlatform!
                 let nfc = bytes[i].low_nibble
-                details[led] = details[led] ?? [UInt8]() //Define if not already defined
-                details[led]!.append(nfc)
+                details[led!] = details[led!] ?? [UInt8]() //Define if not already defined
+                details[led!]!.append(nfc)
             }
         }
         super.init(data: data)
     }
     
     override var description: String {
-        let me = String(self.dynamicType).componentsSeparatedByString(".").last!
+        let me = String(describing: type(of: self)).components(separatedBy: ".").last!
         return "\(me)(\(details))"
     }
     
-    func asHex(value : UInt8) -> String {
+    func asHex(_ value : UInt8) -> String {
         return "0x\(String(value, radix:0x10))"
     }
     
@@ -132,7 +132,7 @@ class PresenceResponse : Response {
 class ReadResponse : Response {
     let blockDataIndex = 2
 
-    var blockData : NSData
+    var blockData : Data
     
     //Delegates for easier access
     var blockNumber : UInt8  {
@@ -152,13 +152,13 @@ class ReadResponse : Response {
         }
     }
     
-    override init(data: NSData) {
-        blockData = data.subdataWithRange(NSMakeRange(blockDataIndex, data.length-blockDataIndex))
+    override init(data: Data) {
+        blockData = data.subdata(in: NSMakeRange(blockDataIndex, data.count-blockDataIndex))
         super.init(data: data)
     }
     
     override var description: String {
-        let me = String(self.dynamicType).componentsSeparatedByString(".").last!
+        let me = String(describing: type(of: self)).components(separatedBy: ".").last!
         return "\(me)(Platform \(nfcIndex) block \(blockNumber): \(blockData))"
     }
 }
@@ -172,14 +172,14 @@ class NextResponse : Response {
     let scrambledIndex = 1
     var value : UInt64 = 0
     
-    override init(data: NSData) {
+    override init(data: Data) {
         var scrambled : UInt64 = 0
-        data.getBytes(&scrambled, range: NSMakeRange(scrambledIndex, sizeof(scrambled.dynamicType)))
+        (data as NSData).getBytes(&scrambled, range: NSMakeRange(scrambledIndex, MemoryLayout<UInt64>.size))
         super.init(data: data)
         value = descramble(scrambled.bigEndian)
     }
 
-    func descramble(input: UInt64) -> UInt64 {
+    func descramble(_ input: UInt64) -> UInt64 {
         var scrambled : UInt64 = input
         var result : UInt64 = 0
         var mask : UInt64 = 0x5517999cd855aa71
@@ -196,7 +196,7 @@ class NextResponse : Response {
     }
     
     override var description: String {
-        let me = String(self.dynamicType).componentsSeparatedByString(".").last!
+        let me = String(describing: type(of: self)).components(separatedBy: ".").last!
         return "\(me): 0x\(String(value, radix:0x10))"
     }
 

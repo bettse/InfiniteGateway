@@ -53,13 +53,13 @@ class TokenDetailViewController : NSViewController {
     }
 
     
-    @IBAction func saveToken(sender: AnyObject?) {
-        let appDelegate = NSApplication.sharedApplication().delegate as! AppDelegate
+    @IBAction func saveToken(_ sender: AnyObject?) {
+        let appDelegate = NSApplication.shared().delegate as! AppDelegate
         let token = representedObject as! Token
         token.experience = UInt16((experience?.integerValue)!)
         let encryptedToken = EncryptedToken(from: token)
         encryptedToken.dump(appDelegate.toyboxDirectory)
-        NSNotificationCenter.defaultCenter().postNotificationName("tokenSaved", object: nil, userInfo: nil)
+        NotificationCenter.default.post(name: Notification.Name(rawValue: "tokenSaved"), object: nil, userInfo: nil)
         self.dismissViewController(self)
     }
     

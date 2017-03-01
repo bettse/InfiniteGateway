@@ -14,28 +14,28 @@ class Update : Message {
     let nfcIndexIndex = 2
     let directionIndex = 3
     enum Direction : UInt8 {
-        case Arriving = 0
-        case Departing = 1
+        case arriving = 0
+        case departing = 1
         func desc() -> String {
-            return String(self).componentsSeparatedByString(".").last!
+            return String(describing: self).components(separatedBy: ".").last!
         }
     }
 
     
     //Setting defaults so I don't have to deal with '?' style variables yet
-    var ledPlatform : LedPlatform = .None
+    var ledPlatform : LedPlatform = .none
     var nfcIndex : UInt8 = 0
-    var direction : Direction = .Arriving
+    var direction : Direction = .arriving
     
-    init(data: NSData) {
-        data.getBytes(&ledPlatform, range: NSMakeRange(ledPlatformIndex, sizeof(LedPlatform)))
-        data.getBytes(&nfcIndex, range: NSMakeRange(nfcIndexIndex, sizeof(nfcIndex.dynamicType)))
-        data.getBytes(&direction, range: NSMakeRange(directionIndex, sizeof(Direction)))
+    init(data: Data) {
+        (data as NSData).getBytes(&ledPlatform, range: NSMakeRange(ledPlatformIndex, MemoryLayout<LedPlatform>.size))
+        (data as NSData).getBytes(&nfcIndex, range: NSMakeRange(nfcIndexIndex, MemoryLayout<UInt8>.size))
+        (data as NSData).getBytes(&direction, range: NSMakeRange(directionIndex, MemoryLayout<Direction>.size))
     }
     
     
     override var description: String {
-        let me = String(self.dynamicType).componentsSeparatedByString(".").last!
+        let me = String(describing: type(of: self)).components(separatedBy: ".").last!
         return "\(me)(\(ledPlatform.desc()) \(nfcIndex) \(direction.desc()))"
     }
 }

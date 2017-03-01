@@ -19,16 +19,16 @@ class Report {
     let contentIndex = 2
     
     enum MessageType : UInt8 {
-        case Unset = 0x00
-        case Command = 0xFF
-        case Response = 0xAA
-        case Update = 0xAB
+        case unset = 0x00
+        case command = 0xFF
+        case response = 0xAA
+        case update = 0xAB
         func desc() -> String {
-            return String(self).componentsSeparatedByString(".").last!
+            return String(describing: self).components(separatedBy: ".").last!
         }
     }
     
-    var type : MessageType = .Unset
+    var type : MessageType = .unset
     var length = 0 //TODO: Convert to use getting/setter
 
     var content : Message? = nil // (command, response, update)
@@ -37,7 +37,7 @@ class Report {
         get {
             var sum = Int(type.rawValue)
             if let content = content as? Command {
-                let b = UnsafeBufferPointer<UInt8>(start: UnsafePointer(content.serialize().bytes), count: length)
+                let b = UnsafeBufferPointer<UInt8>(start: (content.serialize() as NSData).bytes.bindMemory(to: UInt8.self, capacity: content.serialize().count), count: length)
                 
                 for i in 0..<length {
                     sum += Int(b[i])
@@ -51,7 +51,7 @@ class Report {
         }
     }
     
-    init(data: NSData) {
+    init(data: Data) {
         //Extract type and checksum
         type = MessageType.init(rawValue: data[typeIndex])!
         length = Int(data[lengthIndex])
@@ -59,13 +59,13 @@ class Report {
         
         //Case statement for C R U
         switch type {
-        case .Response:
+        case .response:
             //Using parse to get back a Response subclass
-            content = Response.parse(data.subdataWithRange(NSMakeRange(contentIndex, length)))
-        case .Update:
-            content = Update(data: data.subdataWithRange(NSMakeRange(contentIndex, length)))
-        case .Command:
-            content = Command(data: data.subdataWithRange(NSMakeRange(contentIndex, length)))
+            content = Response.parse(data.subdata(with: NSMakeRange(contentIndex, length)))
+        case .update:
+            content = Update(data: data.subdata(in: NSMakeRange(contentIndex, length)))
+        case .command:
+            content = Command(data: data.subdata(in: NSMakeRange(contentIndex, length)))
         default:
             print("Report type \(String(type.rawValue, radix:0x10)) len:\(length) checksum:\(checksum)")
         }
@@ -74,16 +74,16 @@ class Report {
 
     init(cmd: Command) {
         content = cmd
-        type = .Command
-        length = cmd.serialize().length
+        type = .command
+        length = cmd.serialize().count
     }
     
     var description: String {
-        let me = String(self.dynamicType).componentsSeparatedByString(".").last!
+        let me = String(describing: type(of: self)).components(separatedBy: ".").last!
         return "\(me)::\(content!)"
     }
     
-    func serialize() -> NSData {
+    func serialize() -> Data {
         //Only applies to Command
         //Assumes checksum, length, type are already set
         if (content is Command) {
@@ -91,14 +91,14 @@ class Report {
             let data = NSMutableData(length: 0x20)
             var rawType : UInt8 = type.rawValue
             if let data = data {
-                data.replaceBytesInRange(NSMakeRange(typeIndex, sizeof(UInt8)), withBytes: &rawType)
-                data.replaceBytesInRange(NSMakeRange(lengthIndex, sizeof(UInt8)), withBytes: &length)
-                data.replaceBytesInRange(NSMakeRange(contentIndex, length), withBytes: command.serialize().bytes)
-                data.replaceBytesInRange(NSMakeRange(contentIndex + length, sizeof(UInt8)), withBytes: &checksum)
-                return data
+                data.replaceBytes(in: NSMakeRange(typeIndex, MemoryLayout<UInt8>.size), withBytes: &rawType)
+                data.replaceBytes(in: NSMakeRange(lengthIndex, MemoryLayout<UInt8>.size), withBytes: &length)
+                data.replaceBytes(in: NSMakeRange(contentIndex, length), withBytes: (command.serialize() as NSData).bytes)
+                data.replaceBytes(in: NSMakeRange(contentIndex + length, MemoryLayout<UInt8>.size), withBytes: &checksum)
+                return data as Data
             }
         }
 
-        return NSData()
+        return Data()
     }
 }

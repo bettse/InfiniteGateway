@@ -9,13 +9,12 @@
 import Foundation
 
 //https://gist.github.com/kristopherjohnson/ed2623e1b486a8262b12
-extension NSData {
+extension Data {
     
     /// Return hexadecimal string representation of NSData bytes
-    @objc(kdj_hexadecimalString)
     public var hexadecimalString: NSString {
-        var bytes = [UInt8](count: length, repeatedValue: 0)
-        getBytes(&bytes, length: length)
+        var bytes = [UInt8](repeating: 0, count: count)
+        copyBytes(to: &bytes, count: count)
         
         let hexString = NSMutableString()
         for byte in bytes {
@@ -28,8 +27,8 @@ extension NSData {
     subscript(origin: Int) -> UInt8 {
         get {
             var result: UInt8 = 0;
-            if (origin < self.length) {
-                self.getBytes(&result, range: NSMakeRange(origin, 1))
+            if (origin < self.count) {
+                (self as NSData).getBytes(&result, range: NSMakeRange(origin, 1))
             }
             return result
         }

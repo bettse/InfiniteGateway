@@ -15,13 +15,13 @@ class MifareMini {
     static let blockSize : Int = 0x10
     static let tokenSize : Int = blockSize * blockCount
     
-    let sector_trailor = NSData(bytes: [0, 0, 0, 0, 0, 0, 0x77, 0x87, 0x88, 0, 0, 0, 0, 0, 0, 0] as [UInt8], length: MifareMini.blockSize)
-    let emptyBlock = NSData(bytes:[UInt8](count: Int(MifareMini.blockSize), repeatedValue: 0), length: Int(MifareMini.blockSize))
+    let sector_trailor = Data(bytes: UnsafePointer<UInt8>([0, 0, 0, 0, 0, 0, 0x77, 0x87, 0x88, 0, 0, 0, 0, 0, 0, 0] as [UInt8]), count: MifareMini.blockSize)
+    let emptyBlock = Data(bytes: UnsafePointer<UInt8>([UInt8](repeating: 0, count: Int(MifareMini.blockSize))), count: Int(MifareMini.blockSize))
     
-    var tagId : NSData
+    var tagId : Data
     var data : NSMutableData = NSMutableData()
     
-    var uid : NSData {
+    var uid : Data {
         get {
             return tagId
         }
@@ -33,7 +33,7 @@ class MifareMini {
         }
     }
     
-    init(tagId: NSData) {
+    init(tagId: Data) {
         self.tagId = tagId
     }
     
@@ -45,36 +45,36 @@ class MifareMini {
         return (nextBlock() == MifareMini.blockCount)
     }
     
-    func block(blockNumber: UInt8) -> NSData {
+    func block(_ blockNumber: UInt8) -> Data {
         return block(Int(blockNumber))
     }
     
-    func block(blockNumber: Int) -> NSData {
+    func block(_ blockNumber: Int) -> Data {
         let blockStart = blockNumber * MifareMini.blockSize
         let blockRange = NSMakeRange(blockStart, MifareMini.blockSize)
-        return data.subdataWithRange(blockRange)
+        return data.subdata(with: blockRange)
     }
     
-    func load(blockNumber: Int, blockData: NSData) {
+    func load(_ blockNumber: Int, blockData: Data) {
         if (blockNumber == nextBlock()) {
-            data.appendData(blockData)
+            data.append(blockData)
         } else {
             let blockRange = NSMakeRange(blockNumber * MifareMini.blockSize, MifareMini.blockSize)
-            data.replaceBytesInRange(blockRange, withBytes: blockData.bytes)
+            data.replaceBytes(in: blockRange, withBytes: (blockData as NSData).bytes)
         }
         
     }
     
-    func load(blockNumber: UInt8, blockData: NSData) {
+    func load(_ blockNumber: UInt8, blockData: Data) {
         load(Int(blockNumber), blockData: blockData)
     }
     
-    func sectorTrailer(blockNumber : Int) -> Bool {
+    func sectorTrailer(_ blockNumber : Int) -> Bool {
         return (blockNumber + 1) % 4 == 0
     }
     
-    func dump(path: NSURL) {
-        let fullPath = path.URLByAppendingPathComponent(filename)
-        data.writeToURL(fullPath, atomically: true)
+    func dump(_ path: URL) {
+        let fullPath = path.appendingPathComponent(filename)
+        data.write(to: fullPath, atomically: true)
     }
 }

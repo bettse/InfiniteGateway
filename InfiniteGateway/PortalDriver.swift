@@ -15,10 +15,10 @@ typealias tokenLoad = (Message.LedPlatform, Int, Token) -> Void
 typealias tokenLeft = (Message.LedPlatform, Int) -> Void
 class PortalDriver : NSObject {
     
-    static let magic : NSData = "(c) Disney 2013".dataUsingEncoding(NSASCIIStringEncoding)!
-    static let secret : NSData = NSData(bytes: [0xAF, 0x62, 0xD2, 0xEC, 0x04, 0x91, 0x96, 0x8C, 0xC5, 0x2A, 0x1A, 0x71, 0x65, 0xF8, 0x65, 0xFE] as [UInt8], length: 0x10)
+    static let magic : Data = "(c) Disney 2013".data(using: String.Encoding.ascii)!
+    static let secret : Data = Data(bytes: UnsafePointer<UInt8>([0xAF, 0x62, 0xD2, 0xEC, 0x04, 0x91, 0x96, 0x8C, 0xC5, 0x2A, 0x1A, 0x71, 0x65, 0xF8, 0x65, 0xFE] as [UInt8]), count: 0x10)
     static let singleton = PortalDriver()
-    var portalThread : NSThread?
+    var portalThread : Thread?
     var portal : Portal = Portal.singleton
 
     var presence = Dictionary<Message.LedPlatform, [UInt8]>()
@@ -30,37 +30,37 @@ class PortalDriver : NSObject {
     override init() {
         super.init()
         
-        NSNotificationCenter.defaultCenter().addObserver(self, selector: #selector(PortalDriver.deviceConnected(_:)), name: "deviceConnected", object: nil)
-        NSNotificationCenter.defaultCenter().addObserver(self, selector: #selector(PortalDriver.incomingMessage(_:)), name: "incomingMessage", object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(PortalDriver.deviceConnected(_:)), name: NSNotification.Name(rawValue: "deviceConnected"), object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(PortalDriver.incomingMessage(_:)), name: NSNotification.Name(rawValue: "incomingMessage"), object: nil)
         //NSNotificationCenter.defaultCenter().addObserver(self, selector: "deviceDisconnected:", name: "deviceDisconnected", object: nil)
         
-        portalThread = NSThread(target: self.portal, selector:#selector(Portal.initUsb), object: nil)
+        portalThread = Thread(target: self.portal, selector:#selector(Portal.initUsb), object: nil)
         if let thread = portalThread {
             thread.start()
         }
     }
     
-    func registerTokenLoaded(callback: tokenLoad) {
+    func registerTokenLoaded(_ callback: @escaping tokenLoad) {
         loadTokenCallbacks.append(callback)
     }
-    func registerTokenLeft(callback: tokenLeft) {
+    func registerTokenLeft(_ callback: @escaping tokenLeft) {
         leftTokenCallbacks.append(callback)
     }
 
-    func deviceConnected(notification: NSNotification) {
+    func deviceConnected(_ notification: Notification) {
         portal.outputCommand(ActivateCommand())
     }
     
-    func incomingUpdate(update: Update) {
+    func incomingUpdate(_ update: Update) {
         var updateColor : NSColor = NSColor()
-        if (update.direction == Update.Direction.Arriving) {
-            updateColor = NSColor.whiteColor()
+        if (update.direction == Update.Direction.arriving) {
+            updateColor = NSColor.white
             updatePresence(update.ledPlatform, nfcIndex: update.nfcIndex)
             portal.outputCommand(TagIdCommand(nfcIndex: update.nfcIndex))
-        } else if (update.direction == Update.Direction.Departing) {
-            updateColor = NSColor.blackColor()
+        } else if (update.direction == Update.Direction.departing) {
+            updateColor = NSColor.black
             removePresence(update.ledPlatform, nfcIndex: update.nfcIndex)
-            dispatch_async(dispatch_get_main_queue(), {
+            DispatchQueue.main.async(execute: {
                 for callback in self.leftTokenCallbacks {
                     callback(update.ledPlatform, Int(update.nfcIndex))
                 }
@@ -69,9 +69,9 @@ class PortalDriver : NSObject {
         portal.outputCommand(LightOnCommand(ledPlatform: update.ledPlatform, color: updateColor))
     }
     
-    func incomingResponse(response: Response) {
+    func incomingResponse(_ response: Response) {
         if let _ = response as? ActivateResponse {
-            portal.outputCommand(LightOnCommand(ledPlatform: .All, color: NSColor.blackColor()))
+            portal.outputCommand(LightOnCommand(ledPlatform: .all, color: NSColor.black))
         } else if let response = response as? PresenceResponse {
             for (ledPlatform, nfcIndicies) in response.details {
                 let temp = presence[ledPlatform] ?? [UInt8]() //Define if not already defined
@@ -97,8 +97,8 @@ class PortalDriver : NSObject {
         
     }
 
-    func ledPlatformOfNfcIndex(nfcIndex: UInt8) -> Message.LedPlatform {
-        var led = Message.LedPlatform.None
+    func ledPlatformOfNfcIndex(_ nfcIndex: UInt8) -> Message.LedPlatform {
+        var led = Message.LedPlatform.none
         for (ledPlatform, nfcIndices) in presence {
             if (nfcIndices.contains(nfcIndex)) {
                 led = ledPlatform
@@ -107,35 +107,35 @@ class PortalDriver : NSObject {
         return led
     }
     
-    func updatePresence(ledPlatform: Message.LedPlatform, nfcIndex: UInt8) {
+    func updatePresence(_ ledPlatform: Message.LedPlatform, nfcIndex: UInt8) {
         presence[ledPlatform] = presence[ledPlatform] ?? [UInt8]() //Define if not already defined
         if var nfcIndicies = presence[ledPlatform] {
             nfcIndicies.append(nfcIndex)
         }
     }
     
-    func removePresence(ledPlatform: Message.LedPlatform, nfcIndex: UInt8) {
+    func removePresence(_ ledPlatform: Message.LedPlatform, nfcIndex: UInt8) {
         presence[ledPlatform] = presence[ledPlatform] ?? [UInt8]() //Define if not already defined
         if var nfcIndicies = presence[ledPlatform] {
-            if let nfcFound = nfcIndicies.indexOf(nfcIndex) {
-                nfcIndicies.removeAtIndex(nfcFound)
+            if let nfcFound = nfcIndicies.index(of: nfcIndex) {
+                nfcIndicies.remove(at: nfcFound)
             }
         }
         
     }
     
-    func tokenRead(response: ReadResponse) {
+    func tokenRead(_ response: ReadResponse) {
         if let token = encryptedTokens[response.nfcIndex] {
             token.load(response.blockNumber, blockData: response.blockData)
             if (token.complete()) {
                 let ledPlatform = ledPlatformOfNfcIndex(response.nfcIndex)
-                portal.outputCommand(LightOnCommand(ledPlatform: ledPlatform, color: NSColor.greenColor()))
-                dispatch_async(dispatch_get_main_queue(), {
+                portal.outputCommand(LightOnCommand(ledPlatform: ledPlatform, color: NSColor.green))
+                DispatchQueue.main.async(execute: {
                     for callback in self.loadTokenCallbacks {
                         callback(ledPlatform, Int(response.nfcIndex), token.decryptedToken)
                     }
                 })
-                encryptedTokens.removeValueForKey(response.nfcIndex)
+                encryptedTokens.removeValue(forKey: response.nfcIndex)
             } else {
                 let nextBlock = token.nextBlock()
                 portal.outputCommand(ReadCommand(nfcIndex: response.nfcIndex, block: nextBlock))
@@ -143,7 +143,7 @@ class PortalDriver : NSObject {
         } //end if token
     }
     
-    func incomingMessage(notification: NSNotification) {
+    func incomingMessage(_ notification: Notification) {
         let userInfo = notification.userInfo
         if let message = userInfo?["message"] as? Message {
             if let update = message as? Update {

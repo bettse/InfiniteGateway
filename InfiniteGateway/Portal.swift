@@ -17,56 +17,56 @@ class Portal : NSObject {
     static let singleton = Portal()
     var device : IOHIDDevice? = nil
     
-    func input(inResult: IOReturn, inSender: UnsafeMutablePointer<Void>, type: IOHIDReportType, reportId: UInt32, report: UnsafeMutablePointer<UInt8>, reportLength: CFIndex) {
-        let raw = NSData(bytes: report, length: reportLength)
+    func input(_ inResult: IOReturn, inSender: UnsafeMutableRawPointer, type: IOHIDReportType, reportId: UInt32, report: UnsafeMutablePointer<UInt8>, reportLength: CFIndex) {
+        let raw = Data(bytes: UnsafePointer<UInt8>(report), count: reportLength)
         //print("IN: \(raw)")
         let report = Report(data: raw)
         if let msg = report.content {
-            dispatch_async(dispatch_get_main_queue(), {
-                NSNotificationCenter.defaultCenter().postNotificationName("incomingMessage", object: self, userInfo: ["message": msg])
+            DispatchQueue.main.async(execute: {
+                NotificationCenter.default.post(name: Notification.Name(rawValue: "incomingMessage"), object: self, userInfo: ["message": msg])
             })
         }
     }
     
-    func output(report: Report) {
+    func output(_ report: Report) {
         let reportId : CFIndex = 0
         let data = report.serialize()
-        if (data.length > reportSize) {
+        if (data.count > reportSize) {
             print("output data too large for USB report", terminator: "\n")
             return
         }
         if let portal = device {
             //print("Sending output: \(data)")
-            IOHIDDeviceSetReport(portal, kIOHIDReportTypeOutput, reportId, UnsafePointer<UInt8>(data.bytes), data.length);
+            IOHIDDeviceSetReport(portal, kIOHIDReportTypeOutput, reportId, (data as NSData).bytes.bindMemory(to: UInt8.self, capacity: data.count), data.count);
         }
     }
     
-    func outputCommand(cmd: Command) {
+    func outputCommand(_ cmd: Command) {
         output(Report(cmd: cmd))
     }
     
-    func connected(inResult: IOReturn, inSender: UnsafeMutablePointer<Void>, inIOHIDDeviceRef: IOHIDDevice!) {
+    func connected(_ inResult: IOReturn, inSender: UnsafeMutableRawPointer, inIOHIDDeviceRef: IOHIDDevice!) {
         // It would be better to look up the report size and create a chunk of memory of that size
-        let report = UnsafeMutablePointer<UInt8>.alloc(reportSize)
+        let report = UnsafeMutablePointer<UInt8>.allocate(capacity: reportSize)
         device = inIOHIDDeviceRef
         
         let 🙊 : IOHIDReportCallback = { inContext, inResult, inSender, type, reportId, report, reportLength in
-            let this : Portal = unsafeBitCast(inContext, Portal.self)
-            this.input(inResult, inSender: inSender, type: type, reportId: reportId, report: report, reportLength: reportLength)
+            let this : Portal = unsafeBitCast(inContext, to: Portal.self)
+            this.input(inResult, inSender: inSender!, type: type, reportId: reportId, report: report, reportLength: reportLength)
         }
 
         //Hook up inputcallback
-        IOHIDDeviceRegisterInputReportCallback(device, report, reportSize, 🙊, unsafeBitCast(self, UnsafeMutablePointer<Void>.self));
+        IOHIDDeviceRegisterInputReportCallback(device!, report, reportSize, 🙊, unsafeBitCast(self, to: UnsafeMutableRawPointer.self));
 
         //Let the world know
-        dispatch_async(dispatch_get_main_queue(), {
-            NSNotificationCenter.defaultCenter().postNotificationName("deviceConnected", object: self, userInfo: ["class": NSStringFromClass(self.dynamicType)])
+        DispatchQueue.main.async(execute: {
+            NotificationCenter.default.post(name: Notification.Name(rawValue: "deviceConnected"), object: self, userInfo: ["class": NSStringFromClass(type(of: self))])
         })
     }
 
-    func removed(inResult: IOReturn, inSender: UnsafeMutablePointer<Void>, inIOHIDDeviceRef: IOHIDDevice!) {
-        dispatch_async(dispatch_get_main_queue(), {
-            NSNotificationCenter.defaultCenter().postNotificationName("deviceDisconnected", object: self, userInfo: ["class": NSStringFromClass(self.dynamicType)])
+    func removed(_ inResult: IOReturn, inSender: UnsafeMutableRawPointer, inIOHIDDeviceRef: IOHIDDevice!) {
+        DispatchQueue.main.async(execute: {
+            NotificationCenter.default.post(name: Notification.Name(rawValue: "deviceDisconnected"), object: self, userInfo: ["class": NSStringFromClass(type(of: self))])
         })
     }
     
@@ -75,23 +75,23 @@ class Portal : NSObject {
         let managerRef = IOHIDManagerCreate(kCFAllocatorDefault, IOOptionBits(kIOHIDOptionsTypeNone)).takeUnretainedValue()
 
         IOHIDManagerSetDeviceMatching(managerRef, deviceMatch)
-        IOHIDManagerScheduleWithRunLoop(managerRef, CFRunLoopGetCurrent(), kCFRunLoopDefaultMode);
+        IOHIDManagerScheduleWithRunLoop(managerRef, CFRunLoopGetCurrent(), CFRunLoopMode.defaultMode);
         IOHIDManagerOpen(managerRef, 0);
 
         let 🙈 : IOHIDDeviceCallback = { inContext, inResult, inSender, inIOHIDDeviceRef in
-            let this : Portal = unsafeBitCast(inContext, Portal.self)
-            this.connected(inResult, inSender: inSender, inIOHIDDeviceRef: inIOHIDDeviceRef)
+            let this : Portal = unsafeBitCast(inContext, to: Portal.self)
+            this.connected(inResult, inSender: inSender!, inIOHIDDeviceRef: inIOHIDDeviceRef)
         }
 
         let 🙉 : IOHIDDeviceCallback = { inContext, inResult, inSender, inIOHIDDeviceRef in
-            let this : Portal = unsafeBitCast(inContext, Portal.self)
-            this.removed(inResult, inSender: inSender, inIOHIDDeviceRef: inIOHIDDeviceRef)
+            let this : Portal = unsafeBitCast(inContext, to: Portal.self)
+            this.removed(inResult, inSender: inSender!, inIOHIDDeviceRef: inIOHIDDeviceRef)
         }
         
-        IOHIDManagerRegisterDeviceMatchingCallback(managerRef, 🙈, unsafeBitCast(self, UnsafeMutablePointer<Void>.self))
-        IOHIDManagerRegisterDeviceRemovalCallback(managerRef, 🙉, unsafeBitCast(self, UnsafeMutablePointer<Void>.self))
+        IOHIDManagerRegisterDeviceMatchingCallback(managerRef, 🙈, unsafeBitCast(self, to: UnsafeMutableRawPointer.self))
+        IOHIDManagerRegisterDeviceRemovalCallback(managerRef, 🙉, unsafeBitCast(self, to: UnsafeMutableRawPointer.self))
                 
 
-        NSRunLoop.currentRunLoop().run();
+        RunLoop.current.run();
     }
 }
