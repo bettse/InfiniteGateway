@@ -395,7 +395,7 @@ class Token : MifareMini, CustomStringConvertible {
     
     func correctChecksum(_ blockNumber: Int) {
         let blockData = block(blockNumber)
-        verifyChecksum(blockData, blockNumber: blockNumber, update: true)
+        print(verifyChecksum(blockData, blockNumber: blockNumber, update: true))
     }
     
     func correctAllChecksums() {
