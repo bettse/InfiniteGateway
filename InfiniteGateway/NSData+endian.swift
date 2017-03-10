@@ -9,37 +9,32 @@
 import Foundation
 
 extension Data {
-    
     public var bigEndianUInt32: Data {
-        let swappedKey = NSMutableData()
-        let count = (self.count/MemoryLayout<UInt32>.size)
-        for i in 0..<count {
-            var temp : UInt32 = 0
-            (self as NSData).getBytes(&temp, range: NSMakeRange(i*MemoryLayout<UInt32>.size, MemoryLayout<UInt32>.size))
-            var swap = temp.bigEndian
-            swappedKey.append(&swap, length: MemoryLayout<UInt32>.size)
+        var swappedData = Data(self)
+        let sizeof = 4 // sizeof(UInt32)
+        let chunks = self.count / sizeof
+        for i in 0..<chunks {
+            let offset = i * sizeof
+            let temp = self.subdata(in: offset..<offset + sizeof).uint32.bigEndian
+            swappedData.replaceUInt32(offset, value: temp)            
         }
-        return swappedKey as Data
+        return swappedData
     }
     
     public var littleEndianUInt32: Data {
-        let swappedKey = NSMutableData()
-        let count = (self.count/MemoryLayout<UInt32>.size)
-        for i in 0..<count {
-            var temp : UInt32 = 0
-            (self as NSData).getBytes(&temp, range: NSMakeRange(i*MemoryLayout<UInt32>.size, MemoryLayout<UInt32>.size))
-            var swap = temp.littleEndian
-            swappedKey.append(&swap, length: MemoryLayout<UInt32>.size)
+        var swappedData = Data(self)
+        let sizeof = 4 // sizeof(UInt32)
+        let chunks = self.count / sizeof
+        for i in 0..<chunks {
+            let offset = i * sizeof
+            let temp = self.subdata(in: offset..<offset + sizeof).uint32.littleEndian
+            swappedData.replaceUInt32(offset, value: temp)
         }
-        return swappedKey as Data
+        return swappedData
     }
     
     public var negation: Data {
-        var resultBytes = [UInt8](self)
-        for i in 0..<resultBytes.count {
-            resultBytes[i] = ~resultBytes[i]
-        }
-        return Data(resultBytes)
+        return Data(self.map({ return ~$0 }))
     }
     
 }

@@ -29,7 +29,7 @@ class Token : MifareMini, CustomStringConvertible {
     
     override var filename : String {
         get {
-            return "\(tagId.hexadecimalString)-\(name).bin"
+            return "\(tagId.toHexString())-\(name).bin"
         }
     }
 
@@ -336,7 +336,7 @@ class Token : MifareMini, CustomStringConvertible {
                 blockDataWithChecksum.append(checksumResult)
                 load(blockNumber, blockData: blockDataWithChecksum)
             } else {
-                print("Expected checksum \(checksumResult) but tag had \(existingChecksum)")
+                print("Expected checksum \(checksumResult.toHexString()) but tag had \(existingChecksum.toHexString() )")
             }
         }
         return valid

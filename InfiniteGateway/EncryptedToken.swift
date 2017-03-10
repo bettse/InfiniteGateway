@@ -55,7 +55,7 @@ class EncryptedToken : MifareMini {
     
     override var filename : String {
         get {
-            return "\(tagId.hexadecimalString)-\(name).bin"
+            return "\(tagId.toHexString())-\(name).bin"
         }
     }
     

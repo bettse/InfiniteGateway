@@ -31,7 +31,7 @@ class TokenDetailViewController : NSViewController {
         experience?.integerValue = Int(token.experience)
         experienceLabel?.integerValue = Int(token.experience)
         levelLabel?.integerValue = Int(token.level)
-        uidLabel?.stringValue = token.tagId.hexadecimalString as String
+        uidLabel?.stringValue = token.tagId.toHexString()
         skillLabel?.stringValue = String(token.skillTree, radix: BINARY)
         
         experience!.target = self

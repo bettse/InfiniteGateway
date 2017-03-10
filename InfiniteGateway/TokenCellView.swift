@@ -19,7 +19,7 @@ class TokenCellView : NSTableCellView {
     weak var representedObject : AnyObject? {
         didSet {
             let token = representedObject as! Token
-            self.uidLabel.stringValue = "\(token.uid.hexadecimalString)"
+            self.uidLabel.stringValue = "\(token.uid.toHexString())"
             self.modelLabel.stringValue = "\(token.model.name)"
             self.generationLabel.stringValue = "\(token.model.generation).0"
             self.levelLabel.stringValue = "Level \(token.level)"

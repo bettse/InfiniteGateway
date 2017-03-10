@@ -29,7 +29,7 @@ class MifareMini {
     
     var filename : String {
         get {
-            return "\(tagId.hexadecimalString).bin"
+            return "\(tagId.toHexString()).bin"
         }
     }
     

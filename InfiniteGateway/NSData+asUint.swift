@@ -56,31 +56,30 @@ extension Data {
 
     var uint16: UInt16 {
         get {
-            _ = self.withUnsafeBytes {
+            let result = self.withUnsafeBytes {
                 return [UInt16](UnsafeBufferPointer(start: $0, count: self.count))
             }
-            return 0
+            return result[0]
         }
     }
     
     var uint32: UInt32 {
         get {
-            _ = self.withUnsafeBytes {
+            let result = self.withUnsafeBytes {
                 return [UInt32](UnsafeBufferPointer(start: $0, count: self.count))
             }
-            return 0
+            return result[0]
         }
     }
 
     var uint64: UInt64 {
         get {
-            _ = self.withUnsafeBytes {
+            let result = self.withUnsafeBytes {
                 return [UInt64](UnsafeBufferPointer(start: $0, count: self.count))
             }
-            return 0
+            return result[0]
         }
     }
-    
     
     var uuid: UUID? {
         get {
