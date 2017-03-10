@@ -177,7 +177,17 @@ class ThePoster {
         1000222 : "Minnie Mouse",
         1000223 : "Mulan",
         1000224 : "Olaf",
-        1000226 : "Ultron",
+        1000226 : "Ultron",        
+        //Captain America - The First Avenger
+        //Ant-Man
+        //Vision
+        //Black Panther
+        //Baloo
+        //Alice
+        //Time
+        //Mad Hatter
+        //Nemo
+        //Dory
         1000230 : "Finn",
         1000231 : "Kylo Ren",
         1000232 : "Poe Dameron",

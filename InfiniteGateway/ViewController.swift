@@ -8,11 +8,8 @@
 
 import Cocoa
 
-class ViewController: NSTabViewController {
-    
+class ViewController: NSTabViewController {    
     override func viewDidLoad() {
         super.viewDidLoad()
-        
     }
-    
 }

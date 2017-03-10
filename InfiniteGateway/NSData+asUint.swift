@@ -7,17 +7,23 @@
 //
 
 import Foundation
-//
-//  NSData+asUint.swift
-//  Solarbreeze
-//
-//  Created by Eric Betts on 5/28/16.
-//  Copyright © 2016 Eric Betts. All rights reserved.
-//
-
-import Foundation
 
 extension Data {
+    init(value: UInt16) {
+        var v : UInt16 = value
+        self = withUnsafePointer(to: &v) {
+            Data(bytes: UnsafePointer($0), count: MemoryLayout.size(ofValue: v))
+        }
+    }
+    
+    init(value: UInt32) {
+        var v : UInt32 = value
+        self = withUnsafePointer(to: &v) {
+            Data(bytes: UnsafePointer($0), count: MemoryLayout.size(ofValue: v))
+        }
+    }
+
+    
     var uint8: UInt8 {
         get {
             return ([UInt8](self))[0]

@@ -15,11 +15,11 @@ class MifareMini {
     static let blockSize : Int = 0x10
     static let tokenSize : Int = blockSize * blockCount
     
-    let sector_trailor = Data(bytes: UnsafePointer<UInt8>([0, 0, 0, 0, 0, 0, 0x77, 0x87, 0x88, 0, 0, 0, 0, 0, 0, 0] as [UInt8]), count: MifareMini.blockSize)
-    let emptyBlock = Data(bytes: UnsafePointer<UInt8>([UInt8](repeating: 0, count: Int(MifareMini.blockSize))), count: Int(MifareMini.blockSize))
+    let sector_trailor = Data(bytes: [0, 0, 0, 0, 0, 0, 0x77, 0x87, 0x88, 0, 0, 0, 0, 0, 0, 0])
+    let emptyBlock = Data(bytes: ([UInt8](repeating: 0, count: Int(MifareMini.blockSize))), count: Int(MifareMini.blockSize))
     
     var tagId : Data
-    var data : NSMutableData = NSMutableData()
+    var data : Data = Data()
     
     var uid : Data {
         get {
@@ -38,7 +38,7 @@ class MifareMini {
     }
     
     func nextBlock() -> Int {
-        return data.length / MifareMini.blockSize
+        return data.count / MifareMini.blockSize
     }
     
     func complete() -> Bool{
@@ -51,16 +51,17 @@ class MifareMini {
     
     func block(_ blockNumber: Int) -> Data {
         let blockStart = blockNumber * MifareMini.blockSize
-        let blockRange = NSMakeRange(blockStart, MifareMini.blockSize)
-        return data.subdata(with: blockRange)
+        return data.subdata(in: blockStart..<blockStart+MifareMini.blockSize)
     }
     
     func load(_ blockNumber: Int, blockData: Data) {
         if (blockNumber == nextBlock()) {
             data.append(blockData)
         } else {
-            let blockRange = NSMakeRange(blockNumber * MifareMini.blockSize, MifareMini.blockSize)
-            data.replaceBytes(in: blockRange, withBytes: (blockData as NSData).bytes)
+            let start = blockNumber * MifareMini.blockSize
+            let end = start + MifareMini.blockSize
+            let blockRange = start..<end
+            data.replaceSubrange(blockRange, with: blockData)
         }
         
     }
@@ -75,6 +76,6 @@ class MifareMini {
     
     func dump(_ path: URL) {
         let fullPath = path.appendingPathComponent(filename)
-        data.write(to: fullPath, atomically: true)
+        try! data.write(to: fullPath)
     }
 }

@@ -16,16 +16,16 @@ class EncryptedToken : MifareMini {
             //It is the first 16 bytes of a SHA1 hash of: a hard-coded 16 bytes, 15 bytes of the string "(c) Disney 2013", and the 7 bytes of the tag ID.
             //Each integer, or group of 4 bytes, of the SHA1 hash needs to be reversed because of endianness.
             
-            let prekey = NSMutableData(capacity: 38)! //PortalDriver.magic.length + PortalDriver.secret.length + tagId.length
-            prekey.append(PortalDriver.secret as Data)
-            prekey.append(PortalDriver.magic as Data)
-            prekey.append(tagId as Data)
-            if (prekey.length != 38) {
+            var prekey = Data() //PortalDriver.magic.length + PortalDriver.secret.length + tagId.length
+            prekey.append(PortalDriver.secret)
+            prekey.append(PortalDriver.magic)
+            prekey.append(tagId)
+            if (prekey.count != 38) {
                 print("Pre-hashed key wasn't of the correct length")
                 return Data()
             }
             
-            let sha = (prekey as Data).sha1().subdata(in: 0..<16)
+            let sha = prekey.sha1().subdata(in: 0..<16)
             //Swap bytes for endianness
             return sha.bigEndianUInt32
         }
@@ -71,7 +71,7 @@ class EncryptedToken : MifareMini {
     
     convenience init(image: Data) {
         self.init(tagId: image.subdata(in: 0..<7))
-        self.data = (image as NSData).mutableCopy() as! NSMutableData
+        self.data = image
     }
 
     func skipEncryption(_ blockNumber: Int, blockData: Data) -> Bool {

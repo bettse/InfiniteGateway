@@ -11,7 +11,6 @@ import Foundation
 //Tokens can be figures, disks (some are stackable), playsets (clear 3d figure with hex base)
 
 class Token : MifareMini, CustomStringConvertible {
-
     static let DiConstant : UInt16 = 0xD11F // (i.e. D1sney 1nFinity)
 
     let DATE_OFFSET = 1356998400 //Jan 1, 2013
@@ -24,7 +23,7 @@ class Token : MifareMini, CustomStringConvertible {
     }()
     
     var description: String {
-        let me = String(describing: type(of: self)).components(separatedBy: ".").last!
+        let me = String(describing: self)
         return "\(me)(\(tagId): v\(generation) \(name) L\(level)[\(experience)] | Manuf: \(manufactureYear)/\(manufactureMonth)/\(manufactureDay))"
     }
     
@@ -33,7 +32,6 @@ class Token : MifareMini, CustomStringConvertible {
             return "\(tagId.hexadecimalString)-\(name).bin"
         }
     }
-
 
     var dateFormat : DateFormatter {
         get {
@@ -52,18 +50,14 @@ class Token : MifareMini, CustomStringConvertible {
             let blockNumber = 1
             let blockIndex = 0
             let offset = blockNumber * MifareMini.blockSize + blockIndex
-            var value : UInt32 = 0
-            let size = MemoryLayout<UInt32>.size
-            data.getBytes(&value, range: NSMakeRange(offset, size))
-            return value.bigEndian
+            return data.subdata(in: offset..<data.count).uint32//.bigEndian
         }
-        set(newModelId) {
+        set(value) {
             let blockNumber = 1
             let blockIndex = 0
             let offset = blockNumber * MifareMini.blockSize + blockIndex
-            var value : UInt32 = newModelId.littleEndian
-            let size = MemoryLayout<UInt32>.size
-            data.replaceBytes(in: NSMakeRange(offset, size), withBytes: &value)
+            let size = MemoryLayout.size(ofValue: value.littleEndian)
+            data.replaceSubrange(offset..<offset+size, with: Data(value: value.littleEndian))
         }
     }
     
@@ -79,17 +73,14 @@ class Token : MifareMini, CustomStringConvertible {
             let blockNumber = 1
             let blockIndex = 0x09
             let offset = blockNumber * MifareMini.blockSize + blockIndex
-            var value : UInt8 = 0
-            data.getBytes(&value, range: NSMakeRange(offset, MemoryLayout<UInt8>.size))
-            return value
+            return data[offset]
         }
-        set(newGeneration) {
+        set(value) {
             let blockNumber = 1
             let blockIndex = 0x09
             let offset = blockNumber * MifareMini.blockSize + blockIndex
-            var value : UInt8 = newGeneration
-            let size = MemoryLayout<UInt8>.size
-            data.replaceBytes(in: NSMakeRange(offset, size), withBytes: &value)
+            let size = MemoryLayout.size(ofValue: value)
+            data.replaceSubrange(offset..<offset+size, with: Data([value]))
         }
     }
     
@@ -98,8 +89,7 @@ class Token : MifareMini, CustomStringConvertible {
             let blockNumber = 1
             let blockIndex = 0x0A
             let offset = blockNumber * MifareMini.blockSize + blockIndex
-            var value : UInt16 = 0
-            data.getBytes(&value, range: NSMakeRange(offset, MemoryLayout<UInt16>.size))
+            let value = data.subdata(in: offset..<data.count).uint16
             if (value != Token.DiConstant) {
                 print("DiConstant was \(value) when it should be \(Token.DiConstant)")
             }
@@ -109,9 +99,9 @@ class Token : MifareMini, CustomStringConvertible {
             let blockNumber = 1
             let blockIndex = 0x0A
             let offset = blockNumber * MifareMini.blockSize + blockIndex
-            var value : UInt16 = Token.DiConstant.bigEndian
-            let size = MemoryLayout<UInt16>.size
-            data.replaceBytes(in: NSMakeRange(offset, size), withBytes: &value)
+            let value : UInt16 = Token.DiConstant.bigEndian
+            let size = MemoryLayout.size(ofValue: value)
+            data.replaceSubrange(offset..<offset+size, with: Data(value: value))
         }
     }
     
@@ -126,17 +116,14 @@ class Token : MifareMini, CustomStringConvertible {
             let blockNumber = 1
             let blockIndex = 0x04
             let offset = blockNumber * MifareMini.blockSize + blockIndex
-            var value : UInt8 = 0
-            data.getBytes(&value, range: NSMakeRange(offset, MemoryLayout<UInt8>.size))
-            return value
+            return data[offset]
         }
-        set(newYear) {
+        set(value) {
             let blockNumber = 1
             let blockIndex = 0x04
             let offset = blockNumber * MifareMini.blockSize + blockIndex
-            var value : UInt8 = newYear
-            let size = MemoryLayout<UInt8>.size
-            data.replaceBytes(in: NSMakeRange(offset, size), withBytes: &value)
+            let size = MemoryLayout.size(ofValue: value)
+            data.replaceSubrange(offset..<offset+size, with: Data([value]))
         }
     }
     
@@ -145,17 +132,14 @@ class Token : MifareMini, CustomStringConvertible {
             let blockNumber = 1
             let blockIndex = 0x05
             let offset = blockNumber * MifareMini.blockSize + blockIndex
-            var value : UInt8 = 0
-            data.getBytes(&value, range: NSMakeRange(offset, MemoryLayout<UInt8>.size))
-            return value
+            return data[offset]
         }
-        set(newMonth) {
+        set(value) {
             let blockNumber = 1
             let blockIndex = 0x05
             let offset = blockNumber * MifareMini.blockSize + blockIndex
-            var value : UInt8 = newMonth
-            let size = MemoryLayout<UInt8>.size
-            data.replaceBytes(in: NSMakeRange(offset, size), withBytes: &value)
+            let size = MemoryLayout.size(ofValue: value)
+            data.replaceSubrange(offset..<offset+size, with: Data([value]))
         }
     }
     var manufactureDay : UInt8 {
@@ -163,17 +147,14 @@ class Token : MifareMini, CustomStringConvertible {
             let blockNumber = 1
             let blockIndex = 0x06
             let offset = blockNumber * MifareMini.blockSize + blockIndex
-            var value : UInt8 = 0
-            data.getBytes(&value, range: NSMakeRange(offset, MemoryLayout<UInt8>.size))
-            return value
+            return data[offset]
         }
-        set(newDay) {
+        set(value) {
             let blockNumber = 1
             let blockIndex = 0x06
             let offset = blockNumber * MifareMini.blockSize + blockIndex
-            var value : UInt8 = newDay
-            let size = MemoryLayout<UInt8>.size
-            data.replaceBytes(in: NSMakeRange(offset, size), withBytes: &value)
+            let size = MemoryLayout.size(ofValue: value)
+            data.replaceSubrange(offset..<offset+size, with: Data([value]))
         }
     }
     
@@ -182,9 +163,7 @@ class Token : MifareMini, CustomStringConvertible {
             let blockNumber = 4
             let blockIndex = 0x0b
             let offset = blockNumber * MifareMini.blockSize + blockIndex
-            var value : UInt8 = 0
-            data.getBytes(&value, range: NSMakeRange(offset, MemoryLayout<UInt8>.size))
-            return value
+            return data[offset]
         }
     }
     
@@ -193,9 +172,7 @@ class Token : MifareMini, CustomStringConvertible {
             let blockNumber = 8
             let blockIndex = 0x0b
             let offset = blockNumber * MifareMini.blockSize + blockIndex
-            var value : UInt8 = 0
-            data.getBytes(&value, range: NSMakeRange(offset, MemoryLayout<UInt8>.size))
-            return value
+            return data[offset]
         }
     }
     
@@ -214,9 +191,7 @@ class Token : MifareMini, CustomStringConvertible {
     var experience : UInt16 {
         get {
             let blockIndex = 0x03
-            var value : UInt16 = 0
-            (primaryDataBlock as NSData).getBytes(&value, range: NSMakeRange(blockIndex, MemoryLayout<UInt16>.size))
-            return value
+            return primaryDataBlock.subdata(in: blockIndex..<primaryDataBlock.count).uint16
         }
         set(newExperience) {
             let blockIndex = 0x03
@@ -234,9 +209,7 @@ class Token : MifareMini, CustomStringConvertible {
     var level : UInt8 {
         get {
             let blockIndex = 0x04
-            var value : UInt8 = 0
-            (primaryDataBlock as NSData).getBytes(&value, range: NSMakeRange(blockIndex, MemoryLayout<UInt8>.size))
-            return value
+            return primaryDataBlock[blockIndex]
         }
     }
 
@@ -245,9 +218,7 @@ class Token : MifareMini, CustomStringConvertible {
             //Multiply first 3 bytes by 0x7B, multiple top two MSB of 4th byte by 0x1E, sum.
             //This is the number of seconds since Jan 1, 2013 at the international date line.
             let blockIndex = 0x05
-            var value : UInt32 = 0
-            (primaryDataBlock as NSData).getBytes(&value, range: NSMakeRange(blockIndex, MemoryLayout<UInt32>.size))
-            return value
+            return primaryDataBlock.subdata(in: blockIndex..<primaryDataBlock.count).uint32
         }
     }
     
@@ -256,9 +227,7 @@ class Token : MifareMini, CustomStringConvertible {
             let blockNumber = 0x0C
             let blockIndex = 0x08
             let offset = blockNumber * MifareMini.blockSize + blockIndex
-            var value : UInt16 = 0
-            data.getBytes(&value, range: NSMakeRange(offset, MemoryLayout<UInt16>.size))
-            return value
+            return data.subdata(in: offset..<data.count).uint16
         }
     }
 
@@ -267,9 +236,7 @@ class Token : MifareMini, CustomStringConvertible {
             let blockNumber = 0x0C
             let blockIndex = 0x0B
             let offset = blockNumber * MifareMini.blockSize + blockIndex
-            var value : UInt8 = 0
-            data.getBytes(&value, range: NSMakeRange(offset, MemoryLayout<UInt8>.size))
-            return value
+            return data[offset]
         }
     }
 
@@ -278,9 +245,7 @@ class Token : MifareMini, CustomStringConvertible {
             let blockNumber = 0x05
             let blockIndex = 0x0B
             let offset = blockNumber * MifareMini.blockSize + blockIndex
-            var value : UInt8 = 0
-            data.getBytes(&value, range: NSMakeRange(offset, MemoryLayout<UInt8>.size))
-            return value
+            return data[offset]
         }
     }
 
@@ -289,31 +254,23 @@ class Token : MifareMini, CustomStringConvertible {
             let blockNumber = 0x09
             let blockIndex = 0x0B
             let offset = blockNumber * MifareMini.blockSize + blockIndex
-            var value : UInt8 = 0
-            data.getBytes(&value, range: NSMakeRange(offset, MemoryLayout<UInt8>.size))
-            return value
+            return data[offset]
         }
     }
 
     
     var skillTree : UInt64 {
         get {
-            var primarySkillBlock : Data
-            if (skillSequenceA > skillSequenceB) {
-                primarySkillBlock = block(5)
-            } else {
-                primarySkillBlock = block(9)
-            }
-
             //Choose the up skill for my first skill and it became
             //00 00 00 10 00 00 00 00 00 00 00 01
             //Choose the next further up skill and it became:
             //01 00 00 10 00 00 00 00 00 00 00 01
-            
-            print(primarySkillBlock)
-            var value : UInt64 = 0
-            (primarySkillBlock as NSData).getBytes(&value, range: NSMakeRange(0, MemoryLayout<UInt64>.size))
-            return value
+
+            if (skillSequenceA > skillSequenceB) {
+                return block(5).uint64
+            } else {
+                return block(9).uint64
+            }
         }
     }
     
@@ -336,17 +293,17 @@ class Token : MifareMini, CustomStringConvertible {
     
     convenience init(modelId: Int) {
         //Make 7 bytes uid
-        var value = UInt32(modelId).bigEndian
-        let uid = NSMutableData(bytes:[0x04, 0x0e, 0x00, 0x00, 0x00, 0x00, 0x81] as [UInt8], length: 7)
-        uid.replaceBytes(in: NSMakeRange(2, MemoryLayout<UInt32>.size), withBytes: &value)
-        self.init(tagId: uid as Data)
+        let value = UInt32(modelId).bigEndian
+        var uid = Data(bytes: [0x04, 0x0e, 0x00, 0x00, 0x00, 0x00, 0x81])
+        uid.replaceSubrange(2..<2+MemoryLayout.size(ofValue: value), with: Data(value: value))
+        self.init(tagId: uid)
 
         //Block 0
-        let block0 = NSMutableData()
-        block0.append(tagId as Data)
-        let block0remainder = (Int(MifareMini.blockSize) - uid.length)
-        block0.append([UInt8](repeating: 0, count: block0remainder), length: block0remainder)
-        self.load(0, blockData: block0 as Data)
+        var block0 = Data()
+        block0.append(tagId)
+        let block0remainder = (Int(MifareMini.blockSize) - uid.count)
+        block0.append([UInt8](repeating: 0, count: block0remainder), count: block0remainder)
+        self.load(0, blockData: block0)
 
         //Fill with zeros
         while !self.complete() {
@@ -362,9 +319,7 @@ class Token : MifareMini, CustomStringConvertible {
         self.generation = Model(id: modelId).generation
         
         //Other misc
-        var bytes : [UInt8] = [0x02]
-        let miscRange = NSMakeRange(MifareMini.blockSize + 7, 1)
-        data.replaceBytes(in: miscRange, withBytes: &bytes)
+        data.replaceSubrange(MifareMini.blockSize+7..<MifareMini.blockSize+8, with: Data([0x02]))
         correctChecksum(1)
     }
 
@@ -373,19 +328,20 @@ class Token : MifareMini, CustomStringConvertible {
         if (blockNumber == 0 || blockNumber == 2 || sectorTrailer(blockNumber)) {
             return true
         }
-        let checksumIndex = Token.blockSize - MemoryLayout<UInt32>.size //12
+        let checksumSize = 4 //UInt32
+        let checksumIndex = Token.blockSize - checksumSize
         
-        let existingChecksum = blockData.subdata(in: checksumIndex..<checksumIndex+MemoryLayout<UInt32>.size)
+        let existingChecksum = blockData.subdata(in: checksumIndex..<checksumIndex+checksumSize)
         let data = blockData.subdata(in: 0..<checksumIndex)
         let checksumResult = getChecksum(data)
         
         let valid = (existingChecksum == checksumResult)
         if (!valid) {
             if (update) {
-                let blockDataWithChecksum : NSMutableData = NSMutableData()
+                var blockDataWithChecksum : Data = Data()
                 blockDataWithChecksum.append(blockData.subdata(in: 0..<checksumIndex))
                 blockDataWithChecksum.append(checksumResult)
-                load(blockNumber, blockData: blockDataWithChecksum as Data)
+                load(blockNumber, blockData: blockDataWithChecksum)
             } else {
                 print("Expected checksum \(checksumResult) but tag had \(existingChecksum)")
             }

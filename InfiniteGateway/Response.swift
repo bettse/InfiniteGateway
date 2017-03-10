@@ -57,7 +57,7 @@ class Response : Message {
     }
     
     override var description: String {
-        let me = String(describing: type(of: self)).components(separatedBy: ".").last!
+        let me = String(describing: self)
         return "\(me)(\(type.desc()))"
     }
 }
@@ -72,7 +72,7 @@ class ActivateResponse : Response {
     }
     
     override var description: String {
-        let me = String(describing: type(of: self)).components(separatedBy: ".").last!
+        let me = String(describing: self)
         return "\(me)(\(params))"
     }
 }
@@ -105,7 +105,7 @@ class PresenceResponse : Response {
     var details = Dictionary<Message.LedPlatform, Array<UInt8>>()
     
     override init(data: Data) {
-        let bytes = (data as NSData).bytes.bindMemory(to: UInt8.self, capacity: data.count)
+        let bytes = [UInt8](data)
         for i in 1..<data.count {
             if (bytes[i] != 0x09) {
                 let led = LedPlatform(rawValue: bytes[i].high_nibble) as LedPlatform!
@@ -118,7 +118,7 @@ class PresenceResponse : Response {
     }
     
     override var description: String {
-        let me = String(describing: type(of: self)).components(separatedBy: ".").last!
+        let me = String(describing: self)
         return "\(me)(\(details))"
     }
     
@@ -157,7 +157,7 @@ class ReadResponse : Response {
     }
     
     override var description: String {
-        let me = String(describing: type(of: self)).components(separatedBy: ".").last!
+        let me = String(describing: self)
         return "\(me)(Platform \(nfcIndex) block \(blockNumber): \(blockData))"
     }
 }
@@ -196,7 +196,7 @@ class NextResponse : Response {
     }
     
     override var description: String {
-        let me = String(describing: type(of: self)).components(separatedBy: ".").last!
+        let me = String(describing: self)
         return "\(me): 0x\(String(value, radix:0x10))"
     }
 

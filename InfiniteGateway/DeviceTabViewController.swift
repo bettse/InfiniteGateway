@@ -58,11 +58,9 @@ class DeviceTabViewController: NSViewController {
         }
     }
     
-    
     func tableViewDoubleAction() {
         self.performSegue(withIdentifier: "TokenDetail", sender: self)
     }
-    
     
     func deviceDisconnected(_ notification: Notification) {
         status?.stringValue = "Portal Disconnected"
@@ -81,7 +79,6 @@ class DeviceTabViewController: NSViewController {
             table.reloadData()
         }
     }
-
 }
 
 

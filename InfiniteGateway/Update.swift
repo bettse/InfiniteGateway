@@ -17,10 +17,9 @@ class Update : Message {
         case arriving = 0
         case departing = 1
         func desc() -> String {
-            return String(describing: self).components(separatedBy: ".").last!
+            return String(describing: self)
         }
     }
-
     
     //Setting defaults so I don't have to deal with '?' style variables yet
     var ledPlatform : LedPlatform = .none
@@ -28,14 +27,13 @@ class Update : Message {
     var direction : Direction = .arriving
     
     init(data: Data) {
-        (data as NSData).getBytes(&ledPlatform, range: NSMakeRange(ledPlatformIndex, MemoryLayout<LedPlatform>.size))
-        (data as NSData).getBytes(&nfcIndex, range: NSMakeRange(nfcIndexIndex, MemoryLayout<UInt8>.size))
-        (data as NSData).getBytes(&direction, range: NSMakeRange(directionIndex, MemoryLayout<Direction>.size))
+        ledPlatform = Message.LedPlatform(rawValue: data[ledPlatformIndex])!
+        nfcIndex = data[nfcIndexIndex]
+        direction = Update.Direction(rawValue: data[directionIndex])!
     }
     
-    
     override var description: String {
-        let me = String(describing: type(of: self)).components(separatedBy: ".").last!
+        let me = String(describing: self)
         return "\(me)(\(ledPlatform.desc()) \(nfcIndex) \(direction.desc()))"
     }
 }

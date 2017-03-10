@@ -25,7 +25,7 @@ class Message : CustomStringConvertible {
         case write = 0xA3
         case tagId = 0xB4
         func desc() -> String {
-            return String(describing: self).components(separatedBy: ".").last!
+            return String(describing: self)
         }
     }    
     enum LedPlatform : UInt8 {
@@ -35,15 +35,13 @@ class Message : CustomStringConvertible {
         case right = 3
         case none = 0xFF
         func desc() -> String {
-            return String(describing: self).components(separatedBy: ".").last!
+            return String(describing: self)
         }
     }
     
     static var archive = [UInt8: Message]()
     
     var description: String {
-        let me = String(describing: type(of: self)).components(separatedBy: ".").last!
-        return "\(me)"
+        return String(describing: self)
     }
-
 }

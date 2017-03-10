@@ -23,7 +23,11 @@ class LibraryTabViewController: NSViewController {
             let fileManager = FileManager()
             let appDelegate = NSApplication.shared().delegate as! AppDelegate
 
-            let files = fileManager.enumerator(at: appDelegate.toyboxDirectory as URL, includingPropertiesForKeys: nil, options: FileManager.DirectoryEnumerationOptions.skipsHiddenFiles, errorHandler: nil)
+            let files = fileManager.enumerator(
+                at: appDelegate.toyboxDirectory as URL,
+                includingPropertiesForKeys: nil,
+                options: FileManager.DirectoryEnumerationOptions.skipsHiddenFiles,
+                errorHandler: nil)
             while let file = files?.nextObject() as? URL {
                 if file.absoluteString.hasSuffix("bin") { // checks the extension
                     if let image = try? Data(contentsOf: file) {
@@ -86,10 +90,7 @@ class LibraryTabViewController: NSViewController {
             et.dump(appDelegate.toyboxDirectory)
         }
     }
-        
 }
-
-
 
 // MARK: - NSComboBoxDataSource
 extension LibraryTabViewController: NSComboBoxDataSource {

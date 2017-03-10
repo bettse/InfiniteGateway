@@ -24,7 +24,7 @@ class Report {
         case response = 0xAA
         case update = 0xAB
         func desc() -> String {
-            return String(describing: self).components(separatedBy: ".").last!
+            return String(describing: self)
         }
     }
     
@@ -37,13 +37,11 @@ class Report {
         get {
             var sum = Int(type.rawValue)
             if let content = content as? Command {
-                let b = UnsafeBufferPointer<UInt8>(start: (content.serialize() as NSData).bytes.bindMemory(to: UInt8.self, capacity: content.serialize().count), count: length)
-                
+                let b = [UInt8](content.serialize())
                 for i in 0..<length {
                     sum += Int(b[i])
                 }
             }
-        
             return UInt8((sum + length) & 0xff)
         }
         set(newChecksum) {
@@ -56,16 +54,17 @@ class Report {
         type = MessageType.init(rawValue: data[typeIndex])!
         length = Int(data[lengthIndex])
         checksum = data[lengthIndex + length]
+        let c = data.subdata(in: contentIndex..<contentIndex+length)
         
         //Case statement for C R U
         switch type {
         case .response:
             //Using parse to get back a Response subclass
-            content = Response.parse(data.subdata(in: contentIndex..<contentIndex+length))
+            content = Response.parse(c)
         case .update:
-            content = Update(data: data.subdata(in: contentIndex..<contentIndex+length))
+            content = Update(data: c)
         case .command:
-            content = Command(data: data.subdata(in: contentIndex..<contentIndex+length))
+            content = Command(data: c)
         default:
             print("Report type \(String(type.rawValue, radix:0x10)) len:\(length) checksum:\(checksum)")
         }
@@ -79,7 +78,7 @@ class Report {
     }
     
     var description: String {
-        let me = String(describing: type(of: self)).components(separatedBy: ".").last!
+        let me = String(describing: self)
         return "\(me)::\(content!)"
     }
     
@@ -88,15 +87,12 @@ class Report {
         //Assumes checksum, length, type are already set
         if (content is Command) {
             let command = content as! Command
-            let data = NSMutableData(length: 0x20)
-            var rawType : UInt8 = type.rawValue
-            if let data = data {
-                data.replaceBytes(in: NSMakeRange(typeIndex, MemoryLayout<UInt8>.size), withBytes: &rawType)
-                data.replaceBytes(in: NSMakeRange(lengthIndex, MemoryLayout<UInt8>.size), withBytes: &length)
-                data.replaceBytes(in: NSMakeRange(contentIndex, length), withBytes: (command.serialize() as NSData).bytes)
-                data.replaceBytes(in: NSMakeRange(contentIndex + length, MemoryLayout<UInt8>.size), withBytes: &checksum)
-                return data as Data
-            }
+            var r = Data()
+            r.append(Data([type.rawValue]))
+            r.append(Data(bytes: [UInt8(length)]))
+            r.append(command.serialize())
+            r.append(Data([checksum]))
+            return r
         }
 
         return Data()
