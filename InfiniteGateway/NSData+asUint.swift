@@ -9,21 +9,44 @@
 import Foundation
 
 extension Data {
-    init(value: UInt16) {
-        var v : UInt16 = value
+    init(fromUInt16: UInt16) {
+        var v : UInt16 = fromUInt16
         self = withUnsafePointer(to: &v) {
             Data(bytes: UnsafePointer($0), count: MemoryLayout.size(ofValue: v))
         }
     }
     
-    init(value: UInt32) {
-        var v : UInt32 = value
+    init(fromUInt32: UInt32) {
+        var v : UInt32 = fromUInt32
         self = withUnsafePointer(to: &v) {
             Data(bytes: UnsafePointer($0), count: MemoryLayout.size(ofValue: v))
         }
     }
+    
+    // ------
 
+    mutating func replaceUInt8(_ offset: Int, value: UInt8) {
+        let size = MemoryLayout.size(ofValue: value)
+        let range = offset..<offset+size
+        let data = Data([value])
+        self.replaceSubrange(range, with: data)
+    }
     
+    mutating func replaceUInt16(_ offset: Int, value: UInt16) {
+        let size = MemoryLayout.size(ofValue: value)
+        let range = offset..<offset+size
+        let data = Data(fromUInt16: value)
+        self.replaceSubrange(range, with: data)
+    }
+    
+    mutating func replaceUInt32(_ offset: Int, value: UInt32) {
+        let size = MemoryLayout.size(ofValue: value)
+        let range = offset..<offset+size
+        let data = Data(fromUInt32: value)
+        self.replaceSubrange(range, with: data)
+    }
+    
+    // ------
     var uint8: UInt8 {
         get {
             return ([UInt8](self))[0]
