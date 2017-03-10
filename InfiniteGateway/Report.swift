@@ -61,11 +61,11 @@ class Report {
         switch type {
         case .response:
             //Using parse to get back a Response subclass
-            content = Response.parse(data.subdata(with: NSMakeRange(contentIndex, length)))
+            content = Response.parse(data.subdata(in: contentIndex..<contentIndex+length))
         case .update:
-            content = Update(data: data.subdata(in: NSMakeRange(contentIndex, length)))
+            content = Update(data: data.subdata(in: contentIndex..<contentIndex+length))
         case .command:
-            content = Command(data: data.subdata(in: NSMakeRange(contentIndex, length)))
+            content = Command(data: data.subdata(in: contentIndex..<contentIndex+length))
         default:
             print("Report type \(String(type.rawValue, radix:0x10)) len:\(length) checksum:\(checksum)")
         }

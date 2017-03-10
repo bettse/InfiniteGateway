@@ -38,9 +38,9 @@ class Command : Message {
     
     //Parseing from NSData
     init(data: Data) {
-        (data as NSData).getBytes(&type, range: NSMakeRange(typeIndex, MemoryLayout<commandType>.size))
-        (data as NSData).getBytes(&corrolationId, range: NSMakeRange(corrolationIdIndex, MemoryLayout<UInt8>.size))
-        params = data.subdata(in: NSMakeRange(paramsIndex, data.count - paramsIndex))
+        type = Message.commandType(rawValue: data[typeIndex])!
+        corrolationId = data[corrolationIdIndex]
+        params = data.subdata(in: paramsIndex..<data.count)
     }
     
     override var description: String {

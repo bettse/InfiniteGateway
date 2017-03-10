@@ -15,15 +15,4 @@ class ViewController: NSTabViewController {
         
     }
     
-    override var representedObject: AnyObject? {
-        didSet {
-        // Update the view, if already loaded.
-        }
-    }
-    
-    
-
- 
 }
-
-

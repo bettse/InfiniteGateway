@@ -19,7 +19,7 @@ extension Data {
             var swap = temp.bigEndian
             swappedKey.append(&swap, length: MemoryLayout<UInt32>.size)
         }
-        return (NSData(data: swappedKey as Data) as Data)
+        return swappedKey as Data
     }
     
     public var littleEndianUInt32: Data {
@@ -31,16 +31,15 @@ extension Data {
             var swap = temp.littleEndian
             swappedKey.append(&swap, length: MemoryLayout<UInt32>.size)
         }
-        return (NSData(data: swappedKey as Data) as Data)
+        return swappedKey as Data
     }
     
     public var negation: Data {
-        let result = NSData(data: self) as Data
-        let resultBytes = UnsafeMutablePointer<UInt8>(result.mutableBytes)
-        for i in 0..<result.count {
+        var resultBytes = [UInt8](self)
+        for i in 0..<resultBytes.count {
             resultBytes[i] = ~resultBytes[i]
         }
-        return (NSData(data: result) as Data)
+        return Data(resultBytes)
     }
     
 }

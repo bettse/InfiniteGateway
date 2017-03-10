@@ -47,12 +47,6 @@ class LibraryTabViewController: NSViewController {
         NotificationCenter.default.addObserver(self, selector: #selector(LibraryTabViewController.bustFileList(_:)), name: NSNotification.Name(rawValue: "tokenSaved"), object: nil)
     }
     
-    override var representedObject: AnyObject? {
-        didSet {
-            // Update the view, if already loaded.
-        }
-    }
-    
     func bustFileList(_ notification: Notification) {
         self._fileList = nil
         self.libraryTable?.reloadData()

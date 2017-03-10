@@ -38,14 +38,6 @@ class TokenDetailViewController : NSViewController {
         experience!.action = #selector(TokenDetailViewController.experienceUpdate)
     }
     
-    override var representedObject: AnyObject? {
-        didSet {
-            // Update the view, if already loaded.
-            //let token = representedObject as! Token
-            //print("represented object is \(token)")
-        }
-    }
-    
     var token : Token {
         get {
             return representedObject as! Token

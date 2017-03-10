@@ -227,7 +227,7 @@ class Token : MifareMini, CustomStringConvertible {
             }
             let updatedBlock : NSMutableData = (block(blockNumber) as NSData).mutableCopy() as! NSMutableData
             updatedBlock.replaceBytes(in: NSMakeRange(blockIndex, MemoryLayout<UInt16>.size), withBytes: &value)
-            load(blockNumber, blockData: updatedBlock)
+            load(blockNumber, blockData: updatedBlock as Data)
         }
     }
     
@@ -339,14 +339,14 @@ class Token : MifareMini, CustomStringConvertible {
         var value = UInt32(modelId).bigEndian
         let uid = NSMutableData(bytes:[0x04, 0x0e, 0x00, 0x00, 0x00, 0x00, 0x81] as [UInt8], length: 7)
         uid.replaceBytes(in: NSMakeRange(2, MemoryLayout<UInt32>.size), withBytes: &value)
-        self.init(tagId: uid)
+        self.init(tagId: uid as Data)
 
         //Block 0
         let block0 = NSMutableData()
         block0.append(tagId as Data)
         let block0remainder = (Int(MifareMini.blockSize) - uid.length)
         block0.append([UInt8](repeating: 0, count: block0remainder), length: block0remainder)
-        self.load(0, blockData: block0)
+        self.load(0, blockData: block0 as Data)
 
         //Fill with zeros
         while !self.complete() {
@@ -375,17 +375,17 @@ class Token : MifareMini, CustomStringConvertible {
         }
         let checksumIndex = Token.blockSize - MemoryLayout<UInt32>.size //12
         
-        let existingChecksum = blockData.subdata(in: NSMakeRange(checksumIndex, sizeof(UInt32)))
-        let data = blockData.subdata(in: NSMakeRange(0, checksumIndex))
+        let existingChecksum = blockData.subdata(in: checksumIndex..<checksumIndex+MemoryLayout<UInt32>.size)
+        let data = blockData.subdata(in: 0..<checksumIndex)
         let checksumResult = getChecksum(data)
         
         let valid = (existingChecksum == checksumResult)
         if (!valid) {
             if (update) {
                 let blockDataWithChecksum : NSMutableData = NSMutableData()
-                blockDataWithChecksum.append(blockData.subdata(in: NSMakeRange(0, checksumIndex)))
+                blockDataWithChecksum.append(blockData.subdata(in: 0..<checksumIndex))
                 blockDataWithChecksum.append(checksumResult)
-                load(blockNumber, blockData: blockDataWithChecksum)
+                load(blockNumber, blockData: blockDataWithChecksum as Data)
             } else {
                 print("Expected checksum \(checksumResult) but tag had \(existingChecksum)")
             }
@@ -409,7 +409,7 @@ class Token : MifareMini, CustomStringConvertible {
     }
     
     func getChecksum(_ data: Data) -> Data {
-        return data.crc32(0)!.negation
+        return data.crc32(seed: 0).negation
     }
     
     func save() {

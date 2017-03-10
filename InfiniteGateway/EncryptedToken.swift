@@ -25,7 +25,7 @@ class EncryptedToken : MifareMini {
                 return Data()
             }
             
-            let sha = prekey.sha1()!.subdataWithRange(NSMakeRange(0, 16))
+            let sha = (prekey as Data).sha1().subdata(in: 0..<16)
             //Swap bytes for endianness
             return sha.bigEndianUInt32
         }
@@ -70,7 +70,7 @@ class EncryptedToken : MifareMini {
     }
     
     convenience init(image: Data) {
-        self.init(tagId: image.subdata(in: NSMakeRange(0, 7)))
+        self.init(tagId: image.subdata(in: 0..<7))
         self.data = (image as NSData).mutableCopy() as! NSMutableData
     }
 
@@ -98,18 +98,18 @@ class EncryptedToken : MifareMini {
             return blockData
         }
         
-        let aes = try! AES(key: key.arrayOfBytes(), blockMode: .ECB)
+        let aes = try! AES(key: [UInt8](key), blockMode: .ECB)
         var newBytes : [UInt8]
         
         if (encrypt) {
-            newBytes = try! aes.encrypt(blockData.arrayOfBytes(), padding: nil)
+            newBytes = try! aes.encrypt([UInt8](blockData))
         } else {
-            newBytes = try! aes.decrypt(blockData.arrayOfBytes(), padding: nil)
+            newBytes = try! aes.decrypt([UInt8](blockData))
         }
         if (newBytes.count != MifareMini.blockSize) {
             print("Number of bytes after encryption/decryption was \(newBytes.count), but will be truncated")
         }
-        return Data(bytes: newBytes).subdataWithRange(NSMakeRange(0, MifareMini.blockSize))
+        return Data(newBytes).subdata(in: 0..<MifareMini.blockSize)
     }
 }
 

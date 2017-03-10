@@ -27,8 +27,7 @@ class Response : Message {
     
     init(data: Data) {
         super.init()
-        (data as NSData).getBytes(&corrolationId, range: NSMakeRange(corrolationIdIndex, MemoryLayout<UInt8>.size))
-        
+        corrolationId = data[corrolationIdIndex]
     }
     
     static func parse(_ data: Data) -> Response {
@@ -68,7 +67,7 @@ class ActivateResponse : Response {
     let paramsIndex = 1
     
     override init(data: Data) {
-        params = data.subdata(in: NSMakeRange(paramsIndex, data.count - paramsIndex))
+        params = data.subdata(in: paramsIndex..<data.count)
         super.init(data: data)
     }
     
@@ -91,12 +90,12 @@ class TagIdResponse : Response {
     var tagId : Data
     
     override init(data: Data) {
-        tagId = data.subdata(in: NSMakeRange(tagIdIndex, data.count - tagIdIndex))
+        tagId = data.subdata(in: tagIdIndex..<data.count)
         super.init(data: data)        
     }
 
     override var description: String {
-        let me = String(describing: type(of: self)).components(separatedBy: ".").last!
+        let me = String(describing: self)
         return "\(me)(NFC #\(nfcIndex): \(tagId))"
     }
 }
@@ -153,7 +152,7 @@ class ReadResponse : Response {
     }
     
     override init(data: Data) {
-        blockData = data.subdata(in: NSMakeRange(blockDataIndex, data.count-blockDataIndex))
+        blockData = data.subdata(in: blockDataIndex..<data.count)
         super.init(data: data)
     }
     
@@ -174,7 +173,8 @@ class NextResponse : Response {
     
     override init(data: Data) {
         var scrambled : UInt64 = 0
-        (data as NSData).getBytes(&scrambled, range: NSMakeRange(scrambledIndex, MemoryLayout<UInt64>.size))
+        let start = data.subdata(in: scrambledIndex..<data.count)
+        scrambled = start.uint64
         super.init(data: data)
         value = descramble(scrambled.bigEndian)
     }

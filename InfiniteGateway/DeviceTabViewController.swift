@@ -33,12 +33,6 @@ class DeviceTabViewController: NSViewController {
         self.nfcTable?.doubleAction = #selector(DeviceTabViewController.tableViewDoubleAction)
         self.nfcTable?.target = self
     }
-    
-    override var representedObject: AnyObject? {
-        didSet {
-            // Update the view, if already loaded.
-        }
-    }
 
     func tokenLoaded(_ ledPlatform: Message.LedPlatform, nfcIndex: Int, token: Token) {
         if (nfcIndex == -1) { //token from disk image

@@ -22,15 +22,5 @@ extension Data {
         }
         
         return NSString(string: hexString)
-    }
-    
-    subscript(origin: Int) -> UInt8 {
-        get {
-            var result: UInt8 = 0;
-            if (origin < self.count) {
-                (self as NSData).getBytes(&result, range: NSMakeRange(origin, 1))
-            }
-            return result
-        }
-    }
+    }    
 }
