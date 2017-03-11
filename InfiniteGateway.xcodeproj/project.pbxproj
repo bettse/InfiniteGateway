@@ -33,6 +33,7 @@
 		6D3AFB921BAB86FC00FAE962 /* Update.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6D3AFB891BAB86FC00FAE962 /* Update.swift */; };
 		6D3AFB941BACD9AE00FAE962 /* PortalDriver.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6D3AFB931BACD9AE00FAE962 /* PortalDriver.swift */; };
 		6D3AFB961BAD1A7800FAE962 /* EncryptedToken.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6D3AFB951BAD1A7800FAE962 /* EncryptedToken.swift */; };
+		6D89258F1E73857800431637 /* MyNSTableRowView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6D89258E1E73857800431637 /* MyNSTableRowView.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -95,6 +96,7 @@
 		6D3AFB931BACD9AE00FAE962 /* PortalDriver.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PortalDriver.swift; sourceTree = "<group>"; };
 		6D3AFB951BAD1A7800FAE962 /* EncryptedToken.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = EncryptedToken.swift; sourceTree = "<group>"; };
 		6D53681B1BEDBB6D001C7654 /* CryptoSwift.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = CryptoSwift.xcodeproj; path = CryptoSwift/CryptoSwift.xcodeproj; sourceTree = "<group>"; };
+		6D89258E1E73857800431637 /* MyNSTableRowView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MyNSTableRowView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -132,6 +134,7 @@
 				6D2078AB1BAF549F00020B3A /* Block.swift */,
 				6D3AFB681BAB848B00FAE962 /* ViewController.swift */,
 				6D269B501BB4591300D0EF97 /* LibraryTabViewController.swift */,
+				6D89258E1E73857800431637 /* MyNSTableRowView.swift */,
 				6D269B4E1BB4584500D0EF97 /* DeviceTabViewController.swift */,
 				6D2078AD1BAFAD7D00020B3A /* TokenDetailViewController.swift */,
 				6D269B521BB4C2FE00D0EF97 /* TokenCellView.swift */,
@@ -290,6 +293,7 @@
 				6D3AFB961BAD1A7800FAE962 /* EncryptedToken.swift in Sources */,
 				6D269B511BB4591300D0EF97 /* LibraryTabViewController.swift in Sources */,
 				6D3AFB8D1BAB86FC00FAE962 /* Portal.swift in Sources */,
+				6D89258F1E73857800431637 /* MyNSTableRowView.swift in Sources */,
 				6D2078AA1BAF4E3100020B3A /* MifareMini.swift in Sources */,
 				6D3AFB901BAB86FC00FAE962 /* ThePoster.swift in Sources */,
 				6D3AFB8A1BAB86FC00FAE962 /* Command.swift in Sources */,

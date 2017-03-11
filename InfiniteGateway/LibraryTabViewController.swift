@@ -117,6 +117,10 @@ extension LibraryTabViewController: NSTableViewDataSource {
 }
 
 extension LibraryTabViewController: NSTableViewDelegate {
+    func tableView(_ tableView: NSTableView, rowViewForRow row: Int) -> NSTableRowView? {
+        return MyNSTableRowView()
+    }
+    
     func numberOfRows(in tableView: NSTableView) -> Int {
         return fileList.count
     }
