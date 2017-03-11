@@ -11,6 +11,7 @@ import Foundation
 //Sorry about having something call nfcIndexIndex; it was the blending of the two patterns
 class Update : Message {
     let ledPlatformIndex = 0
+    let sakIndex = 1
     let nfcIndexIndex = 2
     let directionIndex = 3
     enum Direction : UInt8 {
@@ -24,16 +25,18 @@ class Update : Message {
     //Setting defaults so I don't have to deal with '?' style variables yet
     var ledPlatform : LedPlatform = .none
     var nfcIndex : UInt8 = 0
+    var sak : Sak = .unknown
     var direction : Direction = .arriving
     
     init(data: Data) {
         ledPlatform = Message.LedPlatform(rawValue: data[ledPlatformIndex])!
+        sak = Message.Sak(rawValue: data[sakIndex])!
         nfcIndex = data[nfcIndexIndex]
         direction = Update.Direction(rawValue: data[directionIndex])!
     }
     
     override var description: String {
-        let me = String(describing: self)
-        return "\(me)(\(ledPlatform.desc()) \(nfcIndex) \(direction.desc()))"
+        let me = String(describing: type(of: self)).components(separatedBy: ".").last!
+        return "\(me)(#\(nfcIndex) [\(sak)] on \(ledPlatform.desc()) Platform is \(direction.desc()))"
     }
 }

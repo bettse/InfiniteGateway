@@ -51,6 +51,7 @@ class PortalDriver : NSObject {
     }
     
     func incomingUpdate(_ update: Update) {
+        print(update)
         var updateColor : NSColor = NSColor()
         if (update.direction == Update.Direction.arriving) {
             updateColor = NSColor.white

@@ -39,6 +39,15 @@ class Message : CustomStringConvertible {
         }
     }
     
+    enum Sak : UInt8 {
+        case mifareUltralight = 0x00
+        case mifareClassic1k = 0x08
+        case mifareMini = 0x09
+        case mifareClassic4k = 0x18
+        case mifareDesFire = 0x20
+        case unknown = 0xFF //Not standard
+    }
+    
     static var archive = [UInt8: Message]()
     
     var description: String {
