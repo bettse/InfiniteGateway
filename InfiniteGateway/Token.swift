@@ -23,7 +23,7 @@ class Token : MifareMini, CustomStringConvertible {
     }()
     
     var description: String {
-        let me = String(describing: self)
+        let me = String(describing: type(of: self)).components(separatedBy: ".").last!
         return "\(me)(\(tagId): v\(generation) \(name) L\(level)[\(experience)] | Manuf: \(manufactureYear)/\(manufactureMonth)/\(manufactureDay))"
     }
     

@@ -57,7 +57,7 @@ class Response : Message {
     }
     
     override var description: String {
-        let me = String(describing: self)
+        let me = String(describing: type(of: self)).components(separatedBy: ".").last!
         return "\(me)(\(type.desc()))"
     }
 }
@@ -72,7 +72,7 @@ class ActivateResponse : Response {
     }
     
     override var description: String {
-        let me = String(describing: self)
+        let me = String(describing: type(of: self)).components(separatedBy: ".").last!
         return "\(me)(\(params))"
     }
 }
@@ -95,7 +95,7 @@ class TagIdResponse : Response {
     }
 
     override var description: String {
-        let me = String(describing: self)
+        let me = String(describing: type(of: self)).components(separatedBy: ".").last!
         return "\(me)(NFC #\(nfcIndex): \(tagId))"
     }
 }
@@ -118,7 +118,7 @@ class PresenceResponse : Response {
     }
     
     override var description: String {
-        let me = String(describing: self)
+        let me = String(describing: type(of: self)).components(separatedBy: ".").last!
         return "\(me)(\(details))"
     }
     
@@ -157,8 +157,8 @@ class ReadResponse : Response {
     }
     
     override var description: String {
-        let me = String(describing: self)
-        return "\(me)(Platform \(nfcIndex) block \(blockNumber): \(blockData))"
+        let me = String(describing: type(of: self)).components(separatedBy: ".").last!
+        return "\(me)(Platform \(nfcIndex) block \(blockNumber): \(blockData.toHexString()))"
     }
 }
 
@@ -196,7 +196,7 @@ class NextResponse : Response {
     }
     
     override var description: String {
-        let me = String(describing: self)
+        let me = String(describing: type(of: self)).components(separatedBy: ".").last!
         return "\(me): 0x\(String(value, radix:0x10))"
     }
 

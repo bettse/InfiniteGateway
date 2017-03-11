@@ -85,6 +85,7 @@ class PortalDriver : NSObject {
             let report = Report(cmd: ReadCommand(nfcIndex: response.nfcIndex, block: 0))
             portal.output(report)
         } else if let response = response as? ReadResponse {
+            print("readResponse \(response)")
             tokenRead(response)
         } else if let response = response as? WriteResponse {
             print(response)
@@ -92,7 +93,7 @@ class PortalDriver : NSObject {
         } else if let _ = response as? LightFadeResponse {
         } else if let _ = response as? LightFlashResponse {
         } else {
-            print("Received \(response) for command \(response.command)", terminator: "\n")
+            print("Received \(response) for command \(response.command)")
         }
         
     }

@@ -78,7 +78,7 @@ class Report {
     }
     
     var description: String {
-        let me = String(describing: self)
+        let me = String(describing: type(of: self)).components(separatedBy: ".").last!
         return "\(me)::\(content!)"
     }
     
