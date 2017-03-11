@@ -10,8 +10,12 @@ import Foundation
 
 class Response : Message {
     let corrolationIdIndex = 0
+    let paramsIndex = 1
+    
     var corrolationId : UInt8 = 0
+    var params : Data
 
+    
     //lol delegate
     var type : commandType {
         get {
@@ -26,6 +30,7 @@ class Response : Message {
     }
     
     init(data: Data) {
+        self.params = data.subdata(in: paramsIndex..<data.count)
         super.init()
         corrolationId = data[corrolationIdIndex]
     }
@@ -60,19 +65,11 @@ class Response : Message {
     
     override var description: String {
         let me = String(describing: type(of: self)).components(separatedBy: ".").last!
-        return "\(me)(\(type.desc()))"
+        return "\(me)(\(type.desc()): \(params.toHexString())"
     }
 }
 
 class ActivateResponse : Response {
-    var params : Data
-    let paramsIndex = 1
-    
-    override init(data: Data) {
-        params = data.subdata(in: paramsIndex..<data.count)
-        super.init(data: data)
-    }
-    
     override var description: String {
         let me = String(describing: type(of: self)).components(separatedBy: ".").last!
         return "\(me)(\(params))"
@@ -218,12 +215,20 @@ class LightFlashResponse : Response {
 }
 
 class C0Response : Response {
-    var params : Data
-    let paramsIndex = 1
-    
-    override init(data: Data) {
-        params = data.subdata(in: paramsIndex..<data.count)
-        super.init(data: data)
+    override var description: String {
+        let me = String(describing: type(of: self)).components(separatedBy: ".").last!
+        return "\(me)[\(params.toHexString())]"
+    }
+}
+
+class B9Response : Response {
+    var value : UInt8  {
+        get {
+            if let command = command as? B9Command {
+                return command.value
+            }
+            return 0
+        }
     }
     
     override var description: String {
