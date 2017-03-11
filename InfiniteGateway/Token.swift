@@ -324,10 +324,10 @@ class Token : MifareMini, CustomStringConvertible {
         let checksumSize = 4 //UInt32
         let checksumIndex = Token.blockSize - checksumSize
         
-        let existingChecksum = blockData.subdata(in: checksumIndex..<checksumIndex+checksumSize)
-        let data = blockData.subdata(in: 0..<checksumIndex)
-        let checksumResult = getChecksum(data)
+        let withoutChecksum = Data(blockData.prefix(upTo: checksumIndex))
+        let existingChecksum = Data(blockData.suffix(from: checksumIndex))
         
+        let checksumResult = withoutChecksum.crc32(seed:0).negation        
         let valid = (existingChecksum == checksumResult)
         if (!valid) {
             if (update) {
@@ -336,7 +336,7 @@ class Token : MifareMini, CustomStringConvertible {
                 blockDataWithChecksum.append(checksumResult)
                 load(blockNumber, blockData: blockDataWithChecksum)
             } else {
-                print("Expected checksum \(checksumResult.toHexString()) but tag had \(existingChecksum.toHexString() )")
+                print("Calculated checksum \(checksumResult.toHexString()) but tag had \(existingChecksum.toHexString() )")
             }
         }
         return valid
@@ -351,14 +351,6 @@ class Token : MifareMini, CustomStringConvertible {
         for blockNumber in 0..<MifareMini.blockCount {
             correctChecksum(blockNumber)
         }
-    }
-    
-    func reverseBytes(_ value: UInt32) -> UInt32 {
-        return ((value & 0x000000FF) << 24) | ((value & 0x0000FF00) << 8) | ((value & 0x00FF0000) >> 8)  | ((value & 0xFF000000) >> 24);
-    }
-    
-    func getChecksum(_ data: Data) -> Data {
-        return data.crc32(seed: 0).negation
     }
     
     func save() {

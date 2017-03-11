@@ -98,7 +98,7 @@ class EncryptedToken : MifareMini {
             return blockData
         }
         
-        let aes = try! AES(key: [UInt8](key), blockMode: .ECB)
+        let aes = try! AES(key: [UInt8](key), iv: nil, blockMode: .ECB, padding: NoPadding())    
         var newBytes : [UInt8]
         
         if (encrypt) {
