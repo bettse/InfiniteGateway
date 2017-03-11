@@ -34,6 +34,8 @@
 		6D3AFB941BACD9AE00FAE962 /* PortalDriver.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6D3AFB931BACD9AE00FAE962 /* PortalDriver.swift */; };
 		6D3AFB961BAD1A7800FAE962 /* EncryptedToken.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6D3AFB951BAD1A7800FAE962 /* EncryptedToken.swift */; };
 		6D89258F1E73857800431637 /* MyNSTableRowView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6D89258E1E73857800431637 /* MyNSTableRowView.swift */; };
+		6DF857E81E74A662008B03E6 /* CryptoSwift.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6D5368241BEDBB6D001C7654 /* CryptoSwift.framework */; };
+		6DF857E91E74A662008B03E6 /* CryptoSwift.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 6D5368241BEDBB6D001C7654 /* CryptoSwift.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -51,6 +53,13 @@
 			remoteGlobalIDString = 754BE46019693E190098E6F3;
 			remoteInfo = CryptoSwiftTests;
 		};
+		6DF857EA1E74A662008B03E6 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 6D53681B1BEDBB6D001C7654 /* CryptoSwift.xcodeproj */;
+			proxyType = 1;
+			remoteGlobalIDString = 754BE45419693E190098E6F3;
+			remoteInfo = CryptoSwift;
+		};
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -60,6 +69,7 @@
 			dstPath = "";
 			dstSubfolderSpec = 10;
 			files = (
+				6DF857E91E74A662008B03E6 /* CryptoSwift.framework in Embed Frameworks */,
 			);
 			name = "Embed Frameworks";
 			runOnlyForDeploymentPostprocessing = 0;
@@ -104,6 +114,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				6DF857E81E74A662008B03E6 /* CryptoSwift.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -194,6 +205,7 @@
 			buildRules = (
 			);
 			dependencies = (
+				6DF857EB1E74A662008B03E6 /* PBXTargetDependency */,
 			);
 			name = InfiniteGateway;
 			productName = InfiniteGateway;
@@ -302,6 +314,14 @@
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		6DF857EB1E74A662008B03E6 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			name = CryptoSwift;
+			targetProxy = 6DF857EA1E74A662008B03E6 /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
 
 /* Begin PBXVariantGroup section */
 		6D3AFB6F1BAB848B00FAE962 /* Main.storyboard */ = {
