@@ -240,10 +240,57 @@ class LightFlashCommand : Command {
 
 }
 
+class B9Command : Command {
+    var value : UInt8 = 0
+
+    init(value: UInt8) {
+        super.init()
+        self.value = value
+        type = .b9
+        params = Data(bytes: [value])
+    }
+    
+    override var description: String {
+        let me = String(describing: type(of: self)).components(separatedBy: ".").last!
+        return "\(me)(\(type.desc()): \(params.toHexString()))"
+    }
+}
+
+class BeCommand : Command {
+    var value : UInt8 = 0
+    
+    init(value: UInt8) {
+        super.init()
+        self.value = value
+        type = .be
+        params = Data(bytes: [value])
+    }
+    
+    override var description: String {
+        let me = String(describing: type(of: self)).components(separatedBy: ".").last!
+        return "\(me)(\(type.desc()): \(params.toHexString()))"
+    }
+}
+
 class C0Command : Command {
     override init() {
         super.init()
         type = .c0
-        params = Data()
+    }
+}
+
+class C1Command : Command {
+    var value : UInt8 = 0
+    
+    init(value: UInt8) {
+        super.init()
+        self.value = value
+        type = .c1
+        params = Data(bytes: [value])
+    }
+    
+    override var description: String {
+        let me = String(describing: type(of: self)).components(separatedBy: ".").last!
+        return "\(me)(\(type.desc()): \(params.toHexString()))"
     }
 }

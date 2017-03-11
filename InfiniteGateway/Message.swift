@@ -24,7 +24,10 @@ class Message : CustomStringConvertible {
         case read = 0xA2
         case write = 0xA3
         case tagId = 0xB4
+        case b9 = 0xb9
+        case be = 0xbe
         case c0 = 0xc0
+        case c1 = 0xc1
         func desc() -> String {
             return String(describing: self)
         }

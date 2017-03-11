@@ -32,7 +32,7 @@ class Response : Message {
     init(data: Data) {
         self.params = data.subdata(in: paramsIndex..<data.count)
         super.init()
-        corrolationId = data[corrolationIdIndex]
+        corrolationId = data[corrolationIdIndex]        
     }
     
     static func parse(_ data: Data) -> Response {
@@ -58,10 +58,15 @@ class Response : Message {
             return SeedResponse(data: data)
         case .next:
             return NextResponse(data: data)
-        case .c0:
-            return C0Response(data: data)
+        case .b9:
+            return B9Response(data: data)
+        case .c1:
+            return C1Response(data: data)
+        default:
+            return r
         }
     }
+
     
     override var description: String {
         let me = String(describing: type(of: self)).components(separatedBy: ".").last!
@@ -214,13 +219,6 @@ class LightFadeResponse : Response {
 class LightFlashResponse : Response {
 }
 
-class C0Response : Response {
-    override var description: String {
-        let me = String(describing: type(of: self)).components(separatedBy: ".").last!
-        return "\(me)[\(params.toHexString())]"
-    }
-}
-
 class B9Response : Response {
     var value : UInt8  {
         get {
@@ -236,3 +234,28 @@ class B9Response : Response {
         return "\(me)[\(params.toHexString())]"
     }
 }
+
+
+class C0Response : Response {
+    override var description: String {
+        let me = String(describing: type(of: self)).components(separatedBy: ".").last!
+        return "\(me)[\(params.toHexString())]"
+    }
+}
+
+class C1Response : Response {
+    var value : UInt8  {
+        get {
+            if let command = command as? C1Command {
+                return command.value
+            }
+            return 0
+        }
+    }
+    
+    override var description: String {
+        let me = String(describing: type(of: self)).components(separatedBy: ".").last!
+        return "\(me)[\(params.toHexString())]"
+    }
+}
+
