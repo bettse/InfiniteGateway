@@ -71,8 +71,8 @@ class PortalDriver : NSObject {
     
     func incomingResponse(_ response: Response) {
         if let _ = response as? ActivateResponse {
-            //portal.outputCommand(LightOnCommand(ledPlatform: .all, color: NSColor.black))
-            experiment()
+            portal.outputCommand(LightOnCommand(ledPlatform: .all, color: NSColor.black))
+            //experiment()
         } else if let response = response as? PresenceResponse {
             for (ledPlatform, nfcIndicies) in response.details {
                 let temp = presence[ledPlatform] ?? [UInt8]() //Define if not already defined
@@ -167,42 +167,24 @@ class PortalDriver : NSObject {
     }
 
     func experiment() {
+        let test : UInt8 = 0x00
         
-        var test : UInt8 = 0x00
+        self.portal.outputCommand(B9Command(value: test))
+        //self.portal.outputCommand(BeCommand(value: test))
+        //self.portal.outputCommand(C1Command(value: test))
+        //self.portal.outputCommand(C0Command())
+        
+        
+        /*
         if #available(OSX 10.12, *) {
             Timer.scheduledTimer(withTimeInterval: 1.0, repeats: true, block: { (timer) in
-                self.portal.outputCommand(C1Command(value: test))
+                self.portal.outputCommand(B9Command(value: test))
                 
                 if test > 0xfe {
                     timer.invalidate()
                 }
                 test = test + 1
             })
-        }
-        
-        //self.portal.outputCommand(BeCommand())
-        //self.portal.outputCommand(C1Command())
-        
-        
-        /*
-        var test : UInt8 = 0xA0
-        if #available(OSX 10.12, *) {
-            Timer.scheduledTimer(withTimeInterval: 1.0, repeats: true, block: { (timer) in
-                let command = C0Command()
-                let report = Report(cmd: command)
-                let corrolationId : UInt8 = command.corrolationId
-                let length : UInt8 = UInt8(report.length)
-                
-                let checksum : UInt8 = UInt8(report.checksum &- command.type.rawValue &+ test)
-                self.portal.output(Data([0xff, length, test, corrolationId, 0x00, checksum]))
-                
-                if test > 0xf0 {
-                    timer.invalidate()
-                }
-                test = test + 1
-            })
-        } else {
-            // Fallback on earlier versions
         }
         */
     }
