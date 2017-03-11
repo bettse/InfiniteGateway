@@ -50,7 +50,7 @@ class Token : MifareMini, CustomStringConvertible {
             let blockNumber = 1
             let blockIndex = 0
             let offset = blockNumber * MifareMini.blockSize + blockIndex
-            return data.subdata(in: offset..<data.count).uint32//.bigEndian
+            return data.subdata(in: offset..<data.count).uint32.bigEndian
         }
         set(value) {
             let blockNumber = 1
