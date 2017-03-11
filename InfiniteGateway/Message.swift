@@ -24,10 +24,11 @@ class Message : CustomStringConvertible {
         case read = 0xA2
         case write = 0xA3
         case tagId = 0xB4
+        case c0 = 0xc0
         func desc() -> String {
             return String(describing: self)
         }
-    }    
+    }
     enum LedPlatform : UInt8 {
         case all = 0
         case hex = 1

@@ -240,3 +240,10 @@ class LightFlashCommand : Command {
 
 }
 
+class C0Command : Command {
+    override init() {
+        super.init()
+        type = .c0
+        params = Data()
+    }
+}

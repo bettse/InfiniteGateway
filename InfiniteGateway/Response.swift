@@ -53,6 +53,8 @@ class Response : Message {
             return SeedResponse(data: data)
         case .next:
             return NextResponse(data: data)
+        case .c0:
+            return C0Response(data: data)
         }
     }
     
@@ -215,3 +217,17 @@ class LightFadeResponse : Response {
 class LightFlashResponse : Response {
 }
 
+class C0Response : Response {
+    var params : Data
+    let paramsIndex = 1
+    
+    override init(data: Data) {
+        params = data.subdata(in: paramsIndex..<data.count)
+        super.init(data: data)
+    }
+    
+    override var description: String {
+        let me = String(describing: type(of: self)).components(separatedBy: ".").last!
+        return "\(me)[\(params.toHexString())]"
+    }
+}
