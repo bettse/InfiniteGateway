@@ -1,0 +1,9 @@
+import PackageDescription
+
+let package = Package(
+    name: "InfiniteGateway",
+    dependencies: [
+        .Package(url: "https://github.com/krzyzanowskim/CryptoSwift.git", majorVersion: 0)
+    ],
+    exclude: ["Assets.xcassets", "Base.lproj" ]
+)
