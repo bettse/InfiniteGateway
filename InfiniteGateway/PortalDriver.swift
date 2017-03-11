@@ -85,7 +85,6 @@ class PortalDriver : NSObject {
             let report = Report(cmd: ReadCommand(nfcIndex: response.nfcIndex, block: 0))
             portal.output(report)
         } else if let response = response as? ReadResponse {
-            print("readResponse \(response)")
             tokenRead(response)
         } else if let response = response as? WriteResponse {
             print(response)
@@ -95,7 +94,6 @@ class PortalDriver : NSObject {
         } else {
             print("Received \(response) for command \(response.command)")
         }
-        
     }
 
     func ledPlatformOfNfcIndex(_ nfcIndex: UInt8) -> Message.LedPlatform {
@@ -125,6 +123,10 @@ class PortalDriver : NSObject {
     }
     
     func tokenRead(_ response: ReadResponse) {
+        if response.blockData.count == 0 {
+            print("Empty (no data) ReadResponse")
+            return
+        }
         if let token = encryptedTokens[response.nfcIndex] {
             token.load(response.blockNumber, blockData: response.blockData)
             if (token.complete()) {
