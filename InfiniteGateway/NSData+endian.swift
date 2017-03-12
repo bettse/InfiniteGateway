@@ -37,4 +37,9 @@ extension Data {
         return Data(self.map({ return ~$0 }))
     }
     
+    public var spacedHexString : String {
+        let s = self.map {String(format: "%02x", $0)}
+        return s.joined(separator: " ")
+    }
+    
 }
