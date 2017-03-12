@@ -78,15 +78,13 @@ class PortalDriver : NSObject {
         } else if let response = response as? PresenceResponse {
             portal.outputCommand(LightOnCommand(ledPlatform: .all, color: NSColor.black))
             for detail in response.details {
-                presence[detail.platform] = presence[detail.platform] ?? [UInt8]() //Define if not already defined
-                presence[detail.platform]?.append(detail.nfcIndex)
+                updatePresence(detail.platform, nfcIndex: detail.nfcIndex)
                 if (detail.sak == .mifareMini) {
                     portal.outputCommand(TagIdCommand(nfcIndex: detail.nfcIndex))
                 }
             }
         } else if let response = response as? TagIdResponse {
             encryptedTokens[response.nfcIndex] = EncryptedToken(tagId: response.tagId)
-
             let report = Report(cmd: ReadCommand(nfcIndex: response.nfcIndex, block: 0))
             portal.output(report)
         } else if let response = response as? ReadResponse {
