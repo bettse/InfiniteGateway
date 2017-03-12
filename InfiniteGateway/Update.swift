@@ -28,6 +28,7 @@ class Update : Message {
     var nfcIndex : UInt8 = 0
     var sak : Sak = .unknown
     var direction : Direction = .unknown
+    var detail : Detail
     
     init(data: Data) {
         ledPlatform = Message.LedPlatform(rawValue: data[ledPlatformIndex]) ?? .none
@@ -37,6 +38,7 @@ class Update : Message {
         if (sak == .unknown) {
             print("Unknown sak: \(data[sakIndex])")
         }
+        detail = Detail(nfcIndex: nfcIndex, platform: ledPlatform, sak: sak)
     }
     
     override var description: String {

@@ -19,8 +19,8 @@ class PortalDriver : NSObject {
     static let singleton = PortalDriver()
     var portalThread : Thread?
     var portal : Portal = Portal.singleton
-
-    var presence = Dictionary<Message.LedPlatform, [UInt8]>()
+    
+    var presence = Dictionary<UInt8, Detail>()
     var encryptedTokens : [UInt8:EncryptedToken] = [:]
     
     var loadTokenCallbacks : [tokenLoad] = []
@@ -56,13 +56,13 @@ class PortalDriver : NSObject {
         if (update.direction == Update.Direction.arriving) {
             // NB: We don't call loadTokenCallbacks until token data is read
             updateColor = NSColor.white
-            updatePresence(update.ledPlatform, nfcIndex: update.nfcIndex)
+            presence[update.nfcIndex] = Detail(nfcIndex: update.nfcIndex, platform: update.ledPlatform, sak: update.sak)
             if update.sak == .mifareMini {                
                 portal.outputCommand(TagIdCommand(nfcIndex: update.nfcIndex))
             }
         } else if (update.direction == Update.Direction.departing) {
             updateColor = NSColor.black
-            removePresence(update.ledPlatform, nfcIndex: update.nfcIndex)
+            presence.removeValue(forKey: update.nfcIndex)
             DispatchQueue.main.async(execute: {
                 for callback in self.leftTokenCallbacks {
                     callback(update.ledPlatform, Int(update.nfcIndex))
@@ -78,7 +78,7 @@ class PortalDriver : NSObject {
         } else if let response = response as? PresenceResponse {
             portal.outputCommand(LightOnCommand(ledPlatform: .all, color: NSColor.black))
             for detail in response.details {
-                updatePresence(detail.platform, nfcIndex: detail.nfcIndex)
+                presence[detail.nfcIndex] = detail
                 if (detail.sak == .mifareMini) {
                     portal.outputCommand(TagIdCommand(nfcIndex: detail.nfcIndex))
                 }
@@ -108,32 +108,6 @@ class PortalDriver : NSObject {
         }
     }
 
-    func ledPlatformOfNfcIndex(_ nfcIndex: UInt8) -> Message.LedPlatform {
-        var led = Message.LedPlatform.none
-        for (ledPlatform, nfcIndices) in presence {
-            if (nfcIndices.contains(nfcIndex)) {
-                led = ledPlatform
-            }
-        }
-        return led
-    }
-    
-    func updatePresence(_ ledPlatform: Message.LedPlatform, nfcIndex: UInt8) {
-        presence[ledPlatform] = presence[ledPlatform] ?? [UInt8]() //Define if not already defined
-        if var nfcIndicies = presence[ledPlatform] {
-            nfcIndicies.append(nfcIndex)
-        }
-    }
-    
-    func removePresence(_ ledPlatform: Message.LedPlatform, nfcIndex: UInt8) {
-        presence[ledPlatform] = presence[ledPlatform] ?? [UInt8]() //Define if not already defined
-        if var nfcIndicies = presence[ledPlatform] {
-            if let nfcFound = nfcIndicies.index(of: nfcIndex) {
-                nfcIndicies.remove(at: nfcFound)
-            }
-        }        
-    }
-    
     func tokenRead(_ response: ReadResponse) {
         if response.blockData.count == 0 {
             print("Empty (no data) ReadResponse")
@@ -142,7 +116,7 @@ class PortalDriver : NSObject {
         if let token = encryptedTokens[response.nfcIndex] {
             token.load(response.blockNumber, blockData: response.blockData)
             if (token.complete()) {
-                let ledPlatform = ledPlatformOfNfcIndex(response.nfcIndex)
+                let ledPlatform = presence[response.nfcIndex]?.platform ?? .none
                 portal.outputCommand(LightOnCommand(ledPlatform: ledPlatform, color: NSColor.green))
                 DispatchQueue.main.async(execute: {
                     for callback in self.loadTokenCallbacks {
