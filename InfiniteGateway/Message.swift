@@ -45,6 +45,7 @@ class Message : CustomStringConvertible {
     
     enum Sak : UInt8 {
         case mifareUltralight = 0x00
+        case mifareTNP3xxx = 0x01
         case mifareClassic1k = 0x08
         case mifareMini = 0x09
         case mifareClassic4k = 0x18

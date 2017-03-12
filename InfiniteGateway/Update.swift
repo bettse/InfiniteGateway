@@ -34,6 +34,9 @@ class Update : Message {
         sak = Message.Sak(rawValue: data[sakIndex]) ?? .unknown
         nfcIndex = data[nfcIndexIndex]
         direction = Update.Direction(rawValue: data[directionIndex]) ?? .unknown
+        if (sak == .unknown) {
+            print("Unknown sak: \(data[sakIndex])")
+        }
     }
     
     override var description: String {
