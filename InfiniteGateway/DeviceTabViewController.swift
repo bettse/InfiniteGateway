@@ -19,7 +19,7 @@ class DeviceTabViewController: NSViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        nfcTable!.register(NSNib(nibNamed: "TokenCellView", bundle: nil), forIdentifier: "TokenCellView")
+        self.nfcTable?.register(NSNib(nibNamed: "TokenCellView", bundle: nil), forIdentifier: "TokenCellView")
 
         // Do any additional setup after loading the view.
         status?.stringValue = "Portal Disconnected"
@@ -47,14 +47,24 @@ class DeviceTabViewController: NSViewController {
     
     
     override func prepare(for segue: NSStoryboardSegue, sender: Any?) {
-        if (segue.identifier == "TokenDetail") {
-            if let tokenDetailViewController = segue.destinationController as? TokenDetailViewController {
-                if let table = nfcTable {
-                    if let token = nfcMap[table.selectedRow] {
-                        tokenDetailViewController.representedObject = token
-                    }
+        switch (segue.identifier!) {
+            case "TokenDetail":
+                guard let table = nfcTable else {
+                    print("No nfcTable")
+                    return
                 }
-            }
+                guard let token = nfcMap[table.selectedRow] else {
+                    print("No selected token")
+                    return
+                }
+                guard let tokenDetailViewController = segue.destinationController as? TokenDetailViewController  else {
+                    print("No tokenDetailViewController")
+                    return
+                }
+                tokenDetailViewController.representedObject = token
+                break
+        default:
+            print("Unhandled segue: \(segue.identifier)")
         }
     }
     

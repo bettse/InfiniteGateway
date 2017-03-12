@@ -57,13 +57,20 @@ class LibraryTabViewController: NSViewController {
     }
 
     override func prepare(for segue: NSStoryboardSegue, sender: Any?) {
-        if (segue.identifier == "TokenDetail") {
-            if let tokenDetailViewController = segue.destinationController as? TokenDetailViewController {
-                if let table = libraryTable {
-                    let token = fileList[table.selectedRow]
-                    tokenDetailViewController.representedObject = token
-                }
+        switch (segue.identifier!) {
+        case "TokenDetail":
+            guard let table = libraryTable else {
+                print("No libraryTable")
+                return
             }
+            guard let tokenDetailViewController = segue.destinationController as? TokenDetailViewController  else {
+                print("No tokenDetailViewController")
+                return
+            }
+            tokenDetailViewController.representedObject = fileList[table.selectedRow]
+            break
+        default:
+            print("Unhandled segue: \(segue.identifier)")
         }
     }
 
