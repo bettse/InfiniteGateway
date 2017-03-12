@@ -71,9 +71,9 @@ class PortalDriver : NSObject {
     
     func incomingResponse(_ response: Response) {
         if let _ = response as? ActivateResponse {
-            portal.outputCommand(LightOnCommand(ledPlatform: .all, color: NSColor.black))
-            //experiment()
+            portal.outputCommand(PresenceCommand())
         } else if let response = response as? PresenceResponse {
+            portal.outputCommand(LightOnCommand(ledPlatform: .all, color: NSColor.black))
             for (ledPlatform, nfcIndicies) in response.details {
                 let temp = presence[ledPlatform] ?? [UInt8]() //Define if not already defined
                 presence[ledPlatform] = temp + nfcIndicies
@@ -94,7 +94,7 @@ class PortalDriver : NSObject {
         } else if let _ = response as? LightFlashResponse {
         } else if let response = response as? B9Response {
             let lastValue = response.value
-            print("\(String(lastValue, radix: 0x10)): \(response.params.toHexString())")
+            print("\(String(lastValue, radix: 0x10)): \(response.params.spacedHexString)")
             if (lastValue < 0xFF) {
                 self.portal.outputCommand(B9Command(value: lastValue+1))
             }
