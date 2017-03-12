@@ -54,10 +54,12 @@ class PortalDriver : NSObject {
         print(update)
         var updateColor : NSColor = NSColor()
         if (update.direction == Update.Direction.arriving) {
-            // We don't call loadTokenCallbacks until token data is read
+            // NB: We don't call loadTokenCallbacks until token data is read
             updateColor = NSColor.white
             updatePresence(update.ledPlatform, nfcIndex: update.nfcIndex)
-            portal.outputCommand(TagIdCommand(nfcIndex: update.nfcIndex))
+            if update.sak == .mifareMini {                
+                portal.outputCommand(TagIdCommand(nfcIndex: update.nfcIndex))
+            }
         } else if (update.direction == Update.Direction.departing) {
             updateColor = NSColor.black
             removePresence(update.ledPlatform, nfcIndex: update.nfcIndex)

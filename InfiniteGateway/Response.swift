@@ -123,9 +123,9 @@ class PresenceResponse : Response {
     override init(data: Data) {
         super.init(data: data)
         for i in stride(from: 0, to: params.count, by: 2) {
-            let led : LedPlatform = LedPlatform(rawValue: params[i+platformOffset].high_nibble)!
+            let led : LedPlatform = LedPlatform(rawValue: params[i+platformOffset].high_nibble) ?? .none
             let nfc = params[i+nfcIndexOffset].low_nibble
-            let sak : Sak = Sak(rawValue: params[i+sakOffset])!
+            let sak : Sak = Sak(rawValue: params[i+sakOffset]) ?? .unknown
             details.append(Detail(nfcIndex: nfc, platform: led, sak: sak))
         }
         

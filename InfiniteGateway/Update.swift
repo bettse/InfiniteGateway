@@ -17,6 +17,7 @@ class Update : Message {
     enum Direction : UInt8 {
         case arriving = 0
         case departing = 1
+        case unknown = 0xff
         func desc() -> String {
             return String(describing: self)
         }
@@ -26,13 +27,13 @@ class Update : Message {
     var ledPlatform : LedPlatform = .none
     var nfcIndex : UInt8 = 0
     var sak : Sak = .unknown
-    var direction : Direction = .arriving
+    var direction : Direction = .unknown
     
     init(data: Data) {
-        ledPlatform = Message.LedPlatform(rawValue: data[ledPlatformIndex])!
-        sak = Message.Sak(rawValue: data[sakIndex])!
+        ledPlatform = Message.LedPlatform(rawValue: data[ledPlatformIndex]) ?? .none
+        sak = Message.Sak(rawValue: data[sakIndex]) ?? .unknown
         nfcIndex = data[nfcIndexIndex]
-        direction = Update.Direction(rawValue: data[directionIndex])!
+        direction = Update.Direction(rawValue: data[directionIndex]) ?? .unknown
     }
     
     override var description: String {
