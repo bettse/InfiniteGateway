@@ -91,6 +91,7 @@ class TagIdResponse : Response {
             return 0
         }
     }
+    
     var tagId : Data
     
     override init(data: Data) {
@@ -105,31 +106,35 @@ class TagIdResponse : Response {
 }
 
 
+struct Detail {
+    var nfcIndex : UInt8 = 0
+    var platform : Message.LedPlatform = .none
+    var sak : Message.Sak = .unknown
+}
+
 class PresenceResponse : Response {
-    var details = Dictionary<Message.LedPlatform, Array<UInt8>>()
+    // Pairs of bytes for each token
+    let platformOffset = 0 // high nibble
+    let nfcIndexOffset = 0 // low nibble
+    let sakOffset = 1
+
+    var details = Array<Detail>()
     
     override init(data: Data) {
-        let bytes = [UInt8](data)
-        for i in 1..<data.count {
-            if (bytes[i] != 0x09) {
-                let led = LedPlatform(rawValue: bytes[i].high_nibble) as LedPlatform!
-                let nfc = bytes[i].low_nibble
-                details[led!] = details[led!] ?? [UInt8]() //Define if not already defined
-                details[led!]!.append(nfc)
-            }
-        }
         super.init(data: data)
+        for i in stride(from: 0, to: params.count, by: 2) {
+            let led : LedPlatform = LedPlatform(rawValue: params[i+platformOffset].high_nibble)!
+            let nfc = params[i+nfcIndexOffset].low_nibble
+            let sak : Sak = Sak(rawValue: params[i+sakOffset])!
+            details.append(Detail(nfcIndex: nfc, platform: led, sak: sak))
+        }
+        
     }
     
     override var description: String {
         let me = String(describing: type(of: self)).components(separatedBy: ".").last!
         return "\(me)(\(details))"
     }
-    
-    func asHex(_ value : UInt8) -> String {
-        return "0x\(String(value, radix:0x10))"
-    }
-    
 }
 
 class ReadResponse : Response {

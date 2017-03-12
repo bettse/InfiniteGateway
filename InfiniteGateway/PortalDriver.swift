@@ -54,6 +54,7 @@ class PortalDriver : NSObject {
         print(update)
         var updateColor : NSColor = NSColor()
         if (update.direction == Update.Direction.arriving) {
+            // We don't call loadTokenCallbacks until token data is read
             updateColor = NSColor.white
             updatePresence(update.ledPlatform, nfcIndex: update.nfcIndex)
             portal.outputCommand(TagIdCommand(nfcIndex: update.nfcIndex))
@@ -74,15 +75,16 @@ class PortalDriver : NSObject {
             portal.outputCommand(PresenceCommand())
         } else if let response = response as? PresenceResponse {
             portal.outputCommand(LightOnCommand(ledPlatform: .all, color: NSColor.black))
-            for (ledPlatform, nfcIndicies) in response.details {
-                let temp = presence[ledPlatform] ?? [UInt8]() //Define if not already defined
-                presence[ledPlatform] = temp + nfcIndicies
-                for nfcIndex in nfcIndicies { //Get data for existing tokens
-                    portal.outputCommand(TagIdCommand(nfcIndex: nfcIndex))
+            for detail in response.details {
+                presence[detail.platform] = presence[detail.platform] ?? [UInt8]() //Define if not already defined
+                presence[detail.platform]?.append(detail.nfcIndex)
+                if (detail.sak == .mifareMini) {
+                    portal.outputCommand(TagIdCommand(nfcIndex: detail.nfcIndex))
                 }
             }
         } else if let response = response as? TagIdResponse {
             encryptedTokens[response.nfcIndex] = EncryptedToken(tagId: response.tagId)
+
             let report = Report(cmd: ReadCommand(nfcIndex: response.nfcIndex, block: 0))
             portal.output(report)
         } else if let response = response as? ReadResponse {
