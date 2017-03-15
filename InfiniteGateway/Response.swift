@@ -58,6 +58,8 @@ class Response : Message {
             return SeedResponse(data: data)
         case .next:
             return NextResponse(data: data)
+        case .b1:
+            return B1Response(data: data)
         case .b9:
             return B9Response(data: data)
         case .c1:
@@ -70,14 +72,14 @@ class Response : Message {
     
     override var description: String {
         let me = String(describing: type(of: self)).components(separatedBy: ".").last!
-        return "\(me)(\(type.desc()): \(params.toHexString())"
+        return "\(me)(\(type.desc()): \(params.toHexString()))"
     }
 }
 
 class ActivateResponse : Response {
     override var description: String {
         let me = String(describing: type(of: self)).components(separatedBy: ".").last!
-        return "\(me)(\(params))"
+        return "\(me)(\(params.toHexString()))"
     }
 }
 
@@ -101,7 +103,7 @@ class TagIdResponse : Response {
 
     override var description: String {
         let me = String(describing: type(of: self)).components(separatedBy: ".").last!
-        return "\(me)(NFC #\(nfcIndex): \(tagId))"
+        return "\(me)(NFC #\(nfcIndex): \(tagId.toHexString()))"
     }
 }
 
@@ -224,6 +226,31 @@ class LightFadeResponse : Response {
 class LightFlashResponse : Response {
 }
 
+class B1Response : Response {
+    var value1 : UInt8  {
+        get {
+            if let command = command as? B1Command {
+                return command.value1
+            }
+            return 0
+        }
+    }
+    
+    var value2 : UInt8  {
+        get {
+            if let command = command as? B1Command {
+                return command.value2
+            }
+            return 0
+        }
+    }
+    
+    override var description: String {
+        let me = String(describing: type(of: self)).components(separatedBy: ".").last!
+        return "\(me)[\(command.params.toHexString()): \(params.toHexString())]"
+    }
+}
+
 class B9Response : Response {
     var value : UInt8  {
         get {
@@ -235,8 +262,8 @@ class B9Response : Response {
     }
     
     override var description: String {
-        let me = String(describing: type(of: self)).components(separatedBy: ".").last!
-        return "\(me)[\(params.toHexString())]"
+        let me = String(describing: type(of: self)).components(separatedBy: ".").last!    
+        return "\(me)[\(command.params.toHexString()): \(params.subdata(in: 0..<16).spacedHexString)]"
     }
 }
 
