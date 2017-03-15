@@ -248,6 +248,40 @@ class Light99 : Command {
     }
 }
 
+
+class B1Command : Command {
+    var nfcIndex : UInt8 = 0
+    var value2 : UInt8 = 0
+    
+    init(nfcIndex: UInt8, value2: UInt8) {
+        super.init()
+        self.nfcIndex = nfcIndex
+        self.value2 = value2
+        type = .b1
+        params = Data(bytes: [nfcIndex, value2])
+    }
+}
+
+class B8Command : Command {
+    var value : UInt8 = 0
+    
+    init(value: UInt8) {
+        super.init()
+        self.value = value
+        type = .b8
+        let content = Data(bytes: [UInt8](repeating: value, count: 24))
+        var start = Data(bytes: [0x2b])
+        start.append(content)
+        params = start
+    }
+    
+    override var description: String {
+        let me = String(describing: type(of: self)).components(separatedBy: ".").last!
+        return "\(me)(\(type.desc()): \(params.toHexString()))"
+    }
+}
+
+
 class B9Command : Command {
     var value : UInt8 = 0
 
@@ -277,19 +311,6 @@ class BeCommand : Command {
     override var description: String {
         let me = String(describing: type(of: self)).components(separatedBy: ".").last!
         return "\(me)(\(type.desc()): \(params.toHexString()))"
-    }
-}
-
-class B1Command : Command {
-    var nfcIndex : UInt8 = 0
-    var value2 : UInt8 = 0
-    
-    init(nfcIndex: UInt8, value2: UInt8) {
-        super.init()
-        self.nfcIndex = nfcIndex
-        self.value2 = value2
-        type = .b1
-        params = Data(bytes: [nfcIndex, value2])
     }
 }
 

@@ -60,6 +60,8 @@ class Response : Message {
             return NextResponse(data: data)
         case .b1:
             return B1Response(data: data)
+        case .b8:
+            return B8Response(data: data)
         case .b9:
             return B9Response(data: data)
         case .c1:
@@ -251,6 +253,23 @@ class B1Response : Response {
     }
 }
 
+class B8Response : Response {
+    var value : UInt8  {
+        get {
+            if let command = command as? B8Command {
+                return command.value
+            }
+            return 0
+        }
+    }
+    
+    override var description: String {
+        let me = String(describing: type(of: self)).components(separatedBy: ".").last!
+        return "\(me)[\(command.params.toHexString()): \(params.toHexString())]"
+    }
+}
+
+
 class B9Response : Response {
     var value : UInt8  {
         get {
@@ -263,7 +282,7 @@ class B9Response : Response {
     
     override var description: String {
         let me = String(describing: type(of: self)).components(separatedBy: ".").last!    
-        return "\(me)[\(command.params.toHexString()): \(params.subdata(in: 0..<16).spacedHexString)]"
+        return "\(me)[\(command.params.toHexString()): \(params.toHexString())]"
     }
 }
 

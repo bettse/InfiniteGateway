@@ -73,7 +73,7 @@ class PortalDriver : NSObject {
     func incomingResponse(_ response: Response) {
         if let _ = response as? ActivateResponse {
             //portal.outputCommand(PresenceCommand())
-            portal.outputCommand(C2Command(value: 0x00))
+            portal.outputCommand(B8Command(value: 0xAA))
         } else if let response = response as? PresenceResponse {
             portal.outputCommand(LightOnCommand(ledPlatform: .all, color: NSColor.black))
             for detail in response.details {
@@ -101,18 +101,13 @@ class PortalDriver : NSObject {
             if value2 < 0xff {
                 self.portal.outputCommand(B1Command(nfcIndex: response.nfcIndex, value2: value2 + 1))
             }
-        } else if let response = response as? B9Response {
+        } else if let response = response as? B8Response {
             print(response)
-            let lastValue = response.value
-            if lastValue < 0x30 {
-                if #available(OSX 10.12, *) {
-                    Timer.scheduledTimer(withTimeInterval: 0.1, repeats: false, block: { (timer) in
-                        self.portal.outputCommand(B9Command(value: lastValue+1))
-                    })
-                }
-            }
+            self.portal.outputCommand(B9Command(value: 0x2b))
+        } else if let response = response as? B9Response {
+            print(response)            
         } else if let _ = response as? C1Response {
-            print("Received \(response) for command \(response.command)")
+            print(response)
             self.portal.outputCommand(C0Command())
         } else {
             print("Received \(response) for command \(response.command)")

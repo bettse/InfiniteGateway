@@ -29,6 +29,7 @@ class Message : CustomStringConvertible {
         case write = 0xA3
         case tagId = 0xB4
         case b1 = 0xb1
+        case b8 = 0xb8
         case b9 = 0xb9
         case be = 0xbe
         case c0 = 0xc0
