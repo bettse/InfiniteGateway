@@ -73,7 +73,7 @@ class PortalDriver : NSObject {
     func incomingResponse(_ response: Response) {
         if let _ = response as? ActivateResponse {
             //portal.outputCommand(PresenceCommand())
-            experiment()
+            portal.outputCommand(C2Command(value: 0x00))
         } else if let response = response as? PresenceResponse {
             portal.outputCommand(LightOnCommand(ledPlatform: .all, color: NSColor.black))
             for detail in response.details {
@@ -87,6 +87,7 @@ class PortalDriver : NSObject {
             if (detail?.sak == .mifareMini) {
                 portal.outputCommand(ReadCommand(nfcIndex: response.nfcIndex, block: 0))
             }
+            self.portal.outputCommand(B1Command(nfcIndex: 0x00, value2: 0x01))
         } else if let response = response as? ReadResponse {
             tokenRead(response)
         } else if let response = response as? WriteResponse {
@@ -96,12 +97,9 @@ class PortalDriver : NSObject {
         } else if let _ = response as? LightFlashResponse {
         } else if let response = response as? B1Response {
             print(response)
-            let lastValue1 = response.value1
-            let lastValue2 = response.value2
-            if lastValue1 < 0xff {
-                self.portal.outputCommand(B1Command(value1: lastValue1 + 1, value2: lastValue2))
-            } else if lastValue2 < 0xff {
-                self.portal.outputCommand(B1Command(value1: 0x00, value2: lastValue2 + 1))
+            let value2 = response.value2
+            if value2 < 0xff {
+                self.portal.outputCommand(B1Command(nfcIndex: response.nfcIndex, value2: value2 + 1))
             }
         } else if let response = response as? B9Response {
             print(response)
@@ -159,9 +157,7 @@ class PortalDriver : NSObject {
         //self.portal.outputCommand(BeCommand(value: test))
         //self.portal.outputCommand(C1Command(value: test))
         //self.portal.outputCommand(C0Command())
-        var test : UInt8 = 0
-        
-        self.portal.outputCommand(B1Command(value1: 0x00, value2: 0x00))
+        //var test : UInt8 = 0
         
         /*
         if #available(OSX 10.12, *) {

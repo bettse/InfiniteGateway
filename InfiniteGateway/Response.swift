@@ -227,10 +227,10 @@ class LightFlashResponse : Response {
 }
 
 class B1Response : Response {
-    var value1 : UInt8  {
+    var nfcIndex : UInt8  {
         get {
             if let command = command as? B1Command {
-                return command.value1
+                return command.nfcIndex
             }
             return 0
         }

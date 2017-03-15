@@ -281,15 +281,15 @@ class BeCommand : Command {
 }
 
 class B1Command : Command {
-    var value1 : UInt8 = 0
+    var nfcIndex : UInt8 = 0
     var value2 : UInt8 = 0
     
-    init(value1: UInt8, value2: UInt8) {
+    init(nfcIndex: UInt8, value2: UInt8) {
         super.init()
-        self.value1 = value1
+        self.nfcIndex = nfcIndex
         self.value2 = value2
         type = .b1
-        params = Data(bytes: [value2, value1])
+        params = Data(bytes: [nfcIndex, value2])
     }
 }
 
@@ -308,6 +308,22 @@ class C1Command : Command {
         self.value = value
         type = .c1
         params = Data(bytes: [value])
+    }
+    
+    override var description: String {
+        let me = String(describing: type(of: self)).components(separatedBy: ".").last!
+        return "\(me)(\(type.desc()): \(params.toHexString()))"
+    }
+}
+
+class C2Command : Command {
+    var value : UInt8 = 0
+    
+    init(value: UInt8) {
+        super.init()
+        self.value = value
+        type = .c2
+        params = Data(bytes: [UInt8](repeating: value, count: 17))
     }
     
     override var description: String {
