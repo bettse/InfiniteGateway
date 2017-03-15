@@ -20,10 +20,15 @@ class Message : CustomStringConvertible {
         case lightOn = 0x90
         case lightFade = 0x92
         case lightFlash = 0x93
+        case light95 = 0x95
+        case light96 = 0x96
+        case light97 = 0x97
+        case light99 = 0x99
         case presence = 0xA1
         case read = 0xA2
         case write = 0xA3
         case tagId = 0xB4
+        case b1 = 0xb1
         case b9 = 0xb9
         case be = 0xbe
         case c0 = 0xc0

@@ -240,6 +240,14 @@ class LightFlashCommand : Command {
 
 }
 
+class Light99 : Command {
+    override init() {
+        super.init()
+        type = .light99
+        params = Data(bytes: [0x00, 0x09, 0x00, 0x64, 0x01])
+    }
+}
+
 class B9Command : Command {
     var value : UInt8 = 0
 
@@ -269,6 +277,19 @@ class BeCommand : Command {
     override var description: String {
         let me = String(describing: type(of: self)).components(separatedBy: ".").last!
         return "\(me)(\(type.desc()): \(params.toHexString()))"
+    }
+}
+
+class B1Command : Command {
+    var value1 : UInt8 = 0
+    var value2 : UInt8 = 0
+    
+    init(value1: UInt8, value2: UInt8) {
+        super.init()
+        self.value1 = value1
+        self.value2 = value2
+        type = .b1
+        params = Data(bytes: [value2, value1])
     }
 }
 
