@@ -57,9 +57,7 @@ class PortalDriver : NSObject {
             // NB: We don't call loadTokenCallbacks until token data is read
             updateColor = NSColor.white
             presence[update.nfcIndex] = Detail(nfcIndex: update.nfcIndex, platform: update.ledPlatform, sak: update.sak)
-            if update.sak == .mifareMini {                
-                portal.outputCommand(TagIdCommand(nfcIndex: update.nfcIndex))
-            }
+            portal.outputCommand(TagIdCommand(nfcIndex: update.nfcIndex))
         } else if (update.direction == Update.Direction.departing) {
             updateColor = NSColor.black
             presence.removeValue(forKey: update.nfcIndex)
@@ -74,19 +72,21 @@ class PortalDriver : NSObject {
     
     func incomingResponse(_ response: Response) {
         if let _ = response as? ActivateResponse {
-            portal.outputCommand(PresenceCommand())
+            //portal.outputCommand(PresenceCommand())
+            experiment()
         } else if let response = response as? PresenceResponse {
             portal.outputCommand(LightOnCommand(ledPlatform: .all, color: NSColor.black))
             for detail in response.details {
                 presence[detail.nfcIndex] = detail
-                if (detail.sak == .mifareMini) {
-                    portal.outputCommand(TagIdCommand(nfcIndex: detail.nfcIndex))
-                }
+                portal.outputCommand(TagIdCommand(nfcIndex: detail.nfcIndex))
             }
         } else if let response = response as? TagIdResponse {
+            print(response)
             encryptedTokens[response.nfcIndex] = EncryptedToken(tagId: response.tagId)
-            let report = Report(cmd: ReadCommand(nfcIndex: response.nfcIndex, block: 0))
-            portal.output(report)
+            let detail = presence[response.nfcIndex]            
+            if (detail?.sak == .mifareMini) {
+                portal.outputCommand(ReadCommand(nfcIndex: response.nfcIndex, block: 0))
+            }
         } else if let response = response as? ReadResponse {
             tokenRead(response)
         } else if let response = response as? WriteResponse {
@@ -94,11 +94,24 @@ class PortalDriver : NSObject {
         } else if let _ = response as? LightOnResponse {
         } else if let _ = response as? LightFadeResponse {
         } else if let _ = response as? LightFlashResponse {
+        } else if let response = response as? B1Response {
+            print(response)
+            let lastValue1 = response.value1
+            let lastValue2 = response.value2
+            if lastValue1 < 0xff {
+                self.portal.outputCommand(B1Command(value1: lastValue1 + 1, value2: lastValue2))
+            } else if lastValue2 < 0xff {
+                self.portal.outputCommand(B1Command(value1: 0x00, value2: lastValue2 + 1))
+            }
         } else if let response = response as? B9Response {
+            print(response)
             let lastValue = response.value
-            print("\(String(lastValue, radix: 0x10)): \(response.params.spacedHexString)")
-            if (lastValue < 0xFF) {
-                self.portal.outputCommand(B9Command(value: lastValue+1))
+            if lastValue < 0x30 {
+                if #available(OSX 10.12, *) {
+                    Timer.scheduledTimer(withTimeInterval: 0.1, repeats: false, block: { (timer) in
+                        self.portal.outputCommand(B9Command(value: lastValue+1))
+                    })
+                }
             }
         } else if let _ = response as? C1Response {
             print("Received \(response) for command \(response.command)")
@@ -143,20 +156,18 @@ class PortalDriver : NSObject {
     }
 
     func experiment() {
-        let test : UInt8 = 0x00
-        
-        self.portal.outputCommand(B9Command(value: test))
         //self.portal.outputCommand(BeCommand(value: test))
         //self.portal.outputCommand(C1Command(value: test))
         //self.portal.outputCommand(C0Command())
+        var test : UInt8 = 0
         
+        self.portal.outputCommand(B1Command(value1: 0x00, value2: 0x00))
         
         /*
         if #available(OSX 10.12, *) {
             Timer.scheduledTimer(withTimeInterval: 1.0, repeats: true, block: { (timer) in
-                self.portal.outputCommand(B9Command(value: test))
-                
-                if test > 0xfe {
+                self.portal.outputCommand(B1Command(value1: 0x00, value2: test))
+                if test > 0x10 {
                     timer.invalidate()
                 }
                 test = test + 1
