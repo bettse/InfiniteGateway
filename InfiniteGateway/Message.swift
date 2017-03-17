@@ -28,6 +28,10 @@ class Message : CustomStringConvertible {
         case read = 0xA2
         case write = 0xA3
         case tagId = 0xB4
+        case a4 = 0xa4
+        case a5 = 0xa5
+        case a6 = 0xa6
+        case a7 = 0xa7
         case b1 = 0xb1
         case b8 = 0xb8
         case b9 = 0xb9
