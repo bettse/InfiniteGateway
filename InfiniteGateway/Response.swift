@@ -142,8 +142,9 @@ class PresenceResponse : Response {
 }
 
 class ReadResponse : Response {
+    let statusIndex = 1
     let blockDataIndex = 2
-
+    var status : Status
     var blockData : Data
     
     //Delegates for easier access
@@ -165,13 +166,22 @@ class ReadResponse : Response {
     }
     
     override init(data: Data) {
-        blockData = data.subdata(in: blockDataIndex..<data.count)
+        status = Status(rawValue: data[statusIndex]) ?? .unknown
+        if (status == .success) {
+            blockData = data.subdata(in: blockDataIndex..<data.count)
+        } else {
+            blockData = Data()
+        }
         super.init(data: data)
     }
     
     override var description: String {
         let me = String(describing: type(of: self)).components(separatedBy: ".").last!
-        return "\(me)(Platform \(nfcIndex) block \(blockNumber): \(blockData.toHexString()))"
+        if (status == .success) {
+            return "\(me)(index \(nfcIndex) block \(blockNumber): \(blockData.toHexString()))"
+        } else {
+            return "\(me)(index \(nfcIndex) block \(blockNumber): Error: \(status))"
+        }
     }
 }
 
