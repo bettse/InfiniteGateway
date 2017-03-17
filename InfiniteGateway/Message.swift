@@ -60,6 +60,16 @@ class Message : CustomStringConvertible {
         case unknown = 0xFF //Not standard
     }
     
+    enum Status : UInt8 {
+        case success = 0x00
+        case missingToken = 0x80
+        case unsupportedToken = 0x82
+        case maybeReadFail = 0x83
+        case maybeWriteFail = 0x84
+        case status86 = 0x86
+        case unknown = 0xff
+    }
+    
     static var archive = [UInt8: Message]()
     
     var description: String {
