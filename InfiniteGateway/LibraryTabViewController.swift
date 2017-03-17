@@ -62,17 +62,17 @@ class LibraryTabViewController: NSViewController {
         switch (segue.identifier!) {
         case "TokenDetail":
             guard let table = libraryTable else {
-                print("No libraryTable")
+                log.error("No libraryTable")
                 return
             }
             guard let tokenDetailViewController = segue.destinationController as? TokenDetailViewController  else {
-                print("No tokenDetailViewController")
+                log.error("No tokenDetailViewController")
                 return
             }
             tokenDetailViewController.representedObject = fileList[table.selectedRow]
             break
         default:
-            print("Unhandled segue: \(segue.identifier)")
+            log.error("Unhandled segue: \(segue.identifier)")
         }
     }
 

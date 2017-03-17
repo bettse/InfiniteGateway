@@ -16,8 +16,11 @@ let log = SwiftyBeaver.self
 class AppDelegate: NSObject, NSApplicationDelegate {
     var portadDriver : PortalDriver = PortalDriver.singleton
     
+    
     func applicationDidFinishLaunching(_ aNotification: Notification) {
         // Insert code here to initialize your application
+        let console = ConsoleDestination()  // log to Xcode Console
+        log.addDestination(console)
     }
 
     func applicationWillTerminate(_ aNotification: Notification) {

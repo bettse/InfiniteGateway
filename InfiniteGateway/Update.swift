@@ -35,10 +35,13 @@ class Update : Message {
         sak = Message.Sak(rawValue: data[sakIndex]) ?? .unknown
         nfcIndex = data[nfcIndexIndex]
         direction = Update.Direction(rawValue: data[directionIndex]) ?? .unknown
-        if (sak == .unknown) {
-            print("Unknown sak: \(data[sakIndex])")
-        }
         detail = Detail(nfcIndex: nfcIndex, platform: ledPlatform, sak: sak)
+
+        //Set to a local so we don't need to reference 'self'
+        let rawSak = data[sakIndex]
+        if (sak == .unknown) {
+            log.warning("Unknown sak: \(rawSak)")
+        }
     }
     
     override var description: String {

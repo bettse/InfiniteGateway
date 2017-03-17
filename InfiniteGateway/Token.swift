@@ -89,7 +89,7 @@ class Token : MifareMini, CustomStringConvertible {
             let offset = blockNumber * MifareMini.blockSize + blockIndex
             let value = data.subdata(in: offset..<data.count).uint16
             if (value != Token.DiConstant) {
-                print("DiConstant was \(value) when it should be \(Token.DiConstant)")
+                log.warning("DiConstant was \(value) when it should be \(Token.DiConstant)")
             }
             return value
         }
@@ -336,7 +336,7 @@ class Token : MifareMini, CustomStringConvertible {
                 blockDataWithChecksum.append(checksumResult)
                 load(blockNumber, blockData: blockDataWithChecksum)
             } else {
-                print("Calculated checksum \(checksumResult.toHexString()) but tag had \(existingChecksum.toHexString() )")
+                log.warning("Calculated checksum \(checksumResult.toHexString()) but tag had \(existingChecksum.toHexString() )")
             }
         }
         return valid
@@ -345,7 +345,7 @@ class Token : MifareMini, CustomStringConvertible {
     func correctChecksum(_ blockNumber: Int) {
         let blockData = block(blockNumber)
         if (!verifyChecksum(blockData, blockNumber: blockNumber, update: true)) {
-            print("Correcting bad checksum of block \(blockNumber)")
+            log.info("Correcting bad checksum of block \(blockNumber)")
         }
     }
     

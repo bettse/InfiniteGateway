@@ -50,21 +50,21 @@ class DeviceTabViewController: NSViewController {
         switch (segue.identifier!) {
             case "TokenDetail":
                 guard let table = nfcTable else {
-                    print("No nfcTable")
+                    log.error("No nfcTable")
                     return
                 }
                 guard let token = nfcMap[table.selectedRow] else {
-                    print("No selected token")
+                    log.error("No selected token")
                     return
                 }
                 guard let tokenDetailViewController = segue.destinationController as? TokenDetailViewController  else {
-                    print("No tokenDetailViewController")
+                    log.error("No tokenDetailViewController")
                     return
                 }
                 tokenDetailViewController.representedObject = token
                 break
         default:
-            print("Unhandled segue: \(segue.identifier)")
+            log.error("Unhandled segue: \(segue.identifier)")
         }
     }
     

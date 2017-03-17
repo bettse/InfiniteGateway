@@ -21,7 +21,7 @@ class EncryptedToken : MifareMini {
             prekey.append(PortalDriver.magic)
             prekey.append(tagId)
             if (prekey.count != 38) {
-                print("Pre-hashed key wasn't of the correct length")
+                log.error("Pre-hashed key wasn't of the correct length")
                 return Data()
             }
             
@@ -40,7 +40,7 @@ class EncryptedToken : MifareMini {
                 if(clearToken.verifyChecksum(clearBlock, blockNumber: blockNumber)) {
                     clearToken.load(blockNumber, blockData: clearBlock)
                 } else {
-                    print("Could not load block \(blockNumber) due to failed checksum")
+                    log.error("Could not load block \(blockNumber) due to failed checksum")
                     return nil
                 }
             }
@@ -91,7 +91,7 @@ class EncryptedToken : MifareMini {
     
     func commonCrypt(_ blockNumber: Int, blockData: Data, encrypt: Bool) -> Data {
         if (blockData.count != MifareMini.blockSize) {
-            print("blockData must be exactly \(MifareMini.blockSize) bytes")
+            log.error("blockData must be exactly \(MifareMini.blockSize) bytes")
             return blockData
         }
         
@@ -108,7 +108,7 @@ class EncryptedToken : MifareMini {
             newBytes = try! aes.decrypt([UInt8](blockData))
         }
         if (newBytes.count != MifareMini.blockSize) {
-            print("Number of bytes after encryption/decryption was \(newBytes.count), but will be truncated")
+            log.error("Number of bytes after encryption/decryption was \(newBytes.count), but will be truncated")
         }
         return Data(newBytes).subdata(in: 0..<MifareMini.blockSize)
     }

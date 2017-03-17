@@ -19,7 +19,7 @@ class Portal : NSObject {
     
     func input(_ inResult: IOReturn, inSender: UnsafeMutableRawPointer, type: IOHIDReportType, reportId: UInt32, report: UnsafeMutablePointer<UInt8>, reportLength: CFIndex) {
         let raw = Data(bytes: report, count: reportLength)
-        //print("<= \(raw.toHexString())")
+        log.verbose("<= \(raw.toHexString())")
         let report = Report(data: raw)
         if let msg = report.content {
             DispatchQueue.main.async(execute: {
@@ -31,11 +31,11 @@ class Portal : NSObject {
     func output(_ data: Data) {
         let reportId : CFIndex = 0
         if (data.count > reportSize) {
-            print("output data too large for USB report")
+            log.error("output data too large for USB report")
             return
         }
         if let portal = device {
-            //print("=> \(data.toHexString())")
+            log.verbose("=> \(data.toHexString())")
             IOHIDDeviceSetReport(portal, kIOHIDReportTypeOutput, reportId, [UInt8](data), data.count);
         }
     }

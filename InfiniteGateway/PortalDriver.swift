@@ -51,7 +51,7 @@ class PortalDriver : NSObject {
     }
     
     func incomingUpdate(_ update: Update) {
-        print(update)
+        log.debug(update)
         var updateColor : NSColor = NSColor()
         if (update.direction == Update.Direction.arriving) {
             // NB: We don't call loadTokenCallbacks until token data is read
@@ -80,38 +80,38 @@ class PortalDriver : NSObject {
                 portal.outputCommand(TagIdCommand(nfcIndex: detail.nfcIndex))
             }
         } else if let response = response as? TagIdResponse {
-            print(response)
+            log.debug(response)
             encryptedTokens[response.nfcIndex] = EncryptedToken(tagId: response.tagId)
             let detail = presence[response.nfcIndex]            
             if (detail?.sak == .mifareMini) {
                 portal.outputCommand(ReadCommand(nfcIndex: response.nfcIndex, block: 0))
             }
         } else if let response = response as? ReadResponse {
-            print(response)
+            log.debug(response)
             if (response.status == .success) {
                 tokenRead(response)
             }
         } else if let response = response as? WriteResponse {
-            print(response)
+            log.debug(response)
         } else if let _ = response as? LightOnResponse {
         } else if let _ = response as? LightFadeResponse {
         } else if let _ = response as? LightFlashResponse {
         } else if let response = response as? B1Response {
-            print(response)
+            log.debug(response)
             let value2 = response.value2
             if value2 < 0xff {
                 self.portal.outputCommand(B1Command(nfcIndex: response.nfcIndex, value2: value2 + 1))
             }
         } else if let response = response as? B8Response {
-            print(response)
+            log.debug(response)
             self.portal.outputCommand(B9Command(value: 0x2b))
         } else if let response = response as? B9Response {
-            print(response)            
+            log.debug(response)
         } else if let _ = response as? C1Response {
-            print(response)
+            log.debug(response)
             self.portal.outputCommand(C0Command())
         } else {
-            print("Received \(response) for command \(response.command)")
+            log.debug("Received \(response) for command \(response.command)")
         }
     }
 

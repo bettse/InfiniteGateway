@@ -66,7 +66,7 @@ class Report {
         case .command:
             content = Command(data: c)
         default:
-            print("Report type \(String(type.rawValue, radix:0x10)) len:\(length) checksum:\(checksum)")
+            log.warning("Report type \(String(type.rawValue, radix:0x10)) len:\(length) checksum:\(checksum)")
         }
     }
     
