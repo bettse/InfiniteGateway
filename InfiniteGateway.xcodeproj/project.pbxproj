@@ -35,6 +35,7 @@
 		6D3AFB961BAD1A7800FAE962 /* EncryptedToken.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6D3AFB951BAD1A7800FAE962 /* EncryptedToken.swift */; };
 		6D89258F1E73857800431637 /* MyNSTableRowView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6D89258E1E73857800431637 /* MyNSTableRowView.swift */; };
 		6DAC8F101E7CAF0900CBB0D6 /* LightCommand.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6DAC8F0F1E7CAF0900CBB0D6 /* LightCommand.swift */; };
+		6DAC8F121E7CAF8300CBB0D6 /* ExperimentalCommands.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6DAC8F111E7CAF8300CBB0D6 /* ExperimentalCommands.swift */; };
 		992DA056B72ECE45297DCD1E /* Pods_InfiniteGateway.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = B4A06A21619B755C01082AA0 /* Pods_InfiniteGateway.framework */; };
 /* End PBXBuildFile section */
 
@@ -84,6 +85,7 @@
 		6D3AFB951BAD1A7800FAE962 /* EncryptedToken.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = EncryptedToken.swift; sourceTree = "<group>"; };
 		6D89258E1E73857800431637 /* MyNSTableRowView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MyNSTableRowView.swift; sourceTree = "<group>"; };
 		6DAC8F0F1E7CAF0900CBB0D6 /* LightCommand.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = LightCommand.swift; sourceTree = "<group>"; };
+		6DAC8F111E7CAF8300CBB0D6 /* ExperimentalCommands.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ExperimentalCommands.swift; sourceTree = "<group>"; };
 		B4A06A21619B755C01082AA0 /* Pods_InfiniteGateway.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_InfiniteGateway.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
@@ -140,6 +142,7 @@
 				6D3AFB841BAB86FC00FAE962 /* Portal.swift */,
 				6D3AFB811BAB86FC00FAE962 /* Command.swift */,
 				6DAC8F0F1E7CAF0900CBB0D6 /* LightCommand.swift */,
+				6DAC8F111E7CAF8300CBB0D6 /* ExperimentalCommands.swift */,
 				6D3AFB831BAB86FC00FAE962 /* Message.swift */,
 				6D3AFB851BAB86FC00FAE962 /* Report.swift */,
 				6D3AFB861BAB86FC00FAE962 /* Response.swift */,
@@ -318,6 +321,7 @@
 				6D3AFB921BAB86FC00FAE962 /* Update.swift in Sources */,
 				6D3AFB941BACD9AE00FAE962 /* PortalDriver.swift in Sources */,
 				6D272BD21E7237C300B7F010 /* NSData+asUint.swift in Sources */,
+				6DAC8F121E7CAF8300CBB0D6 /* ExperimentalCommands.swift in Sources */,
 				6D3AFB961BAD1A7800FAE962 /* EncryptedToken.swift in Sources */,
 				6D269B511BB4591300D0EF97 /* LibraryTabViewController.swift in Sources */,
 				6D3AFB8D1BAB86FC00FAE962 /* Portal.swift in Sources */,
