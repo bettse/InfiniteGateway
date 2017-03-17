@@ -35,6 +35,7 @@ class Message : CustomStringConvertible {
         case c0 = 0xc0
         case c1 = 0xc1
         case c2 = 0xc2
+        case unset = 0xff
         func desc() -> String {
             return String(describing: self)
         }

@@ -26,7 +26,7 @@ class Command : Message {
         }
     }
     
-    var type : commandType = .activate
+    var type : commandType = .unset
     var corrolationId : UInt8 = 0
     var params : Data = Data()
     
