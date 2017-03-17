@@ -19,7 +19,7 @@ class Portal : NSObject {
     
     func input(_ inResult: IOReturn, inSender: UnsafeMutableRawPointer, type: IOHIDReportType, reportId: UInt32, report: UnsafeMutablePointer<UInt8>, reportLength: CFIndex) {
         let raw = Data(bytes: report, count: reportLength)
-        print("<= \(raw.toHexString())")
+        //print("<= \(raw.toHexString())")
         let report = Report(data: raw)
         if let msg = report.content {
             DispatchQueue.main.async(execute: {
@@ -35,7 +35,7 @@ class Portal : NSObject {
             return
         }
         if let portal = device {
-            print("=> \(data.toHexString())")
+            //print("=> \(data.toHexString())")
             IOHIDDeviceSetReport(portal, kIOHIDReportTypeOutput, reportId, [UInt8](data), data.count);
         }
     }
