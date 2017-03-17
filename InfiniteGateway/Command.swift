@@ -136,6 +136,59 @@ class WriteCommand : Command {
 }
 
 
+class A4Command : Command {
+    init(nfcIndex: UInt8, value: UInt8) {
+        super.init()
+        type = .a4
+        var start = Data(bytes: [nfcIndex])
+        let content = Data(bytes: [UInt8](repeating: value, count: 2))
+        start.append(content)
+        params = start
+    }
+    
+    override var description: String {
+        let me = String(describing: type(of: self)).components(separatedBy: ".").last!
+        return "\(me)(\(type.desc()): \(params.toHexString()))"
+    }
+}
+
+class ACommand : Command {
+    init(nfcIndex: UInt8, value: UInt8) {
+        super.init()
+        var start = Data(bytes: [nfcIndex])
+        let content = Data(bytes: [UInt8](repeating: value, count: 6))
+        start.append(content)
+        params = start
+    }
+    
+    override var description: String {
+        let me = String(describing: type(of: self)).components(separatedBy: ".").last!
+        return "\(me)(\(type.desc()): \(params.toHexString()))"
+    }
+}
+
+class A5Command : ACommand {
+    override init(nfcIndex: UInt8, value: UInt8) {
+        super.init(nfcIndex: nfcIndex, value: value)
+        type = .a5
+    }
+}
+
+class A6Command : ACommand {
+    override init(nfcIndex: UInt8, value: UInt8) {
+        super.init(nfcIndex: nfcIndex, value: value)
+        type = .a6
+    }
+}
+
+class A7Command : ACommand {
+    override init(nfcIndex: UInt8, value: UInt8) {
+        super.init(nfcIndex: nfcIndex, value: value)
+        type = .a7
+    }
+}
+
+
 class B1Command : Command {
     var nfcIndex : UInt8 = 0
     var value2 : UInt8 = 0
@@ -237,57 +290,5 @@ class C2Command : Command {
     override var description: String {
         let me = String(describing: type(of: self)).components(separatedBy: ".").last!
         return "\(me)(\(type.desc()): \(params.toHexString()))"
-    }
-}
-
-class A4Command : Command {
-    init(nfcIndex: UInt8, value: UInt8) {
-        super.init()
-        type = .a4
-        var start = Data(bytes: [nfcIndex])
-        let content = Data(bytes: [UInt8](repeating: value, count: 2))
-        start.append(content)
-        params = start
-    }
-    
-    override var description: String {
-        let me = String(describing: type(of: self)).components(separatedBy: ".").last!
-        return "\(me)(\(type.desc()): \(params.toHexString()))"
-    }
-}
-
-class ACommand : Command {
-    init(nfcIndex: UInt8, value: UInt8) {
-        super.init()
-        var start = Data(bytes: [nfcIndex])
-        let content = Data(bytes: [UInt8](repeating: value, count: 6))
-        start.append(content)
-        params = start
-    }
-    
-    override var description: String {
-        let me = String(describing: type(of: self)).components(separatedBy: ".").last!
-        return "\(me)(\(type.desc()): \(params.toHexString()))"
-    }
-}
-
-class A5Command : ACommand {
-    override init(nfcIndex: UInt8, value: UInt8) {
-        super.init(nfcIndex: nfcIndex, value: value)
-        type = .a5
-    }
-}
-
-class A6Command : ACommand {
-    override init(nfcIndex: UInt8, value: UInt8) {
-        super.init(nfcIndex: nfcIndex, value: value)
-        type = .a6
-    }
-}
-
-class A7Command : ACommand {
-    override init(nfcIndex: UInt8, value: UInt8) {
-        super.init(nfcIndex: nfcIndex, value: value)
-        type = .a7
     }
 }
