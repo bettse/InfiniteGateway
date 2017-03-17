@@ -72,8 +72,7 @@ class PortalDriver : NSObject {
     
     func incomingResponse(_ response: Response) {
         if let _ = response as? ActivateResponse {
-            //portal.outputCommand(PresenceCommand())
-            portal.outputCommand(B8Command(value: 0xAA))
+            portal.outputCommand(PresenceCommand())
         } else if let response = response as? PresenceResponse {
             portal.outputCommand(LightOnCommand(ledPlatform: .all, color: NSColor.black))
             for detail in response.details {
@@ -87,9 +86,11 @@ class PortalDriver : NSObject {
             if (detail?.sak == .mifareMini) {
                 portal.outputCommand(ReadCommand(nfcIndex: response.nfcIndex, block: 0))
             }
-            self.portal.outputCommand(B1Command(nfcIndex: 0x00, value2: 0x01))
         } else if let response = response as? ReadResponse {
-            tokenRead(response)
+            print(response)
+            if (response.status == .success) {
+                tokenRead(response)
+            }
         } else if let response = response as? WriteResponse {
             print(response)
         } else if let _ = response as? LightOnResponse {
@@ -115,10 +116,6 @@ class PortalDriver : NSObject {
     }
 
     func tokenRead(_ response: ReadResponse) {
-        if response.blockData.count == 0 {
-            print("Empty (no data) ReadResponse")
-            return
-        }
         if let token = encryptedTokens[response.nfcIndex] {
             token.load(response.blockNumber, blockData: response.blockData)
             if (token.complete()) {
