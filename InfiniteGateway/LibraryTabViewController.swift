@@ -33,7 +33,9 @@ class LibraryTabViewController: NSViewController {
                     if let image = try? Data(contentsOf: file) {
                         if (image.count == MifareMini.tokenSize) {
                             let et : EncryptedToken = EncryptedToken(image: image)
-                            _fileList!.append(et.decryptedToken)
+                            if (et.decryptedToken != nil) {
+                                _fileList!.append(et.decryptedToken!)
+                            }                            
                         }
                     }
                 }

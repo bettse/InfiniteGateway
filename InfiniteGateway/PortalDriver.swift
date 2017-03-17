@@ -120,12 +120,17 @@ class PortalDriver : NSObject {
             token.load(response.blockNumber, blockData: response.blockData)
             if (token.complete()) {
                 let ledPlatform = presence[response.nfcIndex]?.platform ?? .none
-                portal.outputCommand(LightOnCommand(ledPlatform: ledPlatform, color: NSColor.green))
-                DispatchQueue.main.async(execute: {
-                    for callback in self.loadTokenCallbacks {
-                        callback(ledPlatform, Int(response.nfcIndex), token.decryptedToken)
-                    }
-                })
+                if (token.decryptedToken != nil) {
+                    portal.outputCommand(LightOnCommand(ledPlatform: ledPlatform, color: NSColor.green))
+                    DispatchQueue.main.async(execute: {
+                        for callback in self.loadTokenCallbacks {
+                            callback(ledPlatform, Int(response.nfcIndex), token.decryptedToken!)
+                        }
+                    })
+                } else {
+                    portal.outputCommand(LightOnCommand(ledPlatform: ledPlatform, color: NSColor.red))
+                }
+
                 encryptedTokens.removeValue(forKey: response.nfcIndex)
             } else {
                 let nextBlock = token.nextBlock()

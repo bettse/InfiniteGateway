@@ -31,7 +31,7 @@ class EncryptedToken : MifareMini {
         }
     }
     
-    var decryptedToken : Token {
+    var decryptedToken : Token? {
         get {
             let clearToken : Token = Token(tagId: self.tagId)
             for blockNumber in 0..<MifareMini.blockCount {
@@ -41,6 +41,7 @@ class EncryptedToken : MifareMini {
                     clearToken.load(blockNumber, blockData: clearBlock)
                 } else {
                     print("Could not load block \(blockNumber) due to failed checksum")
+                    return nil
                 }
             }
             return clearToken;
@@ -49,7 +50,7 @@ class EncryptedToken : MifareMini {
     
     var name : String {
         get {
-            return decryptedToken.model.name
+            return decryptedToken?.model.name ?? "Invalid"
         }
     }
     
