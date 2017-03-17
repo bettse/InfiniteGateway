@@ -7,5 +7,6 @@ target 'InfiniteGateway' do
 
   # Pods for InfiniteGateway
   pod 'CryptoSwift'
+  pod 'SwiftyBeaver'
 
 end
