@@ -9,6 +9,9 @@
 import Cocoa
 import Foundation
 
+import SwiftyBeaver
+let log = SwiftyBeaver.self
+
 @NSApplicationMain
 class AppDelegate: NSObject, NSApplicationDelegate {
     var portadDriver : PortalDriver = PortalDriver.singleton
