@@ -85,8 +85,8 @@ class PortalDriver : NSObject {
             }
         } else if let response = response as? TagIdResponse {
             log.debug(response)
+            let detail = presence[response.nfcIndex]
             encryptedTokens[response.nfcIndex] = EncryptedToken(tagId: response.tagId)
-            let detail = presence[response.nfcIndex]            
             if (detail?.sak == .mifareMini) {
                 portal.outputCommand(ReadCommand(nfcIndex: response.nfcIndex, sectorNumber: 0, blockNumber: 0))
             }
@@ -95,36 +95,27 @@ class PortalDriver : NSObject {
             if (response.status == .success) {
                 tokenRead(response)
             }
-        } else if let response = response as? WriteResponse {
-            log.debug(response)
-        } else if let response = response as? LightResponse {
-            lightResponse(response)
         } else if let response = response as? A4Response {
             log.debug(response)
-            portal.outputCommand(ReadCommand(nfcIndex: response.nfcIndex, sectorNumber: 0, blockNumber: 5))
-        } else if let response = response as? B1Response {
-            log.debug(response)
-            let value2 = response.value2
-            if value2 < 0xff {
-                self.portal.outputCommand(B1Command(nfcIndex: response.nfcIndex, value2: value2 + 1))
-            }
+            portal.outputCommand(ReadCommand(command: response.command as! BlockCommand))
         } else if let response = response as? B8Response {
-            log.debug(response)
-            self.portal.outputCommand(B9Command(value: 0x2b))
+            log.debug(response)            
         } else if let response = response as? B9Response {
             log.debug(response)
-        } else if let _ = response as? C1Response {
+        } else if let response = response as? StatusResponse { //StatuResponse must be last becuase it is a parent class of other classes
             log.debug(response)
-            self.portal.outputCommand(C0Command())
+            // Handle status responses by detecting their command type and acting on it
+            incomingStatus(response)
         } else {
             log.debug("Received \(response) for command \(response.command)")
         }
     }
     
-    func lightResponse(_ response: LightResponse) {
-        if let _ = response as? LightSetResponse {
-        } else if let _ = response as? LightFadeResponse {
-        } else if let _ = response as? LightFlashResponse {
+    func incomingStatus(_ response: StatusResponse) {
+        if let command = response.command as? A5Command {
+            portal.outputCommand(A4Command(command: command))
+        } else if let _ = response.command as? C1Command {
+            self.portal.outputCommand(C0Command())
         }
     }
 
