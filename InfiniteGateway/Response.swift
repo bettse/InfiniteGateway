@@ -17,7 +17,7 @@ class Response : Message {
 
     
     //lol delegate
-    var type : commandType {
+    var type : CommandType {
         get {
             return command.type
         }

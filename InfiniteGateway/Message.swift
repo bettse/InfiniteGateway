@@ -13,7 +13,7 @@ import Foundation
 
 //CustomStringConvertible make the 'description' method possible
 class Message : CustomStringConvertible {
-    enum commandType : UInt8 {
+    enum CommandType : UInt8 {
         case activate = 0x80
         case seed = 0x81
         case next = 0x83

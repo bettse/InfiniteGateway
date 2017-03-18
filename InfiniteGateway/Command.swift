@@ -26,7 +26,7 @@ class Command : Message {
         }
     }
     
-    var type : commandType = .unset
+    var type : CommandType = .unset
     var corrolationId : UInt8 = 0
     var params : Data = Data()
     
@@ -35,10 +35,21 @@ class Command : Message {
         super.init()
         Message.archive[corrolationId] = self
     }
+
+    init(commandType: CommandType) {
+        self.type = commandType
+        super.init()
+    }
+    
+    init(commandType: CommandType, params: Data) {
+        self.type = commandType
+        self.params = params
+        super.init()
+    }
     
     //Parseing from NSData
     init(data: Data) {
-        type = Message.commandType(rawValue: data[typeIndex])!
+        type = Message.CommandType(rawValue: data[typeIndex]) ?? .unset
         corrolationId = data[corrolationIdIndex]
         params = data.subdata(in: paramsIndex..<data.count)
     }
@@ -59,31 +70,26 @@ class Command : Message {
 
 class ActivateCommand : Command {
     override init() {
-        super.init()
-        type = .activate
-        params = PortalDriver.magic
+        super.init(commandType: .activate, params: PortalDriver.magic)
     }
 }
 
 class SeedCommand : Command {
     override init() {
-        super.init()
-        type = .seed
+        super.init(commandType: .seed)
         params = Data(bytes: [0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00])
     }
 }
 
 class NextCommand : Command {
     override init() {
-        super.init()
-        type = .next
+        super.init(commandType: .next)
     }
 }
 
 class PresenceCommand : Command {
     override init() {
-        super.init()
-        type = .presence
+        super.init(commandType: .presence)
     }
 }
 
@@ -91,8 +97,7 @@ class TagIdCommand : Command {
     var nfcIndex : UInt8
     init(nfcIndex: UInt8) {
         self.nfcIndex = nfcIndex
-        super.init()
-        type = .tagId
+        super.init(commandType: .tagId)
         params = Data(bytes: [nfcIndex])
     }
 }
@@ -104,8 +109,7 @@ class ReadCommand : Command {
     init(nfcIndex: UInt8, block: UInt8) {
         self.nfcIndex = nfcIndex
         self.blockNumber = block
-        super.init()
-        type = .read
+        super.init(commandType: .read)
         params = Data(bytes: [nfcIndex, 0x00, block])
     }
     
@@ -125,8 +129,7 @@ class WriteCommand : Command {
         self.blockNumber = block
         self.sectorNumber = 0
         self.blockData = blockData
-        super.init()
-        type = .write
+        super.init(commandType: .write)
         var temp : Data = Data(bytes: [nfcIndex, sectorNumber, blockNumber])
         temp.append(blockData)
         params = temp
