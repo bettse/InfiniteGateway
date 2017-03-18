@@ -8,10 +8,7 @@
 
 import Foundation
 
-class A4Response : Response {
-    let statusIndex = 1
-    var status : Status
-
+class A4Response : StatusResponse {
     var a4command : A4Command {
         get {
             return (command as? A4Command)!
@@ -34,11 +31,6 @@ class A4Response : Response {
         get {
             return a4command.block
         }
-    }
-    
-    override init(data: Data) {
-        status = Status(rawValue: data[statusIndex]) ?? .unknown
-        super.init(data: data)
     }
     
     override var description: String {

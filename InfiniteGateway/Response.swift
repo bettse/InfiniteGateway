@@ -23,6 +23,7 @@ class Response : Message {
         }
     }
     
+    //IDEA: dictionary to map command type to command class and/or response class
     var command : Command {
         get {
             return (Message.archive[corrolationId] as! Command)
@@ -37,6 +38,10 @@ class Response : Message {
     
     static func parse(_ data: Data) -> Response {
         let r : Response = Response(data: data)
+        if (r.params.count == 0) {
+            return AckResponse(data: data)
+        }
+        
         switch r.command.type {
         case .activate:
             return ActivateResponse(data: data)
@@ -72,11 +77,27 @@ class Response : Message {
             return r
         }
     }
-
     
     override var description: String {
         let me = String(describing: type(of: self)).components(separatedBy: ".").last!
         return "\(me)(\(type.desc()): \(params.toHexString()))"
+    }
+}
+
+class AckResponse : Response {}
+
+class StatusResponse : Response {
+    let statusIndex = 1
+    var status : Status
+    
+    override init(data: Data) {
+        status = Status(rawValue: data[statusIndex]) ?? .unknown
+        super.init(data: data)
+    }
+    
+    override var description: String {
+        let me = String(describing: type(of: self)).components(separatedBy: ".").last!
+        return "\(me)(\(status))"
     }
 }
 
@@ -227,10 +248,7 @@ class NextResponse : Response {
 
 }
 
-class WriteResponse : Response {
-    let statusIndex = 1
-    var status : Status
-    
+class WriteResponse : StatusResponse {
     //Delegates for easier access
     var blockNumber : UInt8  {
         get {
@@ -249,11 +267,6 @@ class WriteResponse : Response {
         }
     }
     
-    override init(data: Data) {
-        status = Status(rawValue: data[statusIndex]) ?? .unknown
-        super.init(data: data)
-    }
-    
     override var description: String {
         let me = String(describing: type(of: self)).components(separatedBy: ".").last!        
         return "\(me)(index \(nfcIndex) block \(blockNumber): Status: \(status))"
@@ -261,15 +274,7 @@ class WriteResponse : Response {
 }
 
 
-class LightResponse : Response {
-
-}
-
-class LightOnResponse : LightResponse {
-}
-
-class LightFadeResponse : LightResponse {
-}
-
-class LightFlashResponse : LightResponse {
-}
+class LightResponse : AckResponse {}
+class LightOnResponse : LightResponse {}
+class LightFadeResponse : LightResponse {}
+class LightFlashResponse : LightResponse {}
