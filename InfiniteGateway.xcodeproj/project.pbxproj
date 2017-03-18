@@ -167,10 +167,10 @@
 				6DAC8F0F1E7CAF0900CBB0D6 /* LightCommand.swift */,
 				6DAC8F111E7CAF8300CBB0D6 /* ExperimentalCommands.swift */,
 				6D3AFB831BAB86FC00FAE962 /* Message.swift */,
-				6D3AFB851BAB86FC00FAE962 /* Report.swift */,
 				6D3AFB861BAB86FC00FAE962 /* Response.swift */,
 				6DAC8F161E7CB11E00CBB0D6 /* ExperimentalResponses.swift */,
 				6D3AFB891BAB86FC00FAE962 /* Update.swift */,
+				6D3AFB851BAB86FC00FAE962 /* Report.swift */,
 			);
 			name = Communication;
 			sourceTree = "<group>";

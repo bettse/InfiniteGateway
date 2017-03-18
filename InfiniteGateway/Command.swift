@@ -131,25 +131,20 @@ class ReadCommand : BlockCommand {
     }
 }
 
-class WriteCommand : Command {
-    var nfcIndex : UInt8
-    var sectorNumber : UInt8
-    var blockNumber : UInt8
+class WriteCommand : BlockCommand {
     var blockData : Data
     
-    init(nfcIndex: UInt8, block: UInt8, blockData: Data) {
-        self.nfcIndex = nfcIndex
-        self.blockNumber = block
-        self.sectorNumber = 0
+    init(nfcIndex: UInt8, sectorNumber: UInt8, blockNumber: UInt8, blockData: Data) {
         self.blockData = blockData
-        super.init(commandType: .write)
-        var temp : Data = Data(bytes: [nfcIndex, sectorNumber, blockNumber])
-        temp.append(blockData)
-        params = temp
+        super.init(nfcIndex: nfcIndex, sectorNumber: sectorNumber, blockNumber: blockNumber)
+        self.type = .read
+        
+        //Params set to [nfcIndex, sectorNumber, blockNumber] by parent class
+        params.append(blockData)
     }
     
-    convenience init(nfcIndex: UInt8, block: Int, blockData: Data) {
-        self.init(nfcIndex: nfcIndex, block: UInt8(block), blockData: blockData)
+    convenience init(nfcIndex: UInt8, sectorNumber: UInt8, blockNumber: Int, blockData: Data) {
+        self.init(nfcIndex: nfcIndex, sectorNumber: sectorNumber, blockNumber: UInt8(blockNumber), blockData: blockData)
     }
 }
 

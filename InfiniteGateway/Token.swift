@@ -360,7 +360,7 @@ class Token : MifareMini, CustomStringConvertible {
         let encryptedToken = EncryptedToken(from: self)
         let blockData = encryptedToken.block(primaryDataBlockNumber)
         let nfcIndex : UInt8 = 0//TODO: Fix this.
-        portalDriver.portal.outputCommand(WriteCommand(nfcIndex: nfcIndex, block: primaryDataBlockNumber, blockData: blockData))
+        portalDriver.portal.outputCommand(WriteCommand(nfcIndex: nfcIndex, sectorNumber: 0, blockNumber: primaryDataBlockNumber, blockData: blockData))
     }    
     
 }
