@@ -10,10 +10,17 @@ import Foundation
 
 
 class A4Command : BlockCommand {
-    
     override init(nfcIndex: UInt8, sectorNumber: UInt8, blockNumber: UInt8) {
         super.init(nfcIndex: nfcIndex, sectorNumber: sectorNumber, blockNumber: blockNumber)
         type = .a4
+    }
+}
+
+class A5Command : BlockCommand {
+    init(nfcIndex: UInt8, sectorNumber: UInt8, blockNumber: UInt8, contents: Data) {
+        super.init(nfcIndex: nfcIndex, sectorNumber: sectorNumber, blockNumber: blockNumber)
+        type = .a5
+        params.append(contents)
     }
 }
 
@@ -63,6 +70,8 @@ class B9Command : Command {
     }
 }
 
+
+//AppleTV Base only
 class BeCommand : Command {
     var value : UInt8 = 0
     
