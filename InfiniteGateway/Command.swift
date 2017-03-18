@@ -29,22 +29,17 @@ class Command : Message {
     var type : CommandType = .unset
     var corrolationId : UInt8 = 0
     var params : Data = Data()
-    
-    override init() {
+
+    init(commandType: CommandType) {
         corrolationId = Command.nextSequence
         super.init()
         Message.archive[corrolationId] = self
-    }
-
-    init(commandType: CommandType) {
         self.type = commandType
-        super.init()
     }
     
-    init(commandType: CommandType, params: Data) {
-        self.type = commandType
+    convenience init(commandType: CommandType, params: Data) {
+        self.init(commandType: commandType)
         self.params = params
-        super.init()
     }
     
     //Parseing from NSData
@@ -91,26 +86,27 @@ class BlockCommand : Command {
 }
 
 class ActivateCommand : Command {
-    override init() {
-        super.init(commandType: .activate, params: PortalDriver.magic)
+    init() {
+        super.init(commandType: .activate)
+        params = PortalDriver.magic
     }
 }
 
 class SeedCommand : Command {
-    override init() {
+    init() {
         super.init(commandType: .seed)
         params = Data(bytes: [0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00])
     }
 }
 
 class NextCommand : Command {
-    override init() {
+    init() {
         super.init(commandType: .next)
     }
 }
 
 class PresenceCommand : Command {
-    override init() {
+    init() {
         super.init(commandType: .presence)
     }
 }

@@ -18,8 +18,7 @@ class LightOnCommand : Command {
         self.red = red
         self.green = green
         self.blue = blue
-        super.init()
-        type = .lightOn
+        super.init(commandType: .lightOn)
         params = Data(bytes: [ledPlatform.rawValue, red, green, blue])
     }
     
@@ -53,8 +52,7 @@ class LightFadeCommand : Command {
         self.blue = blue
         self.speed = speed
         self.count = count
-        super.init()
-        type = .lightOn
+        super.init(commandType: .lightFade)
         params = Data(bytes: [ledPlatform.rawValue, red, green, blue, speed, count])
     }
     
@@ -95,8 +93,7 @@ class LightFlashCommand : Command {
         self.timeNew = timeNew
         self.timeOld = timeOld
         self.count = count
-        super.init()
-        type = .lightOn
+        super.init(commandType: .lightFlash)
         params = Data(bytes: [ledPlatform.rawValue, red, green, blue, timeNew, timeOld, count])
     }
     
@@ -113,12 +110,3 @@ class LightFlashCommand : Command {
     }
     
 }
-
-class Light99 : Command {
-    override init() {
-        super.init()
-        type = .light99
-        params = Data(bytes: [0x00, 0x09, 0x00, 0x64, 0x01])
-    }
-}
-
