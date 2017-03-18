@@ -84,23 +84,18 @@ class LightFadeCommand : LightCommand {
     
 }
 
-class LightFlashCommand : Command {
-    var ledPlatform : LedPlatform
-    var red : UInt8, green: UInt8, blue : UInt8
+class LightFlashCommand : LightCommand {
     var timeNew : UInt8 = 0
     var timeOld : UInt8 = 0
     var count : UInt8 = 0
     
     init(ledPlatform: LedPlatform, red : UInt8, green: UInt8, blue : UInt8, timeNew : UInt8, timeOld : UInt8, count: UInt8) {
-        self.ledPlatform = ledPlatform
-        self.red = red
-        self.green = green
-        self.blue = blue
+        super.init(ledPlatform: ledPlatform, red: red, green: green, blue: blue)
+        type = .lightFlash
         self.timeNew = timeNew
         self.timeOld = timeOld
         self.count = count
-        super.init(commandType: .lightFlash)
-        params = Data(bytes: [ledPlatform.rawValue, red, green, blue, timeNew, timeOld, count])
+        params.append(Data(bytes: [timeNew, timeOld, count]))
     }
     
     convenience init(ledPlatform: LedPlatform, color : NSColor, timeNew : UInt8, timeOld : UInt8, count: UInt8) {
