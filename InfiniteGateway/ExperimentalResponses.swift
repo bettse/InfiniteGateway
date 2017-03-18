@@ -8,60 +8,10 @@
 
 import Foundation
 
-class A4Response : StatusResponse {
-    var a4command : A4Command {
-        get {
-            return (command as? A4Command)!
-        }
-    }
-    
-    var nfcIndex : UInt8  {
-        get {
-            return a4command.nfcIndex
-        }
-    }
-    
-    var sectorNumber : UInt8  {
-        get {
-            return a4command.sectorNumber
-        }
-    }
-    
-    var blockNumber : UInt8  {
-        get {
-            return a4command.blockNumber
-        }
-    }
-    
+class A4Response : StatusResponse {    
     override var description: String {
         let me = String(describing: type(of: self)).components(separatedBy: ".").last!
         return "\(me)(\(status) \(params.toHexString()))"
-    }
-}
-
-
-class B1Response : StatusResponse {
-    var nfcIndex : UInt8  {
-        get {
-            if let command = command as? B1Command {
-                return command.nfcIndex
-            }
-            return 0
-        }
-    }
-    
-    var sectorNumber : UInt8  {
-        get {
-            if let command = command as? B1Command {
-                return command.sectorNumber
-            }
-            return 0
-        }
-    }
-    
-    override var description: String {
-        let me = String(describing: type(of: self)).components(separatedBy: ".").last!
-        return "\(me)[\(command.params.toHexString()): \(status)]"
     }
 }
 
@@ -95,29 +45,5 @@ class B9Response : Response {
     override var description: String {
         let me = String(describing: type(of: self)).components(separatedBy: ".").last!
         return "\(me)[\(command.params.toHexString()): \(params.toHexString())]"
-    }
-}
-
-
-class C0Response : Response {
-    override var description: String {
-        let me = String(describing: type(of: self)).components(separatedBy: ".").last!
-        return "\(me)[\(params.toHexString())]"
-    }
-}
-
-class C1Response : Response {
-    var value : UInt8  {
-        get {
-            if let command = command as? C1Command {
-                return command.value
-            }
-            return 0
-        }
-    }
-    
-    override var description: String {
-        let me = String(describing: type(of: self)).components(separatedBy: ".").last!
-        return "\(me)[\(params.toHexString())]"
     }
 }

@@ -52,6 +52,9 @@ class Response : Message {
         if (r.params.count == 0) {
             return AckResponse(data: data)
         }
+        if (r.params.count == 1) {
+            return StatusResponse(data: data)
+        }
         
         switch r.command.type {
         case .activate:
@@ -62,28 +65,16 @@ class Response : Message {
             return PresenceResponse(data: data)
         case .read:
             return ReadResponse(data: data)
-        case .write:
-            return WriteResponse(data: data)
-        case .lightSet:
-            return LightSetResponse(data: data)
-        case .lightFade:
-            return LightFadeResponse(data: data)
-        case .lightFlash:
-            return LightFlashResponse(data: data)
         case .seed:
             return SeedResponse(data: data)
         case .next:
             return NextResponse(data: data)
         case .a4:
             return A4Response(data: data)
-        case .b1:
-            return B1Response(data: data)
         case .b8:
             return B8Response(data: data)
         case .b9:
             return B9Response(data: data)
-        case .c1:
-            return C1Response(data: data)
         default:
             return r
         }
@@ -108,7 +99,7 @@ class StatusResponse : Response {
     
     override var description: String {
         let me = String(describing: type(of: self)).components(separatedBy: ".").last!
-        return "\(me)(\(status))"
+        return "\(me)(\(command): \(status))"
     }
 }
 
@@ -180,6 +171,14 @@ class ReadResponse : StatusResponse {
     var blockData : Data = Data()
     
     //Delegates for easier access
+    var sectorNumber : UInt8  {
+        get {
+            if let command = command as? ReadCommand {
+                return command.sectorNumber
+            }
+            return 0
+        }
+    }    
     var blockNumber : UInt8  {
         get {
             if let command = command as? ReadCommand {
@@ -207,9 +206,9 @@ class ReadResponse : StatusResponse {
     override var description: String {
         let me = String(describing: type(of: self)).components(separatedBy: ".").last!
         if (status == .success) {
-            return "\(me)(index \(nfcIndex) block \(blockNumber): \(blockData.toHexString()))"
+            return "\(me)(index \(nfcIndex) sector \(sectorNumber) block \(blockNumber): \(blockData.toHexString()))"
         } else {
-            return "\(me)(index \(nfcIndex) block \(blockNumber): Error: \(status))"
+            return "\(me)(index \(nfcIndex) sector \(sectorNumber) block \(blockNumber): Error: \(status))"
         }
     }
 }
@@ -247,36 +246,6 @@ class NextResponse : Response {
         let me = String(describing: type(of: self)).components(separatedBy: ".").last!
         return "\(me): 0x\(String(value, radix:0x10))"
     }
-
-}
-
-class WriteResponse : StatusResponse {
-    //Delegates for easier access
-    var blockNumber : UInt8  {
-        get {
-            if let command = command as? WriteCommand {
-                return command.blockNumber
-            }
-            return 0
-        }
-    }
-    var nfcIndex : UInt8  {
-        get {
-            if let command = command as? WriteCommand {
-                return command.nfcIndex
-            }
-            return 0
-        }
-    }
-    
-    override var description: String {
-        let me = String(describing: type(of: self)).components(separatedBy: ".").last!        
-        return "\(me)(index \(nfcIndex) block \(blockNumber): Status: \(status))"
-    }
 }
 
 class SeedResponse : Response {}
-class LightResponse : AckResponse {}
-class LightSetResponse : LightResponse {}
-class LightFadeResponse : LightResponse {}
-class LightFlashResponse : LightResponse {}
