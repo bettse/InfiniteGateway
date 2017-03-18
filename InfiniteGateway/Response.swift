@@ -8,9 +8,7 @@
 
 import Foundation
 
-
-
-class Response : Message {    
+class Response : Message {
     enum Status : UInt8 {
         case success = 0x00
         case missingToken = 0x80
@@ -27,7 +25,6 @@ class Response : Message {
     var corrolationId : UInt8 = 0
     var params : Data
 
-    
     //lol delegate
     var type : CommandType {
         get {
@@ -36,9 +33,11 @@ class Response : Message {
     }
     
     //IDEA: dictionary to map command type to command class and/or response class
+    // or returning subclass that has been cast to base class    
     var command : Command {
         get {
-            return (Message.archive[corrolationId] as! Command)
+            let baseCommand = (Message.archive[corrolationId] as! Command)
+            return baseCommand
         }
     }
     

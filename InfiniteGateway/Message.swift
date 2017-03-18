@@ -65,8 +65,6 @@ class Message : CustomStringConvertible {
         case unknown = 0xFF //Not standard
     }
     
-
-    
     static var archive = [UInt8: Message]()
     
     var description: String {
