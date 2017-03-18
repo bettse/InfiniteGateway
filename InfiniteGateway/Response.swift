@@ -119,7 +119,7 @@ class ActivateResponse : Response {
     }
 }
 
-class TagIdResponse : Response {
+class TagIdResponse : StatusResponse {
     let tagIdIndex = 2
     var nfcIndex : UInt8  {
         get {
@@ -132,9 +132,9 @@ class TagIdResponse : Response {
     
     var tagId : Data
     
-    override init(data: Data) {
+    override init(data: Data) {        
         tagId = data.subdata(in: tagIdIndex..<data.count)
-        super.init(data: data)        
+        super.init(data: data)
     }
 
     override var description: String {
