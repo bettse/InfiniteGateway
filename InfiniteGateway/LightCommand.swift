@@ -18,17 +18,30 @@ class PlatformCommand : Command {
     }
 }
 
-class LightSetCommand : Command {
-    var ledPlatform : LedPlatform
+class LightGetCommand : PlatformCommand {
+    override init(ledPlatform: LedPlatform) {
+        super.init(ledPlatform: ledPlatform)
+        type = .lightGet
+        /* 
+         Because 'all' doesn't have any meaning when getting a single 
+         light status, the platform numbers are all shifted down by one
+        */
+        params = Data(bytes: [ledPlatform.rawValue-1])
+    }
+}
+
+class LightSetCommand : PlatformCommand {
     var red : UInt8, green: UInt8, blue : UInt8
     
     init(ledPlatform: LedPlatform, red : UInt8, green: UInt8, blue : UInt8) {
-        self.ledPlatform = ledPlatform
+        // Set attributes of current class first
         self.red = red
         self.green = green
         self.blue = blue
-        super.init(commandType: .lightSet)
-        params = Data(bytes: [ledPlatform.rawValue, red, green, blue])
+        // construct parent class and override/modify its attributes
+        super.init(ledPlatform: ledPlatform)
+        self.type = .lightSet
+        params.append(Data(bytes: [red, green, blue]))
     }
     
     convenience init(ledPlatform: LedPlatform, red : Int, green: Int, blue : Int) {
