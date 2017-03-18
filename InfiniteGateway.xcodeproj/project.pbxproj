@@ -131,26 +131,10 @@
 			isa = PBXGroup;
 			children = (
 				6D3AFB661BAB848B00FAE962 /* AppDelegate.swift */,
-				6D2078AB1BAF549F00020B3A /* Block.swift */,
-				6D3AFB681BAB848B00FAE962 /* ViewController.swift */,
-				6D89258E1E73857800431637 /* MyNSTableRowView.swift */,
-				6D269B501BB4591300D0EF97 /* LibraryTabViewController.swift */,
-				6D269B4E1BB4584500D0EF97 /* DeviceTabViewController.swift */,
-				6D2078AD1BAFAD7D00020B3A /* TokenDetailViewController.swift */,
-				6D269B521BB4C2FE00D0EF97 /* TokenCellView.swift */,
-				6D3AFB931BACD9AE00FAE962 /* PortalDriver.swift */,
-				6D3AFB841BAB86FC00FAE962 /* Portal.swift */,
-				6D3AFB811BAB86FC00FAE962 /* Command.swift */,
-				6DAC8F0F1E7CAF0900CBB0D6 /* LightCommand.swift */,
-				6DAC8F111E7CAF8300CBB0D6 /* ExperimentalCommands.swift */,
-				6D3AFB831BAB86FC00FAE962 /* Message.swift */,
-				6D3AFB851BAB86FC00FAE962 /* Report.swift */,
-				6D3AFB861BAB86FC00FAE962 /* Response.swift */,
-				6D3AFB891BAB86FC00FAE962 /* Update.swift */,
+				6DAC8F151E7CAFF000CBB0D6 /* Storage */,
+				6DAC8F141E7CAFE300CBB0D6 /* UI */,
+				6DAC8F131E7CAFDA00CBB0D6 /* Communication */,
 				6D3AFB871BAB86FC00FAE962 /* ThePoster.swift */,
-				6D2078A91BAF4E3100020B3A /* MifareMini.swift */,
-				6D3AFB881BAB86FC00FAE962 /* Token.swift */,
-				6D3AFB951BAD1A7800FAE962 /* EncryptedToken.swift */,
 				6D3AFB6D1BAB848B00FAE962 /* Assets.xcassets */,
 				6D3AFB6F1BAB848B00FAE962 /* Main.storyboard */,
 				6D2BC2E31BB5022500933E7F /* TokenCellView.xib */,
@@ -170,6 +154,46 @@
 				6D272BD11E7237C300B7F010 /* NSData+asUint.swift */,
 			);
 			name = Extensions;
+			sourceTree = "<group>";
+		};
+		6DAC8F131E7CAFDA00CBB0D6 /* Communication */ = {
+			isa = PBXGroup;
+			children = (
+				6D3AFB841BAB86FC00FAE962 /* Portal.swift */,
+				6D3AFB931BACD9AE00FAE962 /* PortalDriver.swift */,
+				6D3AFB811BAB86FC00FAE962 /* Command.swift */,
+				6DAC8F0F1E7CAF0900CBB0D6 /* LightCommand.swift */,
+				6DAC8F111E7CAF8300CBB0D6 /* ExperimentalCommands.swift */,
+				6D3AFB831BAB86FC00FAE962 /* Message.swift */,
+				6D3AFB851BAB86FC00FAE962 /* Report.swift */,
+				6D3AFB861BAB86FC00FAE962 /* Response.swift */,
+				6D3AFB891BAB86FC00FAE962 /* Update.swift */,
+			);
+			name = Communication;
+			sourceTree = "<group>";
+		};
+		6DAC8F141E7CAFE300CBB0D6 /* UI */ = {
+			isa = PBXGroup;
+			children = (
+				6D3AFB681BAB848B00FAE962 /* ViewController.swift */,
+				6D89258E1E73857800431637 /* MyNSTableRowView.swift */,
+				6D269B501BB4591300D0EF97 /* LibraryTabViewController.swift */,
+				6D269B4E1BB4584500D0EF97 /* DeviceTabViewController.swift */,
+				6D2078AD1BAFAD7D00020B3A /* TokenDetailViewController.swift */,
+				6D269B521BB4C2FE00D0EF97 /* TokenCellView.swift */,
+			);
+			name = UI;
+			sourceTree = "<group>";
+		};
+		6DAC8F151E7CAFF000CBB0D6 /* Storage */ = {
+			isa = PBXGroup;
+			children = (
+				6D2078AB1BAF549F00020B3A /* Block.swift */,
+				6D2078A91BAF4E3100020B3A /* MifareMini.swift */,
+				6D3AFB881BAB86FC00FAE962 /* Token.swift */,
+				6D3AFB951BAD1A7800FAE962 /* EncryptedToken.swift */,
+			);
+			name = Storage;
 			sourceTree = "<group>";
 		};
 		BD6D55BFAB211A0387023456 /* Pods */ = {
