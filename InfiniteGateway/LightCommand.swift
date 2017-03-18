@@ -9,7 +9,16 @@
 import Foundation
 import AppKit
 
-class LightOnCommand : Command {
+class PlatformCommand : Command {
+    var ledPlatform : LedPlatform
+    init(ledPlatform: LedPlatform) {
+        self.ledPlatform = ledPlatform
+        super.init(commandType: .unset)
+        params = Data(bytes: [ledPlatform.rawValue])
+    }
+}
+
+class LightSetCommand : Command {
     var ledPlatform : LedPlatform
     var red : UInt8, green: UInt8, blue : UInt8
     
@@ -18,7 +27,7 @@ class LightOnCommand : Command {
         self.red = red
         self.green = green
         self.blue = blue
-        super.init(commandType: .lightOn)
+        super.init(commandType: .lightSet)
         params = Data(bytes: [ledPlatform.rawValue, red, green, blue])
     }
     

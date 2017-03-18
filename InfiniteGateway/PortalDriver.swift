@@ -67,14 +67,14 @@ class PortalDriver : NSObject {
                 }
             })
         }        
-        portal.outputCommand(LightOnCommand(ledPlatform: update.ledPlatform, color: updateColor))
+        portal.outputCommand(LightSetCommand(ledPlatform: update.ledPlatform, color: updateColor))
     }
     
     func incomingResponse(_ response: Response) {
         if let _ = response as? ActivateResponse {
             portal.outputCommand(PresenceCommand())
         } else if let response = response as? PresenceResponse {
-            portal.outputCommand(LightOnCommand(ledPlatform: .all, color: NSColor.black))
+            portal.outputCommand(LightSetCommand(ledPlatform: .all, color: NSColor.black))
             for detail in response.details {
                 presence[detail.nfcIndex] = detail
                 portal.outputCommand(TagIdCommand(nfcIndex: detail.nfcIndex))
@@ -118,7 +118,7 @@ class PortalDriver : NSObject {
     }
     
     func lightResponse(_ response: LightResponse) {
-        if let _ = response as? LightOnResponse {
+        if let _ = response as? LightSetResponse {
         } else if let _ = response as? LightFadeResponse {
         } else if let _ = response as? LightFlashResponse {
         }
@@ -130,14 +130,14 @@ class PortalDriver : NSObject {
             if (token.complete()) {
                 let ledPlatform = presence[response.nfcIndex]?.platform ?? .none
                 if (token.decryptedToken != nil) {
-                    portal.outputCommand(LightOnCommand(ledPlatform: ledPlatform, color: NSColor.green))
+                    portal.outputCommand(LightSetCommand(ledPlatform: ledPlatform, color: NSColor.green))
                     DispatchQueue.main.async(execute: {
                         for callback in self.loadTokenCallbacks {
                             callback(ledPlatform, Int(response.nfcIndex), token.decryptedToken!)
                         }
                     })
                 } else {
-                    portal.outputCommand(LightOnCommand(ledPlatform: ledPlatform, color: NSColor.red))
+                    portal.outputCommand(LightSetCommand(ledPlatform: ledPlatform, color: NSColor.red))
                 }
 
                 encryptedTokens.removeValue(forKey: response.nfcIndex)

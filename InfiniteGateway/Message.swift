@@ -17,7 +17,7 @@ class Message : CustomStringConvertible {
         case activate = 0x80
         case seed = 0x81
         case next = 0x83
-        case lightOn = 0x90
+        case lightSet = 0x90
         case lightFade = 0x92
         case lightFlash = 0x93
         case light95 = 0x95

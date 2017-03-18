@@ -64,8 +64,8 @@ class Response : Message {
             return ReadResponse(data: data)
         case .write:
             return WriteResponse(data: data)
-        case .lightOn:
-            return LightOnResponse(data: data)
+        case .lightSet:
+            return LightSetResponse(data: data)
         case .lightFade:
             return LightFadeResponse(data: data)
         case .lightFlash:
@@ -277,6 +277,6 @@ class WriteResponse : StatusResponse {
 
 class SeedResponse : Response {}
 class LightResponse : AckResponse {}
-class LightOnResponse : LightResponse {}
+class LightSetResponse : LightResponse {}
 class LightFadeResponse : LightResponse {}
 class LightFlashResponse : LightResponse {}
