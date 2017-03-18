@@ -71,9 +71,13 @@ class PortalDriver : NSObject {
     }
     
     func incomingResponse(_ response: Response) {
-        if let _ = response as? ActivateResponse {
+        if let response = response as? AckResponse {
+            log.debug(response)
+        } else if let _ = response as? ActivateResponse {
+            log.debug(response)
             portal.outputCommand(PresenceCommand())
         } else if let response = response as? PresenceResponse {
+            log.debug(response)
             portal.outputCommand(LightSetCommand(ledPlatform: .all, color: NSColor.black))
             for detail in response.details {
                 presence[detail.nfcIndex] = detail
