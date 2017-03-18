@@ -175,11 +175,9 @@ class PresenceResponse : Response {
     }
 }
 
-class ReadResponse : Response {
-    let statusIndex = 1
+class ReadResponse : StatusResponse {
     let blockDataIndex = 2
-    var status : Status
-    var blockData : Data
+    var blockData : Data = Data()
     
     //Delegates for easier access
     var blockNumber : UInt8  {
@@ -200,13 +198,10 @@ class ReadResponse : Response {
     }
     
     override init(data: Data) {
-        status = Status(rawValue: data[statusIndex]) ?? .unknown
+        super.init(data: data)
         if (status == .success) {
             blockData = data.subdata(in: blockDataIndex..<data.count)
-        } else {
-            blockData = Data()
         }
-        super.init(data: data)
     }
     
     override var description: String {
@@ -217,10 +212,6 @@ class ReadResponse : Response {
             return "\(me)(index \(nfcIndex) block \(blockNumber): Error: \(status))"
         }
     }
-}
-
-class SeedResponse : Response {
-    
 }
 
 //Contains next scrambled value in PRNG
@@ -284,7 +275,7 @@ class WriteResponse : StatusResponse {
     }
 }
 
-
+class SeedResponse : Response {}
 class LightResponse : AckResponse {}
 class LightOnResponse : LightResponse {}
 class LightFadeResponse : LightResponse {}
