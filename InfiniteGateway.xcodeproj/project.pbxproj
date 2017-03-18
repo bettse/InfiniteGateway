@@ -36,6 +36,7 @@
 		6D89258F1E73857800431637 /* MyNSTableRowView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6D89258E1E73857800431637 /* MyNSTableRowView.swift */; };
 		6DAC8F101E7CAF0900CBB0D6 /* LightCommand.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6DAC8F0F1E7CAF0900CBB0D6 /* LightCommand.swift */; };
 		6DAC8F121E7CAF8300CBB0D6 /* ExperimentalCommands.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6DAC8F111E7CAF8300CBB0D6 /* ExperimentalCommands.swift */; };
+		6DAC8F171E7CB11E00CBB0D6 /* ExperimentalResponses.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6DAC8F161E7CB11E00CBB0D6 /* ExperimentalResponses.swift */; };
 		992DA056B72ECE45297DCD1E /* Pods_InfiniteGateway.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = B4A06A21619B755C01082AA0 /* Pods_InfiniteGateway.framework */; };
 /* End PBXBuildFile section */
 
@@ -86,6 +87,7 @@
 		6D89258E1E73857800431637 /* MyNSTableRowView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MyNSTableRowView.swift; sourceTree = "<group>"; };
 		6DAC8F0F1E7CAF0900CBB0D6 /* LightCommand.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = LightCommand.swift; sourceTree = "<group>"; };
 		6DAC8F111E7CAF8300CBB0D6 /* ExperimentalCommands.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ExperimentalCommands.swift; sourceTree = "<group>"; };
+		6DAC8F161E7CB11E00CBB0D6 /* ExperimentalResponses.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ExperimentalResponses.swift; sourceTree = "<group>"; };
 		B4A06A21619B755C01082AA0 /* Pods_InfiniteGateway.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_InfiniteGateway.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
@@ -167,6 +169,7 @@
 				6D3AFB831BAB86FC00FAE962 /* Message.swift */,
 				6D3AFB851BAB86FC00FAE962 /* Report.swift */,
 				6D3AFB861BAB86FC00FAE962 /* Response.swift */,
+				6DAC8F161E7CB11E00CBB0D6 /* ExperimentalResponses.swift */,
 				6D3AFB891BAB86FC00FAE962 /* Update.swift */,
 			);
 			name = Communication;
@@ -340,6 +343,7 @@
 				6DAC8F101E7CAF0900CBB0D6 /* LightCommand.swift in Sources */,
 				6D269B4F1BB4584500D0EF97 /* DeviceTabViewController.swift in Sources */,
 				6D3AFB8F1BAB86FC00FAE962 /* Response.swift in Sources */,
+				6DAC8F171E7CB11E00CBB0D6 /* ExperimentalResponses.swift in Sources */,
 				6D3AFB671BAB848B00FAE962 /* AppDelegate.swift in Sources */,
 				6D3AFB8C1BAB86FC00FAE962 /* Message.swift in Sources */,
 				6D3AFB921BAB86FC00FAE962 /* Update.swift in Sources */,
