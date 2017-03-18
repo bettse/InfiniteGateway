@@ -40,7 +40,7 @@ class A4Response : StatusResponse {
 }
 
 
-class B1Response : Response {
+class B1Response : StatusResponse {
     var nfcIndex : UInt8  {
         get {
             if let command = command as? B1Command {
@@ -50,10 +50,10 @@ class B1Response : Response {
         }
     }
     
-    var value2 : UInt8  {
+    var sectorNumber : UInt8  {
         get {
             if let command = command as? B1Command {
-                return command.value2
+                return command.sectorNumber
             }
             return 0
         }
@@ -61,7 +61,7 @@ class B1Response : Response {
     
     override var description: String {
         let me = String(describing: type(of: self)).components(separatedBy: ".").last!
-        return "\(me)[\(command.params.toHexString()): \(params.toHexString())]"
+        return "\(me)[\(command.params.toHexString()): \(status)]"
     }
 }
 

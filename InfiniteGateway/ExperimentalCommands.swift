@@ -19,13 +19,13 @@ class A4Command : BlockCommand {
 
 class B1Command : Command {
     var nfcIndex : UInt8 = 0
-    var value2 : UInt8 = 0
+    var sectorNumber : UInt8 = 0
     
-    init(nfcIndex: UInt8, value2: UInt8) {
+    init(nfcIndex: UInt8, sectorNumber: UInt8) {
         super.init(commandType: .b1)
         self.nfcIndex = nfcIndex
-        self.value2 = value2
-        params = Data(bytes: [nfcIndex, value2])
+        self.sectorNumber = sectorNumber
+        params = Data(bytes: [nfcIndex, sectorNumber])
     }
 }
 
