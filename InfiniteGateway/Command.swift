@@ -63,28 +63,6 @@ class Command : Message {
     }
 }
 
-class BlockCommand : Command {
-    var nfcIndex : UInt8
-    var sectorNumber : UInt8
-    var blockNumber : UInt8
-    
-    init(nfcIndex: UInt8, sectorNumber: UInt8, blockNumber: UInt8) {
-        self.nfcIndex = nfcIndex
-        self.sectorNumber = sectorNumber
-        self.blockNumber = blockNumber
-        super.init(commandType: .read)
-        params = Data(bytes: [nfcIndex, sectorNumber, blockNumber])
-    }
-    
-    convenience init(nfcIndex: Int, sectorNumber: Int, blockNumber: Int) {
-        self.init(nfcIndex: UInt8(nfcIndex), sectorNumber: UInt8(sectorNumber), blockNumber: UInt8(blockNumber))
-    }
-    
-    convenience init(nfcIndex: UInt8, sectorNumber: Int, blockNumber: Int) {
-        self.init(nfcIndex: UInt8(nfcIndex), sectorNumber: UInt8(sectorNumber), blockNumber: UInt8(blockNumber))
-    }
-}
-
 class ActivateCommand : Command {
     init() {
         super.init(commandType: .activate)
@@ -117,6 +95,32 @@ class TagIdCommand : Command {
         self.nfcIndex = nfcIndex
         super.init(commandType: .tagId)
         params = Data(bytes: [nfcIndex])
+    }
+}
+
+class BlockCommand : Command {
+    var nfcIndex : UInt8
+    var sectorNumber : UInt8
+    var blockNumber : UInt8
+    
+    init(nfcIndex: UInt8, sectorNumber: UInt8, blockNumber: UInt8) {
+        self.nfcIndex = nfcIndex
+        self.sectorNumber = sectorNumber
+        self.blockNumber = blockNumber
+        super.init(commandType: .read)
+        params = Data(bytes: [nfcIndex, sectorNumber, blockNumber])
+    }
+    
+    convenience init(nfcIndex: Int, sectorNumber: Int, blockNumber: Int) {
+        self.init(nfcIndex: UInt8(nfcIndex), sectorNumber: UInt8(sectorNumber), blockNumber: UInt8(blockNumber))
+    }
+    
+    convenience init(nfcIndex: UInt8, sectorNumber: Int, blockNumber: Int) {
+        self.init(nfcIndex: UInt8(nfcIndex), sectorNumber: UInt8(sectorNumber), blockNumber: UInt8(blockNumber))
+    }
+    
+    convenience init(command: BlockCommand) {
+        self.init(nfcIndex: command.nfcIndex, sectorNumber: command.sectorNumber, blockNumber: command.blockNumber)
     }
 }
 
