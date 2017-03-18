@@ -30,9 +30,8 @@ class LightGetCommand : PlatformCommand {
     }
 }
 
-class LightSetCommand : PlatformCommand {
+class LightCommand : PlatformCommand {
     var red : UInt8, green: UInt8, blue : UInt8
-    
     init(ledPlatform: LedPlatform, red : UInt8, green: UInt8, blue : UInt8) {
         // Set attributes of current class first
         self.red = red
@@ -40,7 +39,6 @@ class LightSetCommand : PlatformCommand {
         self.blue = blue
         // construct parent class and override/modify its attributes
         super.init(ledPlatform: ledPlatform)
-        self.type = .lightSet
         params.append(Data(bytes: [red, green, blue]))
     }
     
@@ -58,6 +56,13 @@ class LightSetCommand : PlatformCommand {
         }
         
         self.init(ledPlatform: ledPlatform, red: r, green: g, blue: b)
+    }
+}
+
+class LightSetCommand : LightCommand {
+    override init(ledPlatform: LedPlatform, red : UInt8, green: UInt8, blue : UInt8) {
+        super.init(ledPlatform: ledPlatform, red: red, green: green, blue: blue)
+        self.type = .lightSet
     }
 }
 
