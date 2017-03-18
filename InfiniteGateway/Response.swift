@@ -229,11 +229,16 @@ class WriteResponse : Response {
 
 }
 
-class LightOnResponse : Response {
+
+class LightResponse : Response {
+
 }
 
-class LightFadeResponse : Response {
+class LightOnResponse : LightResponse {
 }
 
-class LightFlashResponse : Response {
+class LightFadeResponse : LightResponse {
+}
+
+class LightFlashResponse : LightResponse {
 }

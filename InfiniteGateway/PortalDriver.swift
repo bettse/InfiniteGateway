@@ -93,9 +93,11 @@ class PortalDriver : NSObject {
             }
         } else if let response = response as? WriteResponse {
             log.debug(response)
-        } else if let _ = response as? LightOnResponse {
-        } else if let _ = response as? LightFadeResponse {
-        } else if let _ = response as? LightFlashResponse {
+        } else if let response = response as? LightResponse {
+            lightResponse(response)
+        } else if let response = response as? A4Response {
+            log.debug(response)
+            portal.outputCommand(ReadCommand(nfcIndex: response.nfcIndex, block: 5))
         } else if let response = response as? B1Response {
             log.debug(response)
             let value2 = response.value2
@@ -112,6 +114,13 @@ class PortalDriver : NSObject {
             self.portal.outputCommand(C0Command())
         } else {
             log.debug("Received \(response) for command \(response.command)")
+        }
+    }
+    
+    func lightResponse(_ response: LightResponse) {
+        if let _ = response as? LightOnResponse {
+        } else if let _ = response as? LightFadeResponse {
+        } else if let _ = response as? LightFlashResponse {
         }
     }
 
