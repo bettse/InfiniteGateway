@@ -116,16 +116,18 @@ class ReadCommand : Command {
 
 class WriteCommand : Command {
     var nfcIndex : UInt8
+    var sectorNumber : UInt8
     var blockNumber : UInt8
     var blockData : Data
     
     init(nfcIndex: UInt8, block: UInt8, blockData: Data) {
         self.nfcIndex = nfcIndex
         self.blockNumber = block
+        self.sectorNumber = 0
         self.blockData = blockData
         super.init()
         type = .write
-        var temp : Data = Data(bytes: [nfcIndex, 0x00, block])
+        var temp : Data = Data(bytes: [nfcIndex, sectorNumber, blockNumber])
         temp.append(blockData)
         params = temp
     }
