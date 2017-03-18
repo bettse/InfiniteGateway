@@ -34,14 +34,16 @@ class DeviceTabViewController: NSViewController {
         self.nfcTable?.target = self
     }
 
-    func tokenLoaded(_ ledPlatform: Message.LedPlatform, nfcIndex: Int, token: Token) {
-        if (nfcIndex == -1) { //token from disk image
-            self.performSegue(withIdentifier: "TokenDetail", sender: token)
-        } else {
-            nfcMap[Int(nfcIndex)] = token
-        }
-        if let table = nfcTable {
-            table.reloadData()
+    func tokenLoaded(_ ledPlatform: Message.LedPlatform, nfcIndex: Int, token: Token?) {
+        if let token = token {
+            if (nfcIndex == -1) { //token from disk image
+                self.performSegue(withIdentifier: "TokenDetail", sender: token)
+            } else {
+                nfcMap[Int(nfcIndex)] = token
+            }
+            if let table = nfcTable {
+                table.reloadData()
+            }
         }
     }
     
@@ -80,7 +82,7 @@ class DeviceTabViewController: NSViewController {
         status?.stringValue = "Portal Connected"
     }
     
-    func tokenLeft(_ ledPlatform: Message.LedPlatform, nfcIndex: Int) {
+    func tokenLeft(_ ledPlatform: Message.LedPlatform, nfcIndex: Int, token: Token?) {
         if (nfcMap.keys.contains(nfcIndex)) {
             nfcMap.removeValue(forKey: nfcIndex)
         }

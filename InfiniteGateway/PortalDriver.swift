@@ -11,8 +11,8 @@ import Cocoa
 
 //Handles initial activation, requestion more token data, notification about new tokens
 
-typealias tokenLoad = (Message.LedPlatform, Int, Token) -> Void
-typealias tokenLeft = (Message.LedPlatform, Int) -> Void
+typealias tokenEvent = (Message.LedPlatform, Int, Token?) -> Void
+
 class PortalDriver : NSObject {
     static let magic : Data = "(c) Disney 2013".data(using: String.Encoding.ascii)!
     static let secret : Data = Data(bytes: [0xAF, 0x62, 0xD2, 0xEC, 0x04, 0x91, 0x96, 0x8C, 0xC5, 0x2A, 0x1A, 0x71, 0x65, 0xF8, 0x65, 0xFE])
@@ -23,8 +23,10 @@ class PortalDriver : NSObject {
     var presence = Dictionary<UInt8, Detail>()
     var encryptedTokens : [UInt8:EncryptedToken] = [:]
     
-    var loadTokenCallbacks : [tokenLoad] = []
-    var leftTokenCallbacks : [tokenLeft] = []
+    
+    //var callbacks : Dictionary<String, tokenEvent> = [:]
+    var loadTokenCallbacks : [tokenEvent] = []
+    var leftTokenCallbacks : [tokenEvent] = []
     
     override init() {
         super.init()
@@ -39,10 +41,10 @@ class PortalDriver : NSObject {
         }
     }
     
-    func registerTokenLoaded(_ callback: @escaping tokenLoad) {
+    func registerTokenLoaded(_ callback: @escaping tokenEvent) {
         loadTokenCallbacks.append(callback)
     }
-    func registerTokenLeft(_ callback: @escaping tokenLeft) {
+    func registerTokenLeft(_ callback: @escaping tokenEvent) {
         leftTokenCallbacks.append(callback)
     }
 
@@ -63,7 +65,7 @@ class PortalDriver : NSObject {
             presence.removeValue(forKey: update.nfcIndex)
             DispatchQueue.main.async(execute: {
                 for callback in self.leftTokenCallbacks {
-                    callback(update.ledPlatform, Int(update.nfcIndex))
+                    callback(update.ledPlatform, Int(update.nfcIndex), nil)
                 }
             })
         }        
