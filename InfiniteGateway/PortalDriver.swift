@@ -84,7 +84,7 @@ class PortalDriver : NSObject {
             encryptedTokens[response.nfcIndex] = EncryptedToken(tagId: response.tagId)
             let detail = presence[response.nfcIndex]            
             if (detail?.sak == .mifareMini) {
-                portal.outputCommand(ReadCommand(nfcIndex: response.nfcIndex, block: 0))
+                portal.outputCommand(ReadCommand(nfcIndex: response.nfcIndex, sectorNumber: 0, blockNumber: 0))
             }
         } else if let response = response as? ReadResponse {
             log.debug(response)
@@ -97,7 +97,7 @@ class PortalDriver : NSObject {
             lightResponse(response)
         } else if let response = response as? A4Response {
             log.debug(response)
-            portal.outputCommand(ReadCommand(nfcIndex: response.nfcIndex, block: 5))
+            portal.outputCommand(ReadCommand(nfcIndex: response.nfcIndex, sectorNumber: 0, blockNumber: 5))
         } else if let response = response as? B1Response {
             log.debug(response)
             let value2 = response.value2
@@ -143,7 +143,7 @@ class PortalDriver : NSObject {
                 encryptedTokens.removeValue(forKey: response.nfcIndex)
             } else {
                 let nextBlock = token.nextBlock()
-                portal.outputCommand(ReadCommand(nfcIndex: response.nfcIndex, block: nextBlock))
+                portal.outputCommand(ReadCommand(nfcIndex: response.nfcIndex, sectorNumber: 0, blockNumber: nextBlock))
             }
         } //end if token
     }

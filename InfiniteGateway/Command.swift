@@ -68,6 +68,28 @@ class Command : Message {
     }
 }
 
+class BlockCommand : Command {
+    var nfcIndex : UInt8
+    var sectorNumber : UInt8
+    var blockNumber : UInt8
+    
+    init(nfcIndex: UInt8, sectorNumber: UInt8, blockNumber: UInt8) {
+        self.nfcIndex = nfcIndex
+        self.sectorNumber = sectorNumber
+        self.blockNumber = blockNumber
+        super.init(commandType: .read)
+        params = Data(bytes: [nfcIndex, sectorNumber, blockNumber])
+    }
+    
+    convenience init(nfcIndex: Int, sectorNumber: Int, blockNumber: Int) {
+        self.init(nfcIndex: UInt8(nfcIndex), sectorNumber: UInt8(sectorNumber), blockNumber: UInt8(blockNumber))
+    }
+    
+    convenience init(nfcIndex: UInt8, sectorNumber: Int, blockNumber: Int) {
+        self.init(nfcIndex: UInt8(nfcIndex), sectorNumber: UInt8(sectorNumber), blockNumber: UInt8(blockNumber))
+    }
+}
+
 class ActivateCommand : Command {
     override init() {
         super.init(commandType: .activate, params: PortalDriver.magic)
@@ -102,19 +124,10 @@ class TagIdCommand : Command {
     }
 }
 
-class ReadCommand : Command {
-    var nfcIndex : UInt8
-    var blockNumber : UInt8
-
-    init(nfcIndex: UInt8, block: UInt8) {
-        self.nfcIndex = nfcIndex
-        self.blockNumber = block
-        super.init(commandType: .read)
-        params = Data(bytes: [nfcIndex, 0x00, block])
-    }
-    
-    convenience init(nfcIndex: UInt8, block: Int) {
-        self.init(nfcIndex: nfcIndex, block: UInt8(block))
+class ReadCommand : BlockCommand {
+    override init(nfcIndex: UInt8, sectorNumber: UInt8, blockNumber: UInt8) {
+        super.init(nfcIndex: nfcIndex, sectorNumber: sectorNumber, blockNumber: blockNumber)
+        self.type = .read
     }
 }
 
