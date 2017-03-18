@@ -10,13 +10,17 @@ import Foundation
 
 
 class A4Command : Command {
-    init(nfcIndex: UInt8, value: UInt8) {
+    var nfcIndex : UInt8 = 0
+    var sector : UInt8 = 0
+    var block : UInt8 = 0
+    
+    init(nfcIndex: UInt8, sector: UInt8, block: UInt8) {
         super.init()
         type = .a4
-        var start = Data(bytes: [nfcIndex])
-        let content = Data(bytes: [UInt8](repeating: value, count: 2))
-        start.append(content)
-        params = start
+        self.nfcIndex = nfcIndex
+        self.sector = sector
+        self.block = block
+        params = Data(bytes: [nfcIndex, sector, block])
     }
     
     override var description: String {

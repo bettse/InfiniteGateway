@@ -58,6 +58,8 @@ class Response : Message {
             return SeedResponse(data: data)
         case .next:
             return NextResponse(data: data)
+        case .a4:
+            return A4Response(data: data)
         case .b1:
             return B1Response(data: data)
         case .b8:
@@ -226,7 +228,36 @@ class NextResponse : Response {
 }
 
 class WriteResponse : Response {
-
+    let statusIndex = 1
+    var status : Status
+    
+    //Delegates for easier access
+    var blockNumber : UInt8  {
+        get {
+            if let command = command as? WriteCommand {
+                return command.blockNumber
+            }
+            return 0
+        }
+    }
+    var nfcIndex : UInt8  {
+        get {
+            if let command = command as? WriteCommand {
+                return command.nfcIndex
+            }
+            return 0
+        }
+    }
+    
+    override init(data: Data) {
+        status = Status(rawValue: data[statusIndex]) ?? .unknown
+        super.init(data: data)
+    }
+    
+    override var description: String {
+        let me = String(describing: type(of: self)).components(separatedBy: ".").last!        
+        return "\(me)(index \(nfcIndex) block \(blockNumber): Status: \(status))"
+    }
 }
 
 

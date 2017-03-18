@@ -8,6 +8,45 @@
 
 import Foundation
 
+class A4Response : Response {
+    let statusIndex = 1
+    var status : Status
+
+    var a4command : A4Command {
+        get {
+            return (command as? A4Command)!
+        }
+    }
+    
+    var nfcIndex : UInt8  {
+        get {
+            return a4command.nfcIndex
+        }
+    }
+    
+    var sector : UInt8  {
+        get {
+            return a4command.sector
+        }
+    }
+    
+    var block : UInt8  {
+        get {
+            return a4command.block
+        }
+    }
+    
+    override init(data: Data) {
+        status = Status(rawValue: data[statusIndex]) ?? .unknown
+        super.init(data: data)
+    }
+    
+    override var description: String {
+        let me = String(describing: type(of: self)).components(separatedBy: ".").last!
+        return "\(me)(\(status) \(params.toHexString()))"
+    }
+}
+
 
 class B1Response : Response {
     var nfcIndex : UInt8  {
