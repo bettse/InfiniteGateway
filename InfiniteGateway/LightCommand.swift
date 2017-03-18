@@ -46,16 +46,8 @@ class LightCommand : PlatformCommand {
         self.init(ledPlatform: ledPlatform, red: UInt8(red), green: UInt8(green), blue: UInt8(blue))
     }
     
-    convenience init(ledPlatform: LedPlatform, color : NSColor) {
-        var r : UInt8 = 0, g: UInt8 = 0, b : UInt8 = 0
-        let scale : CGFloat = CGFloat(UInt8.max)
-        if let calibratedColor : NSColor = color.usingColorSpaceName(NSCalibratedRGBColorSpace) {
-            r = UInt8(Int(calibratedColor.redComponent * scale))
-            g = UInt8(Int(calibratedColor.greenComponent * scale))
-            b = UInt8(Int(calibratedColor.blueComponent * scale))
-        }
-        
-        self.init(ledPlatform: ledPlatform, red: r, green: g, blue: b)
+    convenience init(ledPlatform: LedPlatform, color : NSColor) {        
+        self.init(ledPlatform: ledPlatform, red: color.redByte, green: color.greenByte, blue: color.blueByte)
     }
 }
 
@@ -66,21 +58,16 @@ class LightSetCommand : LightCommand {
     }
 }
 
-class LightFadeCommand : Command {
-    var ledPlatform : LedPlatform
-    var red : UInt8, green: UInt8, blue : UInt8
+class LightFadeCommand : LightCommand {
     var speed : UInt8 = 0
     var count : UInt8 = 0 //Even to end on original color, odd to end on new color
     
     init(ledPlatform: LedPlatform, red : UInt8, green: UInt8, blue : UInt8, speed : UInt8, count: UInt8) {
-        self.ledPlatform = ledPlatform
-        self.red = red
-        self.green = green
-        self.blue = blue
+        super.init(ledPlatform: ledPlatform, red: red, green: green, blue: blue)
+        self.type = .lightFade
         self.speed = speed
         self.count = count
-        super.init(commandType: .lightFade)
-        params = Data(bytes: [ledPlatform.rawValue, red, green, blue, speed, count])
+        params.append(Data(bytes: [speed, count]))
     }
     
     convenience init(ledPlatform: LedPlatform, red : Int, green: Int, blue : Int, speed: Int, count: Int) {
@@ -88,15 +75,7 @@ class LightFadeCommand : Command {
     }
     
     convenience init(ledPlatform: LedPlatform, color : NSColor, speed: UInt8, count: UInt8) {
-        var r : UInt8 = 0, g: UInt8 = 0, b : UInt8 = 0
-        let scale : CGFloat = CGFloat(UInt8.max)
-        if let calibratedColor : NSColor = color.usingColorSpaceName(NSCalibratedRGBColorSpace) {
-            r = UInt8(Int(calibratedColor.redComponent * scale))
-            g = UInt8(Int(calibratedColor.greenComponent * scale))
-            b = UInt8(Int(calibratedColor.blueComponent * scale))
-        }
-        
-        self.init(ledPlatform: ledPlatform, red: r, green: g, blue: b, speed: speed, count: count)
+        self.init(ledPlatform: ledPlatform, red: color.redByte, green: color.greenByte, blue: color.blueByte, speed: speed, count: count)
     }
     
     convenience init(ledPlatform: LedPlatform, color : NSColor, speed: Int, count: Int) {
@@ -125,15 +104,6 @@ class LightFlashCommand : Command {
     }
     
     convenience init(ledPlatform: LedPlatform, color : NSColor, timeNew : UInt8, timeOld : UInt8, count: UInt8) {
-        var r : UInt8 = 0, g: UInt8 = 0, b : UInt8 = 0
-        let scale : CGFloat = CGFloat(UInt8.max)
-        if let calibratedColor : NSColor = color.usingColorSpaceName(NSCalibratedRGBColorSpace) {
-            r = UInt8(Int(calibratedColor.redComponent * scale))
-            g = UInt8(Int(calibratedColor.greenComponent * scale))
-            b = UInt8(Int(calibratedColor.blueComponent * scale))
-        }
-        
-        self.init(ledPlatform: ledPlatform, red: r, green: g, blue: b, timeNew: timeNew, timeOld: timeOld, count: count)
+        self.init(ledPlatform: ledPlatform, red: color.redByte, green: color.greenByte, blue: color.blueByte, timeNew: timeNew, timeOld: timeOld, count: count)
     }
-    
 }
