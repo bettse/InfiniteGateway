@@ -21,15 +21,15 @@ class A4Response : StatusResponse {
         }
     }
     
-    var sector : UInt8  {
+    var sectorNumber : UInt8  {
         get {
-            return a4command.sector
+            return a4command.sectorNumber
         }
     }
     
-    var block : UInt8  {
+    var blockNumber : UInt8  {
         get {
-            return a4command.block
+            return a4command.blockNumber
         }
     }
     

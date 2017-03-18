@@ -9,23 +9,11 @@
 import Foundation
 
 
-class A4Command : Command {
-    var nfcIndex : UInt8 = 0
-    var sector : UInt8 = 0
-    var block : UInt8 = 0
+class A4Command : BlockCommand {
     
-    init(nfcIndex: UInt8, sector: UInt8, block: UInt8) {
-        super.init()
+    override init(nfcIndex: UInt8, sectorNumber: UInt8, blockNumber: UInt8) {
+        super.init(nfcIndex: nfcIndex, sectorNumber: sectorNumber, blockNumber: blockNumber)
         type = .a4
-        self.nfcIndex = nfcIndex
-        self.sector = sector
-        self.block = block
-        params = Data(bytes: [nfcIndex, sector, block])
-    }
-    
-    override var description: String {
-        let me = String(describing: type(of: self)).components(separatedBy: ".").last!
-        return "\(me)(\(type.desc()): \(params.toHexString()))"
     }
 }
 
