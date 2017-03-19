@@ -13,6 +13,7 @@ import Cocoa
 
 typealias tokenEvent = (Message.LedPlatform, Int, Token?) -> Void
 typealias deviceEvent = (Void) -> Void
+typealias responseEvent = (Response) -> Void
 
 class PortalDriver : NSObject {
     static let magic : Data = "(c) Disney 2013".data(using: String.Encoding.ascii)!
@@ -26,6 +27,7 @@ class PortalDriver : NSObject {
     
     var tokenCallbacks : [String:[tokenEvent]] = [:]
     var deviceCallbacks : [String:[deviceEvent]] = [:]
+    var responseCallbacks : [String:[responseEvent]] = [:]
     
     override init() {
         super.init()
@@ -35,6 +37,7 @@ class PortalDriver : NSObject {
         NotificationCenter.default.addObserver(self, selector: #selector(PortalDriver.incomingMessage(_:)), name: NSNotification.Name(rawValue: "incomingMessage"), object: nil)        
         
         self.registerDeviceCallback("connected", callback: self.activatePortal)
+        self.registerResponseCallback("*", callback: self.logResponse)
         
         portalThread = Thread(target: self.portal, selector:#selector(Portal.initUsb), object: nil)
         if let thread = portalThread {
@@ -59,12 +62,28 @@ class PortalDriver : NSObject {
         deviceCallbacks[event] = deviceCallbacks[event] ?? []
         deviceCallbacks[event]?.append(callback)
     }
-    
-    
+
     func fireDeviceCallbacks(event: String) {
         DispatchQueue.main.async(execute: {
             for callback in self.deviceCallbacks[event] ?? [] {
                 callback()
+            }
+        })
+    }
+    
+    func registerResponseCallback(_ event: String, callback: @escaping responseEvent) {
+        responseCallbacks[event] = responseCallbacks[event] ?? []
+        responseCallbacks[event]?.append(callback)
+    }
+
+    func fireResponseCallbacks(event: String, response: Response) {
+        DispatchQueue.main.async(execute: {
+            for callback in self.responseCallbacks[event] ?? [] {
+                callback(response)
+            }
+            
+            for callback in self.responseCallbacks["*"] ?? [] {
+                callback(response)
             }
         })
     }
@@ -77,15 +96,17 @@ class PortalDriver : NSObject {
         fireDeviceCallbacks(event: "disconnected")
     }
     
-    
     // Start of "Business logic" //
     
     func activatePortal() {
         portal.outputCommand(ActivateCommand())
     }
     
+    func logResponse(response: Response) {
+        log.debug(response)
+    }
+    
     func incomingUpdate(_ update: Update) {
-        log.debug(update)
         var updateColor : NSColor = NSColor()
         if (update.direction == Update.Direction.arriving) {
             updateColor = NSColor.white
@@ -104,6 +125,8 @@ class PortalDriver : NSObject {
     }
     
     func incomingResponse(_ response: Response) {
+        let responseName = String(describing: type(of: response))
+        fireResponseCallbacks(event: responseName, response: response)
         if let _ = response as? ActivateResponse {
             portal.outputCommand(PresenceCommand())
         } else if let response = response as? PresenceResponse {
