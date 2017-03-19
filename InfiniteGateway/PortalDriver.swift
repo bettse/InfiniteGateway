@@ -32,8 +32,9 @@ class PortalDriver : NSObject {
         
         NotificationCenter.default.addObserver(self, selector: #selector(PortalDriver.deviceConnected(_:)), name: NSNotification.Name(rawValue: "deviceConnected"), object: nil)
         NotificationCenter.default.addObserver(self, selector: #selector(PortalDriver.deviceDisconnected(_:)), name: NSNotification.Name(rawValue: "deviceDiscnnected"), object: nil)
-        NotificationCenter.default.addObserver(self, selector: #selector(PortalDriver.incomingMessage(_:)), name: NSNotification.Name(rawValue: "incomingMessage"), object: nil)
-        //NSNotificationCenter.defaultCenter().addObserver(self, selector: "deviceDisconnected:", name: "deviceDisconnected", object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(PortalDriver.incomingMessage(_:)), name: NSNotification.Name(rawValue: "incomingMessage"), object: nil)        
+        
+        self.registerDeviceCallback("connected", callback: self.activatePortal)
         
         portalThread = Thread(target: self.portal, selector:#selector(Portal.initUsb), object: nil)
         if let thread = portalThread {
@@ -46,45 +47,58 @@ class PortalDriver : NSObject {
         tokenCallbacks[event]?.append(callback)
     }
 
+    func fireTokenCallbacks(event: String, detail: Detail, token: Token?) {
+        DispatchQueue.main.async(execute: {
+            for callback in self.tokenCallbacks[event] ?? [] {
+                callback(detail.platform, Int(detail.nfcIndex), token)
+            }
+        })
+    }
+    
     func registerDeviceCallback(_ event: String, callback: @escaping deviceEvent) {
         deviceCallbacks[event] = deviceCallbacks[event] ?? []
         deviceCallbacks[event]?.append(callback)
     }
     
-    func deviceConnected(_ notification: Notification) {
-        portal.outputCommand(ActivateCommand())
-        
+    
+    func fireDeviceCallbacks(event: String) {
         DispatchQueue.main.async(execute: {
-            for callback in self.deviceCallbacks["connected"] ?? [] {
+            for callback in self.deviceCallbacks[event] ?? [] {
                 callback()
             }
         })
     }
+    
+    func deviceConnected(_ notification: Notification) {
+        fireDeviceCallbacks(event: "connected")
+    }
 
     func deviceDisconnected(_ notification: Notification) {
-        DispatchQueue.main.async(execute: {
-            for callback in self.deviceCallbacks["disconnected"] ?? [] {
-                callback()
-            }
-        })
+        fireDeviceCallbacks(event: "disconnected")
+    }
+    
+    
+    // Start of "Business logic" //
+    
+    func activatePortal() {
+        portal.outputCommand(ActivateCommand())
     }
     
     func incomingUpdate(_ update: Update) {
         log.debug(update)
         var updateColor : NSColor = NSColor()
         if (update.direction == Update.Direction.arriving) {
-            // NB: We don't call loadTokenCallbacks until token data is read
             updateColor = NSColor.white
-            presence[update.nfcIndex] = Detail(nfcIndex: update.nfcIndex, platform: update.ledPlatform, sak: update.sak)
+            let detail = Detail(nfcIndex: update.nfcIndex, platform: update.ledPlatform, sak: update.sak)
+            presence[update.nfcIndex] = detail
             portal.outputCommand(TagIdCommand(nfcIndex: update.nfcIndex))
+            fireTokenCallbacks(event: "loaded", detail: detail, token: nil)
         } else if (update.direction == Update.Direction.departing) {
             updateColor = NSColor.black
-            presence.removeValue(forKey: update.nfcIndex)
-            DispatchQueue.main.async(execute: {
-                for callback in self.tokenCallbacks["left"] ?? [] {
-                    callback(update.ledPlatform, Int(update.nfcIndex), nil)
-                }
-            })
+            if let detail = presence[update.nfcIndex] {
+                fireTokenCallbacks(event: "left", detail: detail, token: nil)
+                presence.removeValue(forKey: update.nfcIndex)
+            }
         }        
         portal.outputCommand(LightSetCommand(ledPlatform: update.ledPlatform, color: updateColor))
     }

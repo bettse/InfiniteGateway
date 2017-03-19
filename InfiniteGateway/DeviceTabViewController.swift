@@ -27,7 +27,6 @@ class DeviceTabViewController: NSViewController {
         portalDriver.registerDeviceCallback("connected", callback: self.deviceConnected)
         portalDriver.registerDeviceCallback("disconnected", callback: self.deviceDisconnected)
         
-        portalDriver.registerTokenCallback("loaded", callback: self.tokenComplete)
         portalDriver.registerTokenCallback("complete", callback: self.tokenComplete)
         portalDriver.registerTokenCallback("left", callback: self.tokenLeft)
         
