@@ -19,32 +19,29 @@ class Response : Message {
         case unknown = 0xff
     }
     
-    let corrolationIdIndex = 0
+    let sequenceIdIndex = 0
     let paramsIndex = 1
     
-    var corrolationId : UInt8 = 0
+    var sequenceId : UInt8 = 0
     var params : Data
-
-    //lol delegate
+    
+    var command : Command {
+        get {
+            let baseCommand = (Message.archive[sequenceId] as! Command)
+            return baseCommand
+        }
+    }
+    
     var type : CommandType {
         get {
             return command.type
         }
     }
     
-    //IDEA: dictionary to map command type to command class and/or response class
-    // or returning subclass that has been cast to base class    
-    var command : Command {
-        get {
-            let baseCommand = (Message.archive[corrolationId] as! Command)
-            return baseCommand
-        }
-    }
-    
     required init(data: Data) {
         self.params = data.subdata(in: paramsIndex..<data.count)
         super.init()
-        corrolationId = data[corrolationIdIndex]        
+        sequenceId = data[sequenceIdIndex]        
     }
     
     static func parse(_ data: Data) -> Response {

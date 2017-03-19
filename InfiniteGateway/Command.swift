@@ -11,30 +11,30 @@ import Foundation
 
 class Command : Message {
     let typeIndex = 0
-    let corrolationIdIndex = 1
+    let sequenceIdIndex = 1
     let paramsIndex = 2
 
-    static var corrolationGenerator = (1..<UInt8.max-1).makeIterator()
+    static var sequenceGenerator = (1..<UInt8.max-1).makeIterator()
     static var nextSequence : UInt8 {
         get {
-            if let next = corrolationGenerator.next() {
+            if let next = sequenceGenerator.next() {
                 return next
             }
             //Implicitly else
-            corrolationGenerator = (1..<UInt8.max-1).makeIterator()
+            sequenceGenerator = (1..<UInt8.max-1).makeIterator()
             return 0
         }
     }
     
     var type : CommandType = .unset
     var responseClass : Response.Type = AckResponse.self
-    var corrolationId : UInt8 = 0
+    var sequenceId : UInt8 = 0
     var params : Data = Data()
 
     init(commandType: CommandType) {
-        corrolationId = Command.nextSequence
+        sequenceId = Command.nextSequence
         super.init()
-        Message.archive[corrolationId] = self
+        Message.archive[sequenceId] = self
         self.type = commandType
     }
     
@@ -46,7 +46,7 @@ class Command : Message {
     //Parseing from NSData
     init(data: Data) {
         type = Message.CommandType(rawValue: data[typeIndex]) ?? .unset
-        corrolationId = data[corrolationIdIndex]
+        sequenceId = data[sequenceIdIndex]
         params = data.subdata(in: paramsIndex..<data.count)
     }
     
@@ -58,7 +58,7 @@ class Command : Message {
     func serialize() -> Data {
         var data = Data()
         data.append(Data([type.rawValue]))
-        data.append(Data([corrolationId]))
+        data.append(Data([sequenceId]))
         data.append(params)
         return data
     }
