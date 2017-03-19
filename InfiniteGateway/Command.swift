@@ -27,6 +27,7 @@ class Command : Message {
     }
     
     var type : CommandType = .unset
+    var responseClass : Response.Type = AckResponse.self
     var corrolationId : UInt8 = 0
     var params : Data = Data()
 
@@ -66,6 +67,7 @@ class Command : Message {
 class ActivateCommand : Command {
     init() {
         super.init(commandType: .activate)
+        responseClass = ActivateResponse.self
         params = PortalDriver.magic
     }
 }
@@ -73,6 +75,7 @@ class ActivateCommand : Command {
 class SeedCommand : Command {
     init() {
         super.init(commandType: .seed)
+        responseClass = SeedResponse.self
         params = Data(bytes: [0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00])
     }
 }
@@ -80,12 +83,14 @@ class SeedCommand : Command {
 class NextCommand : Command {
     init() {
         super.init(commandType: .next)
+        responseClass = NextResponse.self
     }
 }
 
 class PresenceCommand : Command {
     init() {
         super.init(commandType: .presence)
+        responseClass = PresenceResponse.self
     }
 }
 
@@ -94,6 +99,7 @@ class TagIdCommand : Command {
     init(nfcIndex: UInt8) {
         self.nfcIndex = nfcIndex
         super.init(commandType: .tagId)
+        responseClass = TagIdResponse.self
         params = Data(bytes: [nfcIndex])
     }
 }
@@ -127,6 +133,7 @@ class BlockCommand : Command {
 class ReadCommand : BlockCommand {
     override init(nfcIndex: UInt8, sectorNumber: UInt8, blockNumber: UInt8) {
         super.init(nfcIndex: nfcIndex, sectorNumber: sectorNumber, blockNumber: blockNumber)
+        responseClass = ReadResponse.self
         self.type = .read
     }
 }
@@ -137,6 +144,7 @@ class WriteCommand : BlockCommand {
     init(nfcIndex: UInt8, sectorNumber: UInt8, blockNumber: UInt8, blockData: Data) {
         self.blockData = blockData
         super.init(nfcIndex: nfcIndex, sectorNumber: sectorNumber, blockNumber: blockNumber)
+        responseClass = StatusResponse.self
         self.type = .read
         
         //Params set to [nfcIndex, sectorNumber, blockNumber] by parent class

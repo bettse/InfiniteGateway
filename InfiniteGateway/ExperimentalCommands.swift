@@ -12,6 +12,7 @@ import Foundation
 class A4Command : BlockCommand {
     override init(nfcIndex: UInt8, sectorNumber: UInt8, blockNumber: UInt8) {
         super.init(nfcIndex: nfcIndex, sectorNumber: sectorNumber, blockNumber: blockNumber)
+        responseClass = A4Response.self
         type = .a4
     }
 }
@@ -19,6 +20,7 @@ class A4Command : BlockCommand {
 class A5Command : BlockCommand {
     init(nfcIndex: UInt8, sectorNumber: UInt8, blockNumber: UInt8, contents: Data) {
         super.init(nfcIndex: nfcIndex, sectorNumber: sectorNumber, blockNumber: blockNumber)
+        responseClass = StatusResponse.self
         type = .a5
         params.append(contents)
     }
@@ -30,6 +32,7 @@ class B1Command : Command {
     
     init(nfcIndex: UInt8, sectorNumber: UInt8) {
         super.init(commandType: .b1)
+        responseClass = StatusResponse.self
         self.nfcIndex = nfcIndex
         self.sectorNumber = sectorNumber
         params = Data(bytes: [nfcIndex, sectorNumber])
@@ -41,6 +44,7 @@ class B8Command : Command {
     
     init(value: UInt8) {
         super.init(commandType: .b8)
+        responseClass = B8Response.self
         self.value = value
         let content = Data(bytes: [UInt8](repeating: value, count: 24))
         var start = Data(bytes: [0x2b])
@@ -60,6 +64,7 @@ class B9Command : Command {
     
     init(value: UInt8) {
         super.init(commandType: .b9)
+        responseClass = B9Response.self
         self.value = value
         params = Data(bytes: [value])
     }
@@ -77,6 +82,7 @@ class BeCommand : Command {
     
     init(value: UInt8) {
         super.init(commandType: .be)
+        responseClass = StatusResponse.self
         self.value = value
         params = Data(bytes: [value])
     }
@@ -90,6 +96,7 @@ class BeCommand : Command {
 class C0Command : Command {
     init() {
         super.init(commandType: .c0)
+        responseClass = StatusResponse.self
     }
 }
 
@@ -98,6 +105,7 @@ class C1Command : Command {
     
     init(value: UInt8) {
         super.init(commandType: .c1)
+        responseClass = StatusResponse.self
         self.value = value
         params = Data(bytes: [value])
     }

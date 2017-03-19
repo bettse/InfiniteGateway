@@ -41,7 +41,7 @@ class Response : Message {
         }
     }
     
-    init(data: Data) {
+    required init(data: Data) {
         self.params = data.subdata(in: paramsIndex..<data.count)
         super.init()
         corrolationId = data[corrolationIdIndex]        
@@ -49,35 +49,8 @@ class Response : Message {
     
     static func parse(_ data: Data) -> Response {
         let r : Response = Response(data: data)
-        if (r.params.count == 0) {
-            return AckResponse(data: data)
-        }
-        if (r.params.count == 1) {
-            return StatusResponse(data: data)
-        }
-        
-        switch r.command.type {
-        case .activate:
-            return ActivateResponse(data: data)
-        case .tagId:
-            return TagIdResponse(data: data)
-        case .presence:
-            return PresenceResponse(data: data)
-        case .read:
-            return ReadResponse(data: data)
-        case .seed:
-            return SeedResponse(data: data)
-        case .next:
-            return NextResponse(data: data)
-        case .a4:
-            return A4Response(data: data)
-        case .b8:
-            return B8Response(data: data)
-        case .b9:
-            return B9Response(data: data)
-        default:
-            return r
-        }
+        let responseClass : Response.Type = r.command.responseClass
+        return responseClass.init(data: data)
     }
     
     override var description: String {
@@ -92,7 +65,7 @@ class StatusResponse : Response {
     let statusIndex = 1
     var status : Status
     
-    override init(data: Data) {
+    required init(data: Data) {
         status = Status(rawValue: data[statusIndex]) ?? .unknown
         super.init(data: data)
     }
@@ -123,7 +96,7 @@ class TagIdResponse : StatusResponse {
     
     var tagId : Data
     
-    override init(data: Data) {        
+    required init(data: Data) {        
         tagId = data.subdata(in: tagIdIndex..<data.count)
         super.init(data: data)
     }
@@ -149,7 +122,7 @@ class PresenceResponse : Response {
 
     var details = Array<Detail>()
     
-    override init(data: Data) {
+    required init(data: Data) {
         super.init(data: data)
         for i in stride(from: 0, to: params.count, by: 2) {
             let led : LedPlatform = LedPlatform(rawValue: params[i+platformOffset].high_nibble) ?? .none
@@ -196,7 +169,7 @@ class ReadResponse : StatusResponse {
         }
     }
     
-    override init(data: Data) {
+    required init(data: Data) {
         super.init(data: data)
         if (status == .success) {
             blockData = data.subdata(in: blockDataIndex..<data.count)
@@ -218,7 +191,7 @@ class NextResponse : Response {
     let scrambledIndex = 1
     var value : UInt64 = 0
     
-    override init(data: Data) {
+    required init(data: Data) {
         var scrambled : UInt64 = 0
         let start = data.subdata(in: scrambledIndex..<data.count)
         scrambled = start.uint64
