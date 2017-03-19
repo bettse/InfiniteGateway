@@ -147,6 +147,7 @@ class PortalDriver : NSObject {
     // Start of "Business logic" //
     
     func incomingUpdate(_ update: Update) {
+        log.debug(update)
         var updateColor : NSColor = NSColor()
         if (update.direction == Update.Direction.arriving) {
             updateColor = NSColor.white
@@ -162,11 +163,6 @@ class PortalDriver : NSObject {
             }
         }        
         portal.outputCommand(LightSetCommand(ledPlatform: update.ledPlatform, color: updateColor))
-    }
-    
-    func incomingResponse(_ response: Response) {
-        let responseName = String(describing: type(of: response))
-        fireResponseCallbacks(event: responseName, response: response)
     }
     
     func incomingStatus(_ response: StatusResponse) {
@@ -207,7 +203,8 @@ class PortalDriver : NSObject {
             if let update = message as? Update {
                 incomingUpdate(update)
             } else if let response = message as? Response {
-                incomingResponse(response)
+                let responseName = String(describing: type(of: response))
+                fireResponseCallbacks(event: responseName, response: response)
             }
         }
     }
