@@ -37,6 +37,11 @@ class Response : Message {
         }
     }
     
+    override var description : String {
+        let me = String(describing: type(of: self))
+        return "\(me) for \(command)"
+    }
+    
     static func parse(_ data: Data) -> Response {
         let sequenceIdIndex = 0
         let command = Message.archive[data[sequenceIdIndex]]!
@@ -57,6 +62,11 @@ class StatusResponse : Response {
     let statusIndex = 1
     var status : Status
     
+    override var description : String {
+        let me = String(describing: type(of: self))
+        return "\(me)(\(status)) for \(command)"
+    }
+    
     required init(data: Data) {
         status = Status(rawValue: data[statusIndex]) ?? .unknown
         super.init(data: data)
@@ -74,6 +84,11 @@ class TagIdResponse : StatusResponse {
             }
             return 0
         }
+    }
+    
+    override var description : String {
+        let me = String(describing: type(of: self))
+        return "\(me)(\(tagId.toHexString())) for \(command)"
     }
     
     var tagId : Data
@@ -98,6 +113,11 @@ class PresenceResponse : Response {
     let sakOffset = 1
 
     var details = Array<Detail>()
+    
+    override var description : String {
+        let me = String(describing: type(of: self))
+        return "\(me)(\(details)) for \(command)"
+    }
     
     required init(data: Data) {
         super.init(data: data)

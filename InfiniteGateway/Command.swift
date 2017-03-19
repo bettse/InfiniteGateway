@@ -26,6 +26,11 @@ class Command : Message {
         }
     }
     
+    override var description : String {
+        let me = String(describing: type(of: self))
+        return "\(me) \(params.toHexString())"
+    }
+    
     var type : CommandType = .unset
     var responseClass : Response.Type = AckResponse.self
     var sequenceId : UInt8 = 0

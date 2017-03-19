@@ -11,7 +11,7 @@ import Foundation
 //Parent class of Command, Response, and Update
 
 
-class Message {
+class Message : CustomStringConvertible {
     enum CommandType : UInt8 {
         case activate = 0x80
         case seed = 0x81
@@ -40,21 +40,16 @@ class Message {
         case c1 = 0xc1
         case c2 = 0xc2
         case unset = 0xff
-        func desc() -> String {
-            return String(describing: self).components(separatedBy: ".").last!
-        }
     }
+    
     enum LedPlatform : UInt8 {
         case all = 0
         case hex = 1
         case left = 2
         case right = 3
         case none = 0xFF
-        func desc() -> String {
-            return String(describing: self).components(separatedBy: ".").last!
-        }
     }
-    
+
     enum Sak : UInt8 {
         case mifareUltralight = 0x00
         case mifareTNP3xxx = 0x01
@@ -62,11 +57,12 @@ class Message {
         case mifareMini = 0x09
         case mifareClassic4k = 0x18
         case mifareDesFire = 0x20
-        case unknown = 0xFF //Not standard
-        func desc() -> String {
-            return String(describing: self).components(separatedBy: ".").last!
-        }
+        case unknown = 0xFF //Not standard}
     }
     
     static var archive = [UInt8 : Command]()
+    
+    var description : String {
+        return String(describing: type(of: self))
+    }
 }
