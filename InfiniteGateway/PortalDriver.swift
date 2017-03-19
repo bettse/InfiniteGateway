@@ -36,8 +36,56 @@ class PortalDriver : NSObject {
         NotificationCenter.default.addObserver(self, selector: #selector(PortalDriver.deviceDisconnected(_:)), name: NSNotification.Name(rawValue: "deviceDiscnnected"), object: nil)
         NotificationCenter.default.addObserver(self, selector: #selector(PortalDriver.incomingMessage(_:)), name: NSNotification.Name(rawValue: "incomingMessage"), object: nil)        
         
-        self.registerDeviceCallback("connected", callback: self.activatePortal)
-        self.registerResponseCallback("*", callback: self.logResponse)
+        self.registerDeviceCallback("connected") { () in
+            self.portal.outputCommand(ActivateCommand())
+        }
+            
+        self.registerResponseCallback("*") { (response) in
+            log.debug(response)
+        }
+        
+        self.registerResponseCallback("ActivateResponse") { (response) in
+            self.portal.outputCommand(PresenceCommand())
+        }
+        
+        self.registerResponseCallback("PresenceResponse") { (response) in
+            self.portal.outputCommand(LightSetCommand(ledPlatform: .all, color: NSColor.black))
+            if let response = response as? PresenceResponse {
+                for detail in response.details {
+                    self.presence[detail.nfcIndex] = detail
+                    self.portal.outputCommand(TagIdCommand(nfcIndex: detail.nfcIndex))
+                }
+            }
+        }
+
+        self.registerResponseCallback("TagIdResponse") { (response) in
+            if let response = response as? TagIdResponse {
+                let detail = self.presence[response.nfcIndex]
+                self.encryptedTokens[response.nfcIndex] = EncryptedToken(tagId: response.tagId)
+                if (detail?.sak == .mifareMini) {
+                    self.portal.outputCommand(ReadCommand(nfcIndex: response.nfcIndex, sectorNumber: 0, blockNumber: 0))
+                }
+            }
+        }
+        
+        self.registerResponseCallback("A4Response") { (response) in
+            self.portal.outputCommand(ReadCommand(command: response.command as! BlockCommand))
+        }
+
+        self.registerResponseCallback("StatusResponse") { (response) in
+            if let response = response as? StatusResponse {
+                self.incomingStatus(response)
+            }
+        }
+
+        self.registerResponseCallback("ReadResponse") { (response) in
+            if let response = response as? ReadResponse {
+                if (response.status == .success) {
+                    self.tokenRead(response)
+                }
+            }
+        }
+
         
         portalThread = Thread(target: self.portal, selector:#selector(Portal.initUsb), object: nil)
         if let thread = portalThread {
@@ -98,14 +146,6 @@ class PortalDriver : NSObject {
     
     // Start of "Business logic" //
     
-    func activatePortal() {
-        portal.outputCommand(ActivateCommand())
-    }
-    
-    func logResponse(response: Response) {
-        log.debug(response)
-    }
-    
     func incomingUpdate(_ update: Update) {
         var updateColor : NSColor = NSColor()
         if (update.direction == Update.Direction.arriving) {
@@ -127,30 +167,6 @@ class PortalDriver : NSObject {
     func incomingResponse(_ response: Response) {
         let responseName = String(describing: type(of: response))
         fireResponseCallbacks(event: responseName, response: response)
-        if let _ = response as? ActivateResponse {
-            portal.outputCommand(PresenceCommand())
-        } else if let response = response as? PresenceResponse {
-            portal.outputCommand(LightSetCommand(ledPlatform: .all, color: NSColor.black))
-            for detail in response.details {
-                presence[detail.nfcIndex] = detail
-                portal.outputCommand(TagIdCommand(nfcIndex: detail.nfcIndex))
-            }
-        } else if let response = response as? TagIdResponse {
-            let detail = presence[response.nfcIndex]
-            encryptedTokens[response.nfcIndex] = EncryptedToken(tagId: response.tagId)
-            if (detail?.sak == .mifareMini) {
-                portal.outputCommand(ReadCommand(nfcIndex: response.nfcIndex, sectorNumber: 0, blockNumber: 0))
-            }
-        } else if let response = response as? ReadResponse {
-            if (response.status == .success) {
-                tokenRead(response)
-            }
-        } else if let response = response as? A4Response {
-            portal.outputCommand(ReadCommand(command: response.command as! BlockCommand))
-        } else if let response = response as? StatusResponse { //StatuResponse must be last becuase it is a parent class of other classes
-            // Handle status responses by detecting their command type and acting on it
-            incomingStatus(response)
-        }
     }
     
     func incomingStatus(_ response: StatusResponse) {
