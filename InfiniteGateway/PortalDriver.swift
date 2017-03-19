@@ -104,43 +104,29 @@ class PortalDriver : NSObject {
     }
     
     func incomingResponse(_ response: Response) {
-        if let response = response as? AckResponse {
-            log.debug(response)
-        } else if let _ = response as? ActivateResponse {
-            log.debug(response)
+        if let _ = response as? ActivateResponse {
             portal.outputCommand(PresenceCommand())
         } else if let response = response as? PresenceResponse {
-            log.debug(response)
             portal.outputCommand(LightSetCommand(ledPlatform: .all, color: NSColor.black))
             for detail in response.details {
                 presence[detail.nfcIndex] = detail
                 portal.outputCommand(TagIdCommand(nfcIndex: detail.nfcIndex))
             }
         } else if let response = response as? TagIdResponse {
-            log.debug(response)
             let detail = presence[response.nfcIndex]
             encryptedTokens[response.nfcIndex] = EncryptedToken(tagId: response.tagId)
             if (detail?.sak == .mifareMini) {
                 portal.outputCommand(ReadCommand(nfcIndex: response.nfcIndex, sectorNumber: 0, blockNumber: 0))
             }
         } else if let response = response as? ReadResponse {
-            log.debug(response)
             if (response.status == .success) {
                 tokenRead(response)
             }
         } else if let response = response as? A4Response {
-            log.debug(response)
             portal.outputCommand(ReadCommand(command: response.command as! BlockCommand))
-        } else if let response = response as? B8Response {
-            log.debug(response)            
-        } else if let response = response as? B9Response {
-            log.debug(response)
         } else if let response = response as? StatusResponse { //StatuResponse must be last becuase it is a parent class of other classes
-            log.debug(response)
             // Handle status responses by detecting their command type and acting on it
             incomingStatus(response)
-        } else {
-            log.debug("Received \(response) for command \(response.command)")
         }
     }
     
@@ -185,24 +171,5 @@ class PortalDriver : NSObject {
                 incomingResponse(response)
             }
         }
-    }
-
-    func experiment() {
-        //self.portal.outputCommand(BeCommand(value: test))
-        //self.portal.outputCommand(C1Command(value: test))
-        //self.portal.outputCommand(C0Command())
-        //var test : UInt8 = 0
-        
-        /*
-        if #available(OSX 10.12, *) {
-            Timer.scheduledTimer(withTimeInterval: 1.0, repeats: true, block: { (timer) in
-                self.portal.outputCommand(B1Command(value1: 0x00, value2: test))
-                if test > 0x10 {
-                    timer.invalidate()
-                }
-                test = test + 1
-            })
-        }
-        */
     }
 }
