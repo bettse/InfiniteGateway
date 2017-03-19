@@ -12,6 +12,7 @@ import Cocoa
 //Handles initial activation, requestion more token data, notification about new tokens
 
 typealias tokenEvent = (Message.LedPlatform, Int, Token?) -> Void
+typealias deviceEvent = (Void) -> Void
 
 class PortalDriver : NSObject {
     static let magic : Data = "(c) Disney 2013".data(using: String.Encoding.ascii)!
@@ -23,15 +24,14 @@ class PortalDriver : NSObject {
     var presence : [UInt8:Detail] = [:]
     var encryptedTokens : [UInt8:EncryptedToken] = [:]
     
-    
     var tokenCallbacks : [String:[tokenEvent]] = [:]
-    var loadTokenCallbacks : [tokenEvent] = []
-    var leftTokenCallbacks : [tokenEvent] = []
+    var deviceCallbacks : [String:[deviceEvent]] = [:]
     
     override init() {
         super.init()
         
         NotificationCenter.default.addObserver(self, selector: #selector(PortalDriver.deviceConnected(_:)), name: NSNotification.Name(rawValue: "deviceConnected"), object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(PortalDriver.deviceDisconnected(_:)), name: NSNotification.Name(rawValue: "deviceDiscnnected"), object: nil)
         NotificationCenter.default.addObserver(self, selector: #selector(PortalDriver.incomingMessage(_:)), name: NSNotification.Name(rawValue: "incomingMessage"), object: nil)
         //NSNotificationCenter.defaultCenter().addObserver(self, selector: "deviceDisconnected:", name: "deviceDisconnected", object: nil)
         
@@ -41,13 +41,32 @@ class PortalDriver : NSObject {
         }
     }
     
-    func registerCallback(_ event: String, callback: @escaping tokenEvent) {
+    func registerTokenCallback(_ event: String, callback: @escaping tokenEvent) {
         tokenCallbacks[event] = tokenCallbacks[event] ?? []
         tokenCallbacks[event]?.append(callback)
+    }
+
+    func registerDeviceCallback(_ event: String, callback: @escaping deviceEvent) {
+        deviceCallbacks[event] = deviceCallbacks[event] ?? []
+        deviceCallbacks[event]?.append(callback)
     }
     
     func deviceConnected(_ notification: Notification) {
         portal.outputCommand(ActivateCommand())
+        
+        DispatchQueue.main.async(execute: {
+            for callback in self.deviceCallbacks["connected"] ?? [] {
+                callback()
+            }
+        })
+    }
+
+    func deviceDisconnected(_ notification: Notification) {
+        DispatchQueue.main.async(execute: {
+            for callback in self.deviceCallbacks["disconnected"] ?? [] {
+                callback()
+            }
+        })
     }
     
     func incomingUpdate(_ update: Update) {
@@ -62,7 +81,7 @@ class PortalDriver : NSObject {
             updateColor = NSColor.black
             presence.removeValue(forKey: update.nfcIndex)
             DispatchQueue.main.async(execute: {
-                for callback in self.tokenCallbacks["tokenLeft"] ?? [] {
+                for callback in self.tokenCallbacks["left"] ?? [] {
                     callback(update.ledPlatform, Int(update.nfcIndex), nil)
                 }
             })
@@ -127,7 +146,7 @@ class PortalDriver : NSObject {
                 if (token.decryptedToken != nil) {
                     portal.outputCommand(LightSetCommand(ledPlatform: ledPlatform, color: NSColor.green))
                     DispatchQueue.main.async(execute: {
-                        for callback in self.tokenCallbacks["tokenComplete"] ?? [] {
+                        for callback in self.tokenCallbacks["complete"] ?? [] {
                             callback(ledPlatform, Int(response.nfcIndex), token.decryptedToken!)
                         }
                     })

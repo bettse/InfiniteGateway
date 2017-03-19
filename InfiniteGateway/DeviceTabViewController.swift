@@ -24,17 +24,18 @@ class DeviceTabViewController: NSViewController {
         // Do any additional setup after loading the view.
         status?.stringValue = "Portal Disconnected"
         
-        NotificationCenter.default.addObserver(self, selector: #selector(DeviceTabViewController.deviceConnected(_:)), name: NSNotification.Name(rawValue: "deviceConnected"), object: nil)
-        NotificationCenter.default.addObserver(self, selector: #selector(DeviceTabViewController.deviceDisconnected(_:)), name: NSNotification.Name(rawValue: "deviceDisconnected"), object: nil)
+        portalDriver.registerDeviceCallback("connected", callback: self.deviceConnected)
+        portalDriver.registerDeviceCallback("disconnected", callback: self.deviceDisconnected)
         
-        portalDriver.registerCallback("tokenComplete", callback: self.tokenLoaded)
-        portalDriver.registerCallback("tokenLeft", callback: self.tokenLeft)
+        portalDriver.registerTokenCallback("loaded", callback: self.tokenComplete)
+        portalDriver.registerTokenCallback("complete", callback: self.tokenComplete)
+        portalDriver.registerTokenCallback("left", callback: self.tokenLeft)
         
         self.nfcTable?.doubleAction = #selector(DeviceTabViewController.tableViewDoubleAction)
         self.nfcTable?.target = self
     }
 
-    func tokenLoaded(_ ledPlatform: Message.LedPlatform, nfcIndex: Int, token: Token?) {
+    func tokenComplete(_ ledPlatform: Message.LedPlatform, nfcIndex: Int, token: Token?) {
         if let token = token {
             if (nfcIndex == -1) { //token from disk image
                 self.performSegue(withIdentifier: "TokenDetail", sender: token)
@@ -74,11 +75,11 @@ class DeviceTabViewController: NSViewController {
         self.performSegue(withIdentifier: "TokenDetail", sender: self)
     }
     
-    func deviceDisconnected(_ notification: Notification) {
+    func deviceDisconnected() {
         status?.stringValue = "Portal Disconnected"
     }
     
-    func deviceConnected(_ notification: Notification) {
+    func deviceConnected() {
         status?.stringValue = "Portal Connected"
     }
     
