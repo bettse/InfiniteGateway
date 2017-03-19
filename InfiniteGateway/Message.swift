@@ -11,8 +11,7 @@ import Foundation
 //Parent class of Command, Response, and Update
 
 
-//CustomStringConvertible make the 'description' method possible
-class Message : CustomStringConvertible {
+class Message {
     enum CommandType : UInt8 {
         case activate = 0x80
         case seed = 0x81
@@ -42,7 +41,7 @@ class Message : CustomStringConvertible {
         case c2 = 0xc2
         case unset = 0xff
         func desc() -> String {
-            return String(describing: self)
+            return String(describing: self).components(separatedBy: ".").last!
         }
     }
     enum LedPlatform : UInt8 {
@@ -52,7 +51,7 @@ class Message : CustomStringConvertible {
         case right = 3
         case none = 0xFF
         func desc() -> String {
-            return String(describing: self)
+            return String(describing: self).components(separatedBy: ".").last!
         }
     }
     
@@ -64,11 +63,10 @@ class Message : CustomStringConvertible {
         case mifareClassic4k = 0x18
         case mifareDesFire = 0x20
         case unknown = 0xFF //Not standard
+        func desc() -> String {
+            return String(describing: self).components(separatedBy: ".").last!
+        }
     }
     
-    static var archive = [UInt8: Message]()
-    
-    var description: String {
-        return String(describing: self)
-    }
+    static var archive = [UInt8 : Command]()
 }

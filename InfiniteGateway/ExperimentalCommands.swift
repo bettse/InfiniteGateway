@@ -51,11 +51,6 @@ class B8Command : Command {
         start.append(content)
         params = start
     }
-    
-    override var description: String {
-        let me = String(describing: type(of: self)).components(separatedBy: ".").last!
-        return "\(me)(\(type.desc()): \(params.toHexString()))"
-    }
 }
 
 
@@ -67,11 +62,6 @@ class B9Command : Command {
         responseClass = B9Response.self
         self.value = value
         params = Data(bytes: [value])
-    }
-    
-    override var description: String {
-        let me = String(describing: type(of: self)).components(separatedBy: ".").last!
-        return "\(me)(\(type.desc()): \(params.toHexString()))"
     }
 }
 
@@ -85,11 +75,6 @@ class BeCommand : Command {
         responseClass = StatusResponse.self
         self.value = value
         params = Data(bytes: [value])
-    }
-    
-    override var description: String {
-        let me = String(describing: type(of: self)).components(separatedBy: ".").last!
-        return "\(me)(\(type.desc()): \(params.toHexString()))"
     }
 }
 
@@ -109,11 +94,6 @@ class C1Command : Command {
         self.value = value
         params = Data(bytes: [value])
     }
-    
-    override var description: String {
-        let me = String(describing: type(of: self)).components(separatedBy: ".").last!
-        return "\(me)(\(type.desc()): \(params.toHexString()))"
-    }
 }
 
 class C2Command : Command {
@@ -123,10 +103,5 @@ class C2Command : Command {
         super.init(commandType: .c2)
         self.value = value
         params = Data(bytes: [UInt8](repeating: value, count: 17))
-    }
-    
-    override var description: String {
-        let me = String(describing: type(of: self)).components(separatedBy: ".").last!
-        return "\(me)(\(type.desc()): \(params.toHexString()))"
     }
 }

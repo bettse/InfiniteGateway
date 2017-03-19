@@ -43,9 +43,4 @@ class Update : Message {
             log.warning("Unknown sak: \(rawSak)")
         }
     }
-    
-    override var description: String {
-        let me = String(describing: type(of: self)).components(separatedBy: ".").last!
-        return "\(me)(#\(nfcIndex) [\(sak)] on \(ledPlatform.desc()) Platform is \(direction.desc()))"
-    }
 }

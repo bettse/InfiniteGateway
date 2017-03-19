@@ -49,12 +49,7 @@ class Command : Message {
         sequenceId = data[sequenceIdIndex]
         params = data.subdata(in: paramsIndex..<data.count)
     }
-    
-    override var description: String {
-        let me = String(describing: type(of: self)).components(separatedBy: ".").last!
-        return "\(me)(\(type.desc()))"
-    }
-    
+
     func serialize() -> Data {
         var data = Data()
         data.append(Data([type.rawValue]))

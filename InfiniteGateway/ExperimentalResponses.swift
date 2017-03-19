@@ -8,12 +8,7 @@
 
 import Foundation
 
-class A4Response : StatusResponse {    
-    override var description: String {
-        let me = String(describing: type(of: self)).components(separatedBy: ".").last!
-        return "\(me)(\(status) \(params.toHexString()))"
-    }
-}
+class A4Response : StatusResponse {}
 
 class B8Response : Response {
     var value : UInt8  {
@@ -23,11 +18,6 @@ class B8Response : Response {
             }
             return 0
         }
-    }
-    
-    override var description: String {
-        let me = String(describing: type(of: self)).components(separatedBy: ".").last!
-        return "\(me)[\(command.params.toHexString()): \(params.toHexString())]"
     }
 }
 
@@ -40,10 +30,5 @@ class B9Response : Response {
             }
             return 0
         }
-    }
-    
-    override var description: String {
-        let me = String(describing: type(of: self)).components(separatedBy: ".").last!
-        return "\(me)[\(command.params.toHexString()): \(params.toHexString())]"
     }
 }

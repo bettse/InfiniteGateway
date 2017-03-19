@@ -27,8 +27,7 @@ class Response : Message {
     
     var command : Command {
         get {
-            let baseCommand = (Message.archive[sequenceId] as! Command)
-            return baseCommand
+            return Message.archive[sequenceId]!
         }
     }
     
@@ -38,21 +37,17 @@ class Response : Message {
         }
     }
     
+    static func parse(_ data: Data) -> Response {
+        let sequenceIdIndex = 0
+        let command = Message.archive[data[sequenceIdIndex]]!
+        let responseClass : Response.Type = command.responseClass
+        return responseClass.init(data: data)
+    }
+    
     required init(data: Data) {
         self.params = data.subdata(in: paramsIndex..<data.count)
         super.init()
         sequenceId = data[sequenceIdIndex]        
-    }
-    
-    static func parse(_ data: Data) -> Response {
-        let r : Response = Response(data: data)
-        let responseClass : Response.Type = r.command.responseClass
-        return responseClass.init(data: data)
-    }
-    
-    override var description: String {
-        let me = String(describing: type(of: self)).components(separatedBy: ".").last!
-        return "\(me)(\(type.desc()): \(params.toHexString()))"
     }
 }
 
@@ -66,19 +61,9 @@ class StatusResponse : Response {
         status = Status(rawValue: data[statusIndex]) ?? .unknown
         super.init(data: data)
     }
-    
-    override var description: String {
-        let me = String(describing: type(of: self)).components(separatedBy: ".").last!
-        return "\(me)(\(command): \(status))"
-    }
 }
 
-class ActivateResponse : Response {
-    override var description: String {
-        let me = String(describing: type(of: self)).components(separatedBy: ".").last!
-        return "\(me)(\(params.toHexString()))"
-    }
-}
+class ActivateResponse : Response {}
 
 class TagIdResponse : StatusResponse {
     let tagIdIndex = 2
@@ -96,11 +81,6 @@ class TagIdResponse : StatusResponse {
     required init(data: Data) {        
         tagId = data.subdata(in: tagIdIndex..<data.count)
         super.init(data: data)
-    }
-
-    override var description: String {
-        let me = String(describing: type(of: self)).components(separatedBy: ".").last!
-        return "\(me)(NFC #\(nfcIndex): \(tagId.toHexString()))"
     }
 }
 
@@ -126,13 +106,7 @@ class PresenceResponse : Response {
             let nfc = params[i+nfcIndexOffset].low_nibble
             let sak : Sak = Sak(rawValue: params[i+sakOffset]) ?? .unknown
             details.append(Detail(nfcIndex: nfc, platform: led, sak: sak))
-        }
-        
-    }
-    
-    override var description: String {
-        let me = String(describing: type(of: self)).components(separatedBy: ".").last!
-        return "\(me)(\(details))"
+        }        
     }
 }
 
@@ -172,15 +146,6 @@ class ReadResponse : StatusResponse {
             blockData = data.subdata(in: blockDataIndex..<data.count)
         }
     }
-    
-    override var description: String {
-        let me = String(describing: type(of: self)).components(separatedBy: ".").last!
-        if (status == .success) {
-            return "\(me)(index \(nfcIndex) sector \(sectorNumber) block \(blockNumber): \(blockData.toHexString()))"
-        } else {
-            return "\(me)(index \(nfcIndex) sector \(sectorNumber) block \(blockNumber): Error: \(status))"
-        }
-    }
 }
 
 //Contains next scrambled value in PRNG
@@ -210,11 +175,6 @@ class NextResponse : Response {
             mask = mask >> 1;
         }
         return result;
-    }
-    
-    override var description: String {
-        let me = String(describing: type(of: self)).components(separatedBy: ".").last!
-        return "\(me): 0x\(String(value, radix:0x10))"
     }
 }
 
