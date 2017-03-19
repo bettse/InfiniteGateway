@@ -27,8 +27,8 @@ class DeviceTabViewController: NSViewController {
         NotificationCenter.default.addObserver(self, selector: #selector(DeviceTabViewController.deviceConnected(_:)), name: NSNotification.Name(rawValue: "deviceConnected"), object: nil)
         NotificationCenter.default.addObserver(self, selector: #selector(DeviceTabViewController.deviceDisconnected(_:)), name: NSNotification.Name(rawValue: "deviceDisconnected"), object: nil)
         
-        portalDriver.registerTokenLoaded(self.tokenLoaded)
-        portalDriver.registerTokenLeft(self.tokenLeft)
+        portalDriver.registerCallback("tokenComplete", callback: self.tokenLoaded)
+        portalDriver.registerCallback("tokenLeft", callback: self.tokenLeft)
         
         self.nfcTable?.doubleAction = #selector(DeviceTabViewController.tableViewDoubleAction)
         self.nfcTable?.target = self

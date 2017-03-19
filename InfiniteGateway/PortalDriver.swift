@@ -20,11 +20,11 @@ class PortalDriver : NSObject {
     var portalThread : Thread?
     var portal : Portal = Portal.singleton
     
-    var presence = Dictionary<UInt8, Detail>()
+    var presence : [UInt8:Detail] = [:]
     var encryptedTokens : [UInt8:EncryptedToken] = [:]
     
     
-    //var callbacks : Dictionary<String, tokenEvent> = [:]
+    var tokenCallbacks : [String:[tokenEvent]] = [:]
     var loadTokenCallbacks : [tokenEvent] = []
     var leftTokenCallbacks : [tokenEvent] = []
     
@@ -41,13 +41,11 @@ class PortalDriver : NSObject {
         }
     }
     
-    func registerTokenLoaded(_ callback: @escaping tokenEvent) {
-        loadTokenCallbacks.append(callback)
+    func registerCallback(_ event: String, callback: @escaping tokenEvent) {
+        tokenCallbacks[event] = tokenCallbacks[event] ?? []
+        tokenCallbacks[event]?.append(callback)
     }
-    func registerTokenLeft(_ callback: @escaping tokenEvent) {
-        leftTokenCallbacks.append(callback)
-    }
-
+    
     func deviceConnected(_ notification: Notification) {
         portal.outputCommand(ActivateCommand())
     }
@@ -64,7 +62,7 @@ class PortalDriver : NSObject {
             updateColor = NSColor.black
             presence.removeValue(forKey: update.nfcIndex)
             DispatchQueue.main.async(execute: {
-                for callback in self.leftTokenCallbacks {
+                for callback in self.tokenCallbacks["tokenLeft"] ?? [] {
                     callback(update.ledPlatform, Int(update.nfcIndex), nil)
                 }
             })
@@ -129,7 +127,7 @@ class PortalDriver : NSObject {
                 if (token.decryptedToken != nil) {
                     portal.outputCommand(LightSetCommand(ledPlatform: ledPlatform, color: NSColor.green))
                     DispatchQueue.main.async(execute: {
-                        for callback in self.loadTokenCallbacks {
+                        for callback in self.tokenCallbacks["tokenComplete"] ?? [] {
                             callback(ledPlatform, Int(response.nfcIndex), token.decryptedToken!)
                         }
                     })
