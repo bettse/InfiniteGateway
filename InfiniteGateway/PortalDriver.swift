@@ -222,27 +222,29 @@ class PortalDriver : NSObject {
     }
 
     func tokenRead(_ response: ReadResponse) {
-        if let token = encryptedTokens[response.nfcIndex] {
-            token.load(response.blockNumber, blockData: response.blockData)
-            if (token.complete()) {
-                let ledPlatform = presence[response.nfcIndex]?.platform ?? .none
-                if (token.decryptedToken != nil) {
-                    portal.outputCommand(LightSetCommand(ledPlatform: ledPlatform, color: NSColor.green))
-                    DispatchQueue.main.async(execute: {
-                        for callback in self.tokenCallbacks["complete"] ?? [] {
-                            callback(ledPlatform, Int(response.nfcIndex), token.decryptedToken!)
-                        }
-                    })
-                } else {
-                    portal.outputCommand(LightSetCommand(ledPlatform: ledPlatform, color: NSColor.red))
-                }
-
-                encryptedTokens.removeValue(forKey: response.nfcIndex)
-            } else {
-                let nextBlock = token.nextBlock()
-                portal.outputCommand(ReadCommand(nfcIndex: response.nfcIndex, sectorNumber: 0, blockNumber: nextBlock))
+        guard let token = encryptedTokens[response.nfcIndex] else {
+            log.warning("Could not find partial encryptedToken for nfcIndex \(response.nfcIndex)")
+            return
+        }
+        token.load(response.blockNumber, blockData: response.blockData)
+        if (token.complete()) {
+            guard let detail = presence[response.nfcIndex] else {
+                log.warning("Could not retrieve detail for token")
+                return
             }
-        } //end if token
+            guard let completeToken = token.decryptedToken else {
+                log.warning("Could not decrypt token")
+                portal.outputCommand(LightSetCommand(ledPlatform: detail.platform, color: NSColor.red))
+                return
+            }
+            portal.outputCommand(LightSetCommand(ledPlatform: detail.platform, color: NSColor.green))
+            fireTokenCallbacks(event: "complete", detail: detail, token: completeToken)
+            encryptedTokens.removeValue(forKey: response.nfcIndex)
+        } else {
+            let nextBlock = token.nextBlock()
+            portal.outputCommand(ReadCommand(nfcIndex: response.nfcIndex, sectorNumber: 0, blockNumber: nextBlock))
+        }
+    
     }
     
     func incomingMessage(_ notification: Notification) {
