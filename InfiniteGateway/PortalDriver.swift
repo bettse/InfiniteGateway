@@ -95,15 +95,12 @@ class PortalDriver : NSObject {
     }
     
     func deviceConnected(_ notification: Notification) {
-        
-        
         fireDeviceCallbacks(event: "connected")
     }
 
     func deviceDisconnected(_ notification: Notification) {
         fireDeviceCallbacks(event: "disconnected")
     }
-    
     
     // Start of "Business logic" //
     
@@ -118,22 +115,32 @@ class PortalDriver : NSObject {
         
         self.registerResponseCallback("PresenceResponse") { (response) in
             self.portal.outputCommand(LightSetCommand(ledPlatform: .all, color: NSColor.black))
-            if let response = response as? PresenceResponse {
-                for detail in response.details {
-                    self.presence[detail.nfcIndex] = detail
-                    self.portal.outputCommand(TagIdCommand(nfcIndex: detail.nfcIndex))
-                }
+            guard let response = response as? PresenceResponse else {
+                log.error("Couldn't cast response to expected type")
+                return
+            }
+            for detail in response.details {
+                self.presence[detail.nfcIndex] = detail
+                self.portal.outputCommand(TagIdCommand(nfcIndex: detail.nfcIndex))
             }
         }
         
         self.registerResponseCallback("TagIdResponse") { (response) in
-            if let response = response as? TagIdResponse {
-                let detail = self.presence[response.nfcIndex]
-                self.encryptedTokens[response.nfcIndex] = EncryptedToken(tagId: response.tagId)
-                if (detail?.sak == .mifareMini) {
-                    self.portal.outputCommand(ReadCommand(nfcIndex: response.nfcIndex, sectorNumber: 0, blockNumber: 0))
-                }
+            guard let response = response as? TagIdResponse else {
+                log.error("Couldn't cast response to expected type")
+                return
             }
+            
+            self.portal.outputCommand(A6Command(nfcIndex: response.nfcIndex, sectorNumber: 0, blockNumber: 5, contents: Data([0xa6, 0xa6, 0xa6, 0xa6])))
+
+            
+            return
+            let detail = self.presence[response.nfcIndex]
+            self.encryptedTokens[response.nfcIndex] = EncryptedToken(tagId: response.tagId)
+            if (detail?.sak == .mifareMini) {
+                self.portal.outputCommand(ReadCommand(nfcIndex: response.nfcIndex, sectorNumber: 0, blockNumber: 0))
+            }
+
         }
         
         self.registerResponseCallback("A4Response") { (response) in
@@ -141,21 +148,33 @@ class PortalDriver : NSObject {
         }
         
         self.registerResponseCallback("StatusResponse") { (response) in
-            if let response = response as? StatusResponse {
-                self.incomingStatus(response)
+            guard let response = response as? StatusResponse else {
+                log.error("Couldn't cast response to expected type")
+                return
             }
+            if let command = response.command as? A5Command {
+                self.portal.outputCommand(A4Command(command: command))
+            } else if let command = response.command as? A6Command {
+                self.portal.outputCommand(A4Command(command: command))
+            } else if let command = response.command as? A7Command {
+                self.portal.outputCommand(A4Command(command: command))
+            } else if let _ = response.command as? C1Command {
+                self.portal.outputCommand(C0Command())
+            }
+
         }
         
         self.registerResponseCallback("ReadResponse") { (response) in
-            if let response = response as? ReadResponse {
-                if (response.status == .success) {
-                    self.tokenRead(response)
-                }
+            guard let response = response as? ReadResponse else {
+                log.error("Couldn't cast response to expected type")
+                return
+            }
+
+            if (response.status == .success) {
+                self.tokenRead(response)
             }
         }
-
     }
-
     
     func incomingUpdate(_ update: Update) {
         log.debug(update)
@@ -174,14 +193,6 @@ class PortalDriver : NSObject {
             }
         }        
         portal.outputCommand(LightSetCommand(ledPlatform: update.ledPlatform, color: updateColor))
-    }
-    
-    func incomingStatus(_ response: StatusResponse) {
-        if let command = response.command as? A5Command {
-            portal.outputCommand(A4Command(command: command))
-        } else if let _ = response.command as? C1Command {
-            self.portal.outputCommand(C0Command())
-        }
     }
 
     func tokenRead(_ response: ReadResponse) {

@@ -109,6 +109,11 @@ class BlockCommand : Command {
     var sectorNumber : UInt8
     var blockNumber : UInt8
     
+    override var description : String {
+        let me = String(describing: type(of: self))
+        return "\(me)(nfcIndex: \(nfcIndex), sectorNumber: \(sectorNumber), blockNumber: \(blockNumber))"
+    }
+    
     init(nfcIndex: UInt8, sectorNumber: UInt8, blockNumber: UInt8) {
         self.nfcIndex = nfcIndex
         self.sectorNumber = sectorNumber

@@ -160,6 +160,11 @@ class ReadResponse : StatusResponse {
         }
     }
     
+    override var description : String {
+        let me = String(describing: type(of: self))
+        return "\(me)(\(blockData.toHexString())) for \(command)"
+    }
+    
     required init(data: Data) {
         super.init(data: data)
         if (status == .success) {

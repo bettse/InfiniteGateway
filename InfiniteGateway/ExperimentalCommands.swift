@@ -26,6 +26,14 @@ class A5Command : BlockCommand {
     }
 }
 
+class A6Command : A5Command {
+
+}
+
+class A7Command : A5Command {
+    
+}
+
 class B1Command : Command {
     var nfcIndex : UInt8 = 0
     var sectorNumber : UInt8 = 0
