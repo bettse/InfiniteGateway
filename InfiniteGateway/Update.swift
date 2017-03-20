@@ -30,6 +30,11 @@ class Update : Message {
     var direction : Direction = .unknown
     var detail : Detail
     
+    override var description : String {
+        let me = String(describing: type(of: self))
+        return "\(me)(nfcIndex: \(nfcIndex), sak: \(sak), ledPlatform: \(ledPlatform), direction: \(direction))"
+    }
+    
     init(data: Data) {
         ledPlatform = Message.LedPlatform(rawValue: data[ledPlatformIndex]) ?? .none
         sak = Message.Sak(rawValue: data[sakIndex]) ?? .unknown
