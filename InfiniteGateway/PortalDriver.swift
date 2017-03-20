@@ -41,6 +41,10 @@ class PortalDriver : NSObject {
             self.portal.outputCommand(ActivateCommand())
         }
         
+        self.registerTokenCallback("loaded") { (platform, nfcIndex, token) in
+            self.portal.outputCommand(TagIdCommand(nfcIndex: UInt8(nfcIndex)))
+        }
+        
         self.registerDeviceCallback("disconnected") { () in
             self.responseCallbacks.removeAll()
         }
@@ -182,16 +186,20 @@ class PortalDriver : NSObject {
     
     func incomingUpdate(_ update: Update) {
         log.debug(update)
-        if (update.direction == Update.Direction.arriving) {
+        switch (update.direction) {
+        case .arriving:
             let detail = Detail(nfcIndex: update.nfcIndex, platform: update.ledPlatform, sak: update.sak)
             presence[update.nfcIndex] = detail
-            portal.outputCommand(TagIdCommand(nfcIndex: update.nfcIndex))
             fireTokenCallbacks(event: "loaded", detail: detail, token: nil)
-        } else if (update.direction == Update.Direction.departing) {
-            if let detail = presence[update.nfcIndex] {
-                fireTokenCallbacks(event: "left", detail: detail, token: nil)
-                presence.removeValue(forKey: update.nfcIndex)
+        case .departing:
+            guard let detail = presence[update.nfcIndex] else {
+                log.warning("Could not find record for that nfcIndex")
+                return
             }
+            fireTokenCallbacks(event: "left", detail: detail, token: nil)
+            presence.removeValue(forKey: update.nfcIndex)
+        default:
+            log.warning("Somehow we have an update that is neither arriving, nor departing")
         }
         
         let tokensOnPlatform = presence.values.filter { (detail) -> Bool in return (detail.platform == update.ledPlatform) }
