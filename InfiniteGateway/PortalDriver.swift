@@ -130,7 +130,7 @@ class PortalDriver : NSObject {
                 log.error("Couldn't cast response to expected type")
                 return
             }
-
+            
             let detail = self.presence[response.nfcIndex]
             self.encryptedTokens[response.nfcIndex] = EncryptedToken(tagId: response.tagId)
             if (detail?.sak == .mifareMini) {
@@ -153,6 +153,11 @@ class PortalDriver : NSObject {
                 self.portal.outputCommand(A4Command(command: command))
             } else if let command = response.command as? A7Command {
                 self.portal.outputCommand(A4Command(command: command))
+            } else if let command = response.command as? B1Command {
+                let sectorNumber = command.sectorNumber + 1
+                if (Int(sectorNumber) < MifareMini.sectorCount) {
+                    self.portal.outputCommand(B1Command(nfcIndex: command.nfcIndex, sectorNumber: sectorNumber))
+                }
             } else if let _ = response.command as? C1Command {
                 self.portal.outputCommand(C0Command())
             }
