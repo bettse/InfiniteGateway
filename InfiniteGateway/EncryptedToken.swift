@@ -76,7 +76,7 @@ class EncryptedToken : MifareMini {
     }
 
     func skipEncryption(_ blockNumber: Int, blockData: Data) -> Bool {
-        return (blockNumber == 0 || blockNumber == 18 || sectorTrailer(blockNumber) || (blockData == emptyBlock))
+        return (blockNumber == 0 || blockNumber == 18 || sectorTrailer(blockNumber) || (blockData == MifareMini.emptyBlock))
     }
     
     //Each block is encrypted with a 128-bit AES key (ECB) unique to that figure.

@@ -130,17 +130,12 @@ class PortalDriver : NSObject {
                 log.error("Couldn't cast response to expected type")
                 return
             }
-            
-            self.portal.outputCommand(A6Command(nfcIndex: response.nfcIndex, sectorNumber: 0, blockNumber: 5, contents: Data([0xa6, 0xa6, 0xa6, 0xa6])))
 
-            
-            return
             let detail = self.presence[response.nfcIndex]
             self.encryptedTokens[response.nfcIndex] = EncryptedToken(tagId: response.tagId)
             if (detail?.sak == .mifareMini) {
                 self.portal.outputCommand(ReadCommand(nfcIndex: response.nfcIndex, sectorNumber: 0, blockNumber: 0))
             }
-
         }
         
         self.registerResponseCallback("A4Response") { (response) in

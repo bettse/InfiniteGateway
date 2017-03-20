@@ -14,9 +14,9 @@ class MifareMini {
     static let blockCount : Int = sectorSize * sectorCount
     static let blockSize : Int = 0x10
     static let tokenSize : Int = blockSize * blockCount
+    static let emptyBlock = Data(bytes: ([UInt8](repeating: 0, count: Int(MifareMini.blockSize))))
     
     let sector_trailor = Data(bytes: [0, 0, 0, 0, 0, 0, 0x77, 0x87, 0x88, 0, 0, 0, 0, 0, 0, 0])
-    let emptyBlock = Data(bytes: ([UInt8](repeating: 0, count: Int(MifareMini.blockSize))), count: Int(MifareMini.blockSize))
     
     var tagId : Data
     var data : Data = Data()

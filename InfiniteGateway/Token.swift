@@ -300,7 +300,7 @@ class Token : MifareMini, CustomStringConvertible {
 
         //Fill with zeros
         while !self.complete() {
-            self.load(self.nextBlock(), blockData: emptyBlock)
+            self.load(self.nextBlock(), blockData: MifareMini.emptyBlock)
         }
         
         //Setters for known values
