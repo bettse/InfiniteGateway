@@ -156,7 +156,11 @@ class PortalDriver : NSObject {
             } else if let _ = response.command as? C1Command {
                 self.portal.outputCommand(C0Command())
             }
-
+        }
+        
+        self.registerResponseCallback("WriteResponse") { (response) in
+            // Read back written block
+            self.portal.outputCommand(ReadCommand(command: response.command as! BlockCommand))
         }
         
         self.registerResponseCallback("ReadResponse") { (response) in
