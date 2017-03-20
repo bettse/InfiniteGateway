@@ -271,6 +271,7 @@ class ThePoster {
         3000193 : "Ultimate Falcon",
         3000200 : "Tomorrowland Time Bomb",
         3000206 : "Galactic Team-Up: Mace Windu",
+        3000226 : "Darkhawk's Blast",
         3000231 : "Kingdom Hearts Mickey",
         //MARK- Hex powerdisks
         4000018 : "Mickey's Car",
