@@ -118,7 +118,7 @@ class BlockCommand : Command {
         self.nfcIndex = nfcIndex
         self.sectorNumber = sectorNumber
         self.blockNumber = blockNumber
-        super.init(commandType: .read)
+        super.init(commandType: .unset)
         params = Data(bytes: [nfcIndex, sectorNumber, blockNumber])
     }
     
@@ -150,8 +150,10 @@ class WriteCommand : BlockCommand {
         self.blockData = blockData
         super.init(nfcIndex: nfcIndex, sectorNumber: sectorNumber, blockNumber: blockNumber)
         responseClass = StatusResponse.self
-        self.type = .read
-        
+        self.type = .write
+        if (blockData.count != MifareMini.blockSize) {
+            log.warning("Write command with only \(blockData.count) bytes, expected \(MifareMini.blockSize)")
+        }
         //Params set to [nfcIndex, sectorNumber, blockNumber] by parent class
         params.append(blockData)
     }
