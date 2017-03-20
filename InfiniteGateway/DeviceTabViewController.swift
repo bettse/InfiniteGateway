@@ -24,8 +24,17 @@ class DeviceTabViewController: NSViewController {
         // Do any additional setup after loading the view.
         status?.stringValue = "Portal Disconnected"
         
-        portalDriver.registerDeviceCallback("connected", callback: self.deviceConnected)
-        portalDriver.registerDeviceCallback("disconnected", callback: self.deviceDisconnected)
+        portalDriver.registerDeviceCallback("ready") { () in
+            self.status?.stringValue = "Portal Ready"
+        }
+        
+        portalDriver.registerDeviceCallback("connected") { () in
+            self.status?.stringValue = "Portal Connected"
+        }
+        
+        portalDriver.registerDeviceCallback("disconnected") { () in
+            self.status?.stringValue = "Portal Disconnected"
+        }
         
         portalDriver.registerTokenCallback("complete", callback: self.tokenComplete)
         portalDriver.registerTokenCallback("left", callback: self.tokenLeft)
@@ -33,17 +42,27 @@ class DeviceTabViewController: NSViewController {
         self.nfcTable?.doubleAction = #selector(DeviceTabViewController.tableViewDoubleAction)
         self.nfcTable?.target = self
     }
-
+    
     func tokenComplete(_ ledPlatform: Message.LedPlatform, nfcIndex: Int, token: Token?) {
         if let token = token {
             if (nfcIndex == -1) { //token from disk image
                 self.performSegue(withIdentifier: "TokenDetail", sender: token)
             } else {
-                nfcMap[Int(nfcIndex)] = token
+                nfcMap[nfcIndex] = token
             }
             if let table = nfcTable {
                 table.reloadData()
             }
+        }
+    }
+    
+    func tokenLeft(_ ledPlatform: Message.LedPlatform, nfcIndex: Int, token: Token?) {
+        if (nfcMap.keys.contains(nfcIndex)) {
+            nfcMap.removeValue(forKey: nfcIndex)
+        }
+        
+        if let table = nfcTable {
+            table.reloadData()
         }
     }
     
@@ -73,24 +92,7 @@ class DeviceTabViewController: NSViewController {
     func tableViewDoubleAction() {
         self.performSegue(withIdentifier: "TokenDetail", sender: self)
     }
-    
-    func deviceDisconnected() {
-        status?.stringValue = "Portal Disconnected"
-    }
-    
-    func deviceConnected() {
-        status?.stringValue = "Portal Connected"
-    }
-    
-    func tokenLeft(_ ledPlatform: Message.LedPlatform, nfcIndex: Int, token: Token?) {
-        if (nfcMap.keys.contains(nfcIndex)) {
-            nfcMap.removeValue(forKey: nfcIndex)
-        }
 
-        if let table = nfcTable {
-            table.reloadData()
-        }
-    }
 }
 
 

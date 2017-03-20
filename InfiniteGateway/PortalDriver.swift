@@ -131,6 +131,7 @@ class PortalDriver : NSObject {
         }
         
         self.registerResponseCallback("ActivateResponse") { (response) in
+            self.fireDeviceCallbacks(event: "ready")
             self.portal.outputCommand(PresenceCommand())
         }
         
