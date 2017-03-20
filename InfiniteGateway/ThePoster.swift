@@ -272,6 +272,10 @@ class ThePoster {
         3000200 : "Tomorrowland Time Bomb",
         3000206 : "Galactic Team-Up: Mace Windu",
         3000226 : "Darkhawk's Blast",
+        3000222 : "Officer Wilde",
+        3000223 : "Meter Maid Judy",
+        3000227 : "Cosmic Cube Blast",
+        3000230 : "Nova Corps Strike",
         3000231 : "Kingdom Hearts Mickey",
         //MARK- Hex powerdisks
         4000018 : "Mickey's Car",
@@ -391,5 +395,8 @@ class ThePoster {
         4000213 : "Nash",
         4000214 : "Butch",
         4000215 : "Ramsey",
+        4000220 : "Stars Over Sahara Square",
+        4000221 : "Sahara Square Sands",
+        4000224 : "Ghost Rider's Motorcycle",
     ]
 }
