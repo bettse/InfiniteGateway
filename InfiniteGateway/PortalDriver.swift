@@ -42,7 +42,24 @@ class PortalDriver : NSObject {
         }
         
         self.registerTokenCallback("loaded") { (platform, nfcIndex, token) in
-            self.portal.outputCommand(TagIdCommand(nfcIndex: UInt8(nfcIndex)))
+            let tokensOnPlatform = self.presence.values.filter { (detail) -> Bool in return (detail.platform == platform) }
+            
+            if (tokensOnPlatform.count == 1) {
+                self.portal.outputCommand(LightSetCommand(ledPlatform: platform, color: NSColor.white))
+            }
+            
+            if (tokensOnPlatform.count < 4) {
+                self.portal.outputCommand(TagIdCommand(nfcIndex: UInt8(nfcIndex)))
+            } else {
+                log.warning("Too many tokens on platform \(platform)")
+            }
+        }
+        
+        self.registerTokenCallback("left") { (platform, nfcIndex, token) in
+            let tokensOnPlatform = self.presence.values.filter { (detail) -> Bool in return (detail.platform == platform) }
+            if (tokensOnPlatform.isEmpty) {
+                self.portal.outputCommand(LightSetCommand(ledPlatform: platform, color: NSColor.black))
+            }
         }
         
         self.registerDeviceCallback("disconnected") { () in
@@ -202,14 +219,6 @@ class PortalDriver : NSObject {
             log.warning("Somehow we have an update that is neither arriving, nor departing")
         }
         
-        let tokensOnPlatform = presence.values.filter { (detail) -> Bool in return (detail.platform == update.ledPlatform) }
-        
-        if (tokensOnPlatform.isEmpty) {
-            portal.outputCommand(LightSetCommand(ledPlatform: update.ledPlatform, color: NSColor.black))
-        } else if (tokensOnPlatform.count == 1 && update.direction == .arriving) {
-            // We must have just added this one
-            portal.outputCommand(LightSetCommand(ledPlatform: update.ledPlatform, color: NSColor.white))
-        }
     }
 
     func tokenRead(_ response: ReadResponse) {
