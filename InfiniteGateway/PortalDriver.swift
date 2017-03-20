@@ -177,21 +177,26 @@ class PortalDriver : NSObject {
     
     func incomingUpdate(_ update: Update) {
         log.debug(update)
-        var updateColor : NSColor = NSColor()
         if (update.direction == Update.Direction.arriving) {
-            updateColor = NSColor.white
             let detail = Detail(nfcIndex: update.nfcIndex, platform: update.ledPlatform, sak: update.sak)
             presence[update.nfcIndex] = detail
             portal.outputCommand(TagIdCommand(nfcIndex: update.nfcIndex))
             fireTokenCallbacks(event: "loaded", detail: detail, token: nil)
         } else if (update.direction == Update.Direction.departing) {
-            updateColor = NSColor.black
             if let detail = presence[update.nfcIndex] {
                 fireTokenCallbacks(event: "left", detail: detail, token: nil)
                 presence.removeValue(forKey: update.nfcIndex)
             }
-        }        
-        portal.outputCommand(LightSetCommand(ledPlatform: update.ledPlatform, color: updateColor))
+        }
+        
+        let tokensOnPlatform = presence.values.filter { (detail) -> Bool in return (detail.platform == update.ledPlatform) }
+        
+        if (tokensOnPlatform.isEmpty) {
+            portal.outputCommand(LightSetCommand(ledPlatform: update.ledPlatform, color: NSColor.black))
+        } else if (tokensOnPlatform.count == 1 && update.direction == .arriving) {
+            // We must have just added this one
+            portal.outputCommand(LightSetCommand(ledPlatform: update.ledPlatform, color: NSColor.white))
+        }
     }
 
     func tokenRead(_ response: ReadResponse) {
